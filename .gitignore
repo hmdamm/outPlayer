@@ -1,0 +1,50 @@
+# Build & Output Directories
+build/
+bin/
+out/
+cmake-build-*/
+.ninja*
+*.ninja*
+compile_commands.json
+
+# Compiler & Object Artifacts
+*.o
+*.obj
+*.a
+*.so
+*.so.*
+*.dylib
+*.dll
+*.exe
+
+# Cache & Tooling Directories
+.cache/
+.clangd/
+.vscode/
+.idea/
+*.swp
+*~
+
+# Superpowers Workflow Directory
+.superpowers/
+.superpowers
+
+# External Reference Checkouts
+mpv/
+mpv-examples/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+
+# Temporary Test Media & Artifacts
+tests/media/temp_*
+*.raw
+*.yuv
+*.log
+*.core
+*.coredump
+
+# OS Artifacts
+Thumbs.db
+.DS_Store
