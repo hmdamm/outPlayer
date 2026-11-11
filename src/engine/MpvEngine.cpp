@@ -65,7 +65,7 @@ void MpvEngine::onMpvWakeup(void* ctx)
     if (!self) {
         return;
     }
-    QMetaObject::invokeMethod(self, "handleMpvEvents", Qt::QueuedConnection);
+    QMetaObject::invokeMethod(self, &MpvEngine::handleMpvEvents, Qt::QueuedConnection);
 }
 
 void MpvEngine::handleMpvEvents()

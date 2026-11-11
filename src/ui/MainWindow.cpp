@@ -7,7 +7,7 @@ namespace outplayer::ui {
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
-    , m_engine(std::make_unique<engine::MpvEngine>(this))
+    , m_engine(std::make_unique<engine::MpvEngine>())
 {
     m_engine->initialize();
 

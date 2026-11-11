@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
                              &app, &QCoreApplication::quit);
         }
         // Fallback timer ensuring prompt non-hanging exit under headless test environments
-        QTimer::singleShot(1000, &app, &QCoreApplication::quit);
+        QTimer::singleShot(5000, &app, &QCoreApplication::quit);
     }
 
     return app.exec();
