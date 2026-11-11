@@ -44,5 +44,42 @@ def test_task1():
 
     print("Task 1 spec verification passed.")
 
+def test_task2():
+    import csv
+    csv_path = "docs/spec/features.csv"
+    assert os.path.exists(csv_path), "features.csv missing"
+
+    with open(csv_path, "r", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        required_columns = ["id", "area", "feature", "path_or_hotkey", "default_value", "observed_behavior", "evidence_ref", "status"]
+        assert reader.fieldnames == required_columns, f"Invalid columns: {reader.fieldnames} != {required_columns}"
+        rows = list(reader)
+
+    assert len(rows) >= 150, f"Expected at least 150 rows, got {len(rows)}"
+
+    required_areas = {
+        "Open", "Play", "Subtitles", "Video", "Audio", "Filters",
+        "Bookmarks", "Capture", "Skins", "Aspect Ratio", "Window Size", "Help"
+    }
+    found_areas = {r["area"] for r in rows}
+    missing_areas = required_areas - found_areas
+    assert not missing_areas, f"Missing required areas: {missing_areas}"
+
+    seen_ids = set()
+    for i, r in enumerate(rows, 1):
+        for col in required_columns:
+            assert r[col] is not None and r[col].strip() != "", f"Empty field '{col}' at row {i} (id: {r.get('id')})"
+        assert r["evidence_ref"] == "CR-004", f"Invalid evidence_ref '{r['evidence_ref']}' at row {i}"
+        assert r["id"] not in seen_ids, f"Duplicate id '{r['id']}' at row {i}"
+        seen_ids.add(r["id"])
+
+    # Check clean-room log entry CR-004
+    with open("docs/clean-room-log.md", "r", encoding="utf-8") as f:
+        log_content = f.read()
+    assert "### Entry CR-004:" in log_content, "CR-004 missing in clean-room-log.md"
+
+    print(f"Task 2 spec verification passed ({len(rows)} menu features across {len(found_areas)} areas).")
+
 if __name__ == "__main__":
     test_task1()
+    test_task2()

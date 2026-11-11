@@ -1,0 +1,259 @@
+id,area,feature,path_or_hotkey,default_value,observed_behavior,evidence_ref,status
+FEAT-OPEN-001,Open,Open File(s)...,Menu > Open File(s)... (F3),N/A,Prompts native desktop file dialog to select and play one or more media files.,CR-004,Planned
+FEAT-OPEN-002,Open,Open File(s) (Standard),Menu > Open > Open File(s)... (Ctrl+O),N/A,Opens system file picker dialog to open media files replacing current playlist or item.,CR-004,Planned
+FEAT-OPEN-003,Open,Open URL...,Menu > Open > Open URL... (Ctrl+U),N/A,"Displays input dialog to enter a direct streaming URL (HTTP/HTTPS, HLS, DASH, RTSP, RTMP).",CR-004,Planned
+FEAT-OPEN-004,Open,Open Folder...,Menu > Open > Open Folder... (F2),N/A,Opens directory picker dialog; recursively imports and enqueues all supported media files in folder.,CR-004,Planned
+FEAT-OPEN-005,Open,Open FTP/WebDAV/HTTP...,Menu > Open > Open FTP/WebDAV/HTTP... (Alt+F12),N/A,Opens remote server connection browser dialog to stream files over network shares.,CR-004,Planned
+FEAT-OPEN-006,Open,Open Clipboard,Menu > Open > Open Clipboard,N/A,Inspects system clipboard and plays URL or file path currently copied in clipboard.,CR-004,Planned
+FEAT-OPEN-007,Open,Default Action: Open File(s),Menu > Open > Default Open Action > Open File(s),Enabled,Configures default button action in player UI to trigger Open File(s) dialog.,CR-004,Planned
+FEAT-OPEN-008,Open,Default Action: Open URL,Menu > Open > Default Open Action > Open URL,Disabled,Configures default button action in player UI to trigger Open URL dialog.,CR-004,Planned
+FEAT-OPEN-009,Open,Default Action: Open Folder,Menu > Open > Default Open Action > Open Folder,Disabled,Configures default button action in player UI to trigger Open Folder dialog.,CR-004,Planned
+FEAT-OPEN-010,Open,Default Action: File Navigator,Menu > Open > Default Open Action > Open File Navigator,Disabled,Configures default button action in player UI to open in-player file navigator overlay.,CR-004,Planned
+FEAT-OPEN-011,Open,Navigate Files...,Menu > Open > Navigate > Files... (F12),N/A,Displays full-screen or OSD file system navigation tree with keyboard traversal.,CR-004,Planned
+FEAT-OPEN-012,Open,Navigate Subtitles...,Menu > Open > Navigate > Subtitles...,N/A,Displays OSD browser listing available external subtitles in the directory.,CR-004,Planned
+FEAT-OPEN-013,Open,Navigate Current File Folder,Menu > Open > Navigate > Current File...,N/A,Opens system file manager window highlighting the currently playing file.,CR-004,Planned
+FEAT-OPEN-014,Open,Open Screen Capture,Menu > Open > Open Screen Capture (Ctrl+S),N/A,Activates live desktop screen or window video capture input via PipeWire/X11/Wayland.,CR-004,Planned
+FEAT-OPEN-015,Open,Open Webcam/Device,Menu > Open > Open Webcam/Other Device (Ctrl+J),N/A,Opens video capture hardware using Linux V4L2 device nodes (/dev/video*).,CR-004,Planned
+FEAT-OPEN-016,Open,Open Digital TV,Menu > Open > Open Digital TV (Ctrl+K),N/A,Connects to DVB/ATSC digital television tuner device (/dev/dvb).,CR-004,Planned
+FEAT-OPEN-017,Open,Device Settings...,Menu > Open > Device Settings... (Alt+D),N/A,"Displays configuration dialog for webcam, capture card, or tuner parameters.",CR-004,Planned
+FEAT-OPEN-018,Open,Open DVD,Menu > Open > Open DVD (Ctrl+D),N/A,Mounts and starts playback of physical DVD-Video disc or mounted ISO (dvdnav://).,CR-004,Planned
+FEAT-OPEN-019,Open,Open DVD files (*.IFO),Menu > Open > Open DVD files (*.IFO)...,N/A,Selects VIDEO_TS.IFO from disk to navigate DVD title menu structure.,CR-004,Planned
+FEAT-OPEN-020,Open,Open Blu-ray,Menu > Open > Open Blu-ray (Ctrl+Alt+D),N/A,Plays default Blu-ray disc mount point or disc structure via libbluray (bd://).,CR-004,Planned
+FEAT-OPEN-021,Open,Open Blu-ray files (*.MPLS),Menu > Open > Open Blu-ray files (*.MPLS)...,N/A,Selects specific MPLS playlist file from Blu-ray BDMV structure.,CR-004,Planned
+FEAT-OPEN-022,Open,Load Subtitle...,Menu > Open > Load Subtitle... (Alt+O),N/A,Opens file picker to load external subtitle file for the current video.,CR-004,Planned
+FEAT-OPEN-023,Open,Add Subtitle...,Menu > Open > Add Subtitle...,N/A,Loads a secondary subtitle file without displacing the primary loaded subtitle.,CR-004,Planned
+FEAT-OPEN-024,Open,Reload Subtitle,Menu > Open > Reload Subtitle (Ctrl+Alt+Y),N/A,Reloads current subtitle file from disk to reflect external edits immediately.,CR-004,Planned
+FEAT-OPEN-025,Open,Reopen Current/Last Item,Menu > Open > Reopen Current/Last Item (Ctrl+Y),N/A,Closes and immediately re-executes playback of the active or preceding media file.,CR-004,Planned
+FEAT-OPEN-026,Open,Load External Audio...,Menu > Open > Load External Audio...,N/A,Opens file picker to select an external audio stream file to sync with playing video.,CR-004,Planned
+FEAT-OPEN-027,Open,Close Playback,Menu > Close Playback (F4),N/A,"Unloads current media stream and clears video surface, returning player to idle state.",CR-004,Planned
+FEAT-PLAY-001,Play,Play/Pause Playback,Menu > Playback > Play/Pause Playback (Space),Playing,Toggles between playback and pause states with OSD icon confirmation.,CR-004,Planned
+FEAT-PLAY-002,Play,Stop Playback,Menu > Playback > Stop,Stopped,Halts playback and resets playback head position to time 00:00:00.,CR-004,Planned
+FEAT-PLAY-003,Play,Play Previous Item,Menu > Playback > Play Previous Item (PgUp),N/A,Skips to the preceding track in the active playlist.,CR-004,Planned
+FEAT-PLAY-004,Play,Play Next Item,Menu > Playback > Play Next Item (PgDn),N/A,Advances to the following track in the active playlist.,CR-004,Planned
+FEAT-PLAY-005,Play,Previous Frame,Menu > Playback > Jump > Previous frame (D),N/A,Steps backward by one exact video frame while paused.,CR-004,Planned
+FEAT-PLAY-006,Play,Next Frame,Menu > Playback > Jump > Next frame (F),N/A,Advances forward by one exact video frame and pauses.,CR-004,Planned
+FEAT-PLAY-007,Play,Previous Keyframe,Menu > Playback > Jump > Previous keyframe (Ctrl+Shift+Left),N/A,Seeks to the previous I-frame/keyframe in the video stream.,CR-004,Planned
+FEAT-PLAY-008,Play,Next Keyframe,Menu > Playback > Jump > Next keyframe (Ctrl+Shift+Right),N/A,Seeks to the subsequent I-frame/keyframe in the video stream.,CR-004,Planned
+FEAT-PLAY-009,Play,Jump Backward 5 sec,Menu > Playback > Jump > 5s Backward (Left),N/A,Relative backward seek by default short step (5 seconds).,CR-004,Planned
+FEAT-PLAY-010,Play,Jump Forward 5 sec,Menu > Playback > Jump > 5s Forward (Right),N/A,Relative forward seek by default short step (5 seconds).,CR-004,Planned
+FEAT-PLAY-011,Play,Jump Backward 30 sec,Menu > Playback > Jump > 30s Backward (Ctrl+Left),N/A,Relative backward seek by medium step (30 seconds).,CR-004,Planned
+FEAT-PLAY-012,Play,Jump Forward 30 sec,Menu > Playback > Jump > 30s Forward (Ctrl+Right),N/A,Relative forward seek by medium step (30 seconds).,CR-004,Planned
+FEAT-PLAY-013,Play,Jump Backward 1 min,Menu > Playback > Jump > 1m Backward (Shift+Left),N/A,Relative backward seek by large step (60 seconds).,CR-004,Planned
+FEAT-PLAY-014,Play,Jump Forward 1 min,Menu > Playback > Jump > 1m Forward (Shift+Right),N/A,Relative forward seek by large step (60 seconds).,CR-004,Planned
+FEAT-PLAY-015,Play,Jump Backward 5 min,Menu > Playback > Jump > 5m Backward (Ctrl+Alt+Left),N/A,Relative backward seek by extra large step (300 seconds).,CR-004,Planned
+FEAT-PLAY-016,Play,Jump Forward 5 min,Menu > Playback > Jump > 5m Forward (Ctrl+Alt+Right),N/A,Relative forward seek by extra large step (300 seconds).,CR-004,Planned
+FEAT-PLAY-017,Play,Jump to Starting Point,Menu > Playback > Jump > Starting point (BackSpace),N/A,Seeks directly to the beginning of the media stream (00:00:00).,CR-004,Planned
+FEAT-PLAY-018,Play,Jump to Middle Point,Menu > Playback > Jump > Middle point (Ctrl+BackSpace),N/A,Seeks directly to 50% of total media duration.,CR-004,Planned
+FEAT-PLAY-019,Play,Jump to 30s Before End,Menu > Playback > Jump > 30 Sec. before ending (Shift+BackSpace),N/A,Seeks to 30 seconds before media completion.,CR-004,Planned
+FEAT-PLAY-020,Play,Jump to Previous Subtitle,Menu > Playback > Jump > Previous subtitle position (Home),N/A,Seeks to the start timestamp of the previous subtitle event.,CR-004,Planned
+FEAT-PLAY-021,Play,Jump to Next Subtitle,Menu > Playback > Jump > Next subtitle position (End),N/A,Seeks to the start timestamp of the next subtitle event.,CR-004,Planned
+FEAT-PLAY-022,Play,Jump to Current Subtitle,Menu > Playback > Jump > Current subtitle position (Ctrl+Home),N/A,Seeks to the start timestamp of the currently visible subtitle event.,CR-004,Planned
+FEAT-PLAY-023,Play,Jump to Specified Time...,Menu > Playback > Jump > Jump to Specified Time/Frame... (G),N/A,"Opens jump modal dialog supporting HH:MM:SS, percentage, or frame number entry.",CR-004,Planned
+FEAT-PLAY-024,Play,Fast Seek via Keyframe,Menu > Playback > Jump > Use keyframe to jump to a time,Enabled,Directs mpv to seek to nearest keyframe for instantaneous seeking without decoding intermediate frames.,CR-004,Planned
+FEAT-PLAY-025,Play,Speed: Default/Reset,Menu > Playback > Speed > Default/Last used (Z),1.0x,Resets playback rate to normal 1.0x speed.,CR-004,Planned
+FEAT-PLAY-026,Play,Speed: Decrease Speed,Menu > Playback > Speed > Decrease speed (X),N/A,Decrements playback speed by 0.1x steps (down to 0.2x).,CR-004,Planned
+FEAT-PLAY-027,Play,Speed: Increase Speed,Menu > Playback > Speed > Increase speed (C),N/A,Increments playback speed by 0.1x steps (up to 3.0x).,CR-004,Planned
+FEAT-PLAY-028,Play,Speed: Audio Pitch Correction,Menu > Playback > Speed > Use high quality audio time stretching,Enabled,Enables scaletempo2 filter to preserve audio pitch during speed changes.,CR-004,Planned
+FEAT-PLAY-029,Play,A-B Repeat: Set Point A,Menu > Playback > A-B Repeat > Set Starting Point (A) ([),N/A,Marks current playback position as start of A-B loop.,CR-004,Planned
+FEAT-PLAY-030,Play,A-B Repeat: Set Point B,Menu > Playback > A-B Repeat > Set Ending Point (B) (]),N/A,Marks current playback position as end of A-B loop and begins repeating segment.,CR-004,Planned
+FEAT-PLAY-031,Play,A-B Repeat: Reset Point A,Menu > Playback > A-B Repeat > Reset Point A (Shift+[),N/A,Clears start marker of active A-B loop.,CR-004,Planned
+FEAT-PLAY-032,Play,A-B Repeat: Reset Point B,Menu > Playback > A-B Repeat > Reset Point B (Shift+]),N/A,Clears end marker of active A-B loop.,CR-004,Planned
+FEAT-PLAY-033,Play,A-B Repeat: Toggle Loop,Menu > Playback > A-B Repeat > Start/Stop A-B Section Repeat (\),Disabled,Toggles looping of configured A-B segment.,CR-004,Planned
+FEAT-PLAY-034,Play,Repeat: Cycle Repeat Mode,Menu > Playback > Repeat Playback > Cycle Repeat Playback,Disabled,"Cycles between No Repeat, Repeat Track, and Repeat Playlist.",CR-004,Planned
+FEAT-PLAY-035,Play,Repeat: Disable Repeat,Menu > Playback > Repeat Playback > Disable,Enabled,Playback stops or advances once without repeating.,CR-004,Planned
+FEAT-PLAY-036,Play,Repeat: Repeat Playing Item,Menu > Playback > Repeat Playback > Enable: Repeat playing item,Disabled,Continuously loops current file indefinitely.,CR-004,Planned
+FEAT-PLAY-037,Play,Repeat: Repeat Playlist,Menu > Playback > Repeat Playback > Enable: Repeat playlist,Disabled,Loops entire playlist back to first item upon completion.,CR-004,Planned
+FEAT-PLAY-038,Play,Shuffle Playback,Menu > Playback > Use shuffle playback mode,Disabled,Randomizes order of playlist playback.,CR-004,Planned
+FEAT-PLAY-039,Play,Remember Playback Position,Menu > Playback > Remember playback positions,Enabled,Stores last played timestamp per file in local state database and resumes upon reopen.,CR-004,Planned
+FEAT-PLAY-040,Play,Prevent Screen Saver,Menu > Playback > Prevent screen saver during playback,Enabled,Inhibits system display sleep/screensaver via FreeDesktop ScreenSaver DBus portal while playing.,CR-004,Planned
+FEAT-SUB-001,Subtitles,Show/Hide Subtitles,Menu > Subtitles > Show/Hide Subtitles (Alt+H),Visible,Toggles subtitle visibility on or off.,CR-004,Planned
+FEAT-SUB-002,Subtitles,Cycle Subtitle Stream,Menu > Subtitles > Add/Select Subtitles > Cycle Subtitle (Alt+L),Track 1,Cycles to the next available subtitle stream track.,CR-004,Planned
+FEAT-SUB-003,Subtitles,Select Subtitle Track...,Menu > Subtitles > Add/Select Subtitles (L),Auto,Opens selection submenu to choose from embedded or external subtitle tracks.,CR-004,Planned
+FEAT-SUB-004,Subtitles,Subtitle Bold Font,Menu > Subtitles > Subtitle Style > Use Bold Font (Alt+B),Disabled,Toggles bold weight styling on rendered text subtitles.,CR-004,Planned
+FEAT-SUB-005,Subtitles,Increase Font Size,Menu > Subtitles > Subtitle Style > Increase Font Size (Alt+PGUP),100%,Increases subtitle font scale factor by 5%.,CR-004,Planned
+FEAT-SUB-006,Subtitles,Decrease Font Size,Menu > Subtitles > Subtitle Style > Decrease Font Size (Alt+PGDN),100%,Decreases subtitle font scale factor by 5%.,CR-004,Planned
+FEAT-SUB-007,Subtitles,Font Style Settings...,Menu > Subtitles > Subtitle Style > Font Settings... (Alt+F),N/A,"Opens subtitle font configuration dialog for family, color, outline, and shadow.",CR-004,Planned
+FEAT-SUB-008,Subtitles,Align Subtitles Left,Menu > Subtitles > Subtitle Style > Align Left,Disabled,Sets text horizontal justification to the left edge.,CR-004,Planned
+FEAT-SUB-009,Subtitles,Align Subtitles Center,Menu > Subtitles > Subtitle Style > Align Center,Enabled,Centers subtitle text horizontally on screen.,CR-004,Planned
+FEAT-SUB-010,Subtitles,Align Subtitles Right,Menu > Subtitles > Subtitle Style > Align Right,Disabled,Sets text horizontal justification to the right edge.,CR-004,Planned
+FEAT-SUB-011,Subtitles,Reset Subtitle Position,Menu > Subtitles > Subtitle Style > Default Position (Alt+Home),"0, 0",Restores subtitle vertical and horizontal offset coordinates to default baseline.,CR-004,Planned
+FEAT-SUB-012,Subtitles,Move Subtitle Up,Menu > Subtitles > Subtitle Style > Move Up (Alt+Up),N/A,Shifts subtitle vertical rendering position upward by 2 pixels.,CR-004,Planned
+FEAT-SUB-013,Subtitles,Move Subtitle Down,Menu > Subtitles > Subtitle Style > Move Down (Alt+Down),N/A,Shifts subtitle vertical rendering position downward by 2 pixels.,CR-004,Planned
+FEAT-SUB-014,Subtitles,Move Subtitle Left,Menu > Subtitles > Subtitle Style > Move Left (Alt+Left),N/A,Shifts subtitle horizontal position left by 2 pixels.,CR-004,Planned
+FEAT-SUB-015,Subtitles,Move Subtitle Right,Menu > Subtitles > Subtitle Style > Move Right (Alt+Right),N/A,Shifts subtitle horizontal position right by 2 pixels.,CR-004,Planned
+FEAT-SUB-016,Subtitles,Subtitle Sync: Delay 0.5s,"Menu > Subtitles > Subtitle Sync > Decrease Subtitle Sync by 0.5s (< or ,)",0.0s,Delays subtitle presentation by 0.5 seconds relative to video.,CR-004,Planned
+FEAT-SUB-017,Subtitles,Subtitle Sync: Advance 0.5s,Menu > Subtitles > Subtitle Sync > Increase Subtitle Sync by 0.5s (> or .),0.0s,Advances subtitle presentation by 0.5 seconds relative to video.,CR-004,Planned
+FEAT-SUB-018,Subtitles,Subtitle Sync: Reset,Menu > Subtitles > Subtitle Sync > Default Subtitle Sync (/),0.0s,Resets subtitle time delay offset back to 0.0 seconds.,CR-004,Planned
+FEAT-SUB-019,Subtitles,Subtitle Sync: Adjust Dialog...,Menu > Subtitles > Subtitle Sync > Adjust Subtitle Sync...,N/A,Opens precision timing offset dialog with millisecond adjustment entry.,CR-004,Planned
+FEAT-SUB-020,Subtitles,Convert Subtitle FPS: 23.976,Menu > Subtitles > Subtitle Sync > Convert Subtitle FPS: 23.976,Original,Scales subtitle timestamps from source FPS to 23.976 frame rate.,CR-004,Planned
+FEAT-SUB-021,Subtitles,Convert Subtitle FPS: 24,Menu > Subtitles > Subtitle Sync > Convert Subtitle FPS: 24,Original,Scales subtitle timestamps from source FPS to 24.0 frame rate.,CR-004,Planned
+FEAT-SUB-022,Subtitles,Convert Subtitle FPS: 25,Menu > Subtitles > Subtitle Sync > Convert Subtitle FPS: 25,Original,Scales subtitle timestamps from source FPS to 25.0 PAL frame rate.,CR-004,Planned
+FEAT-SUB-023,Subtitles,Convert Subtitle FPS: 29.97,Menu > Subtitles > Subtitle Sync > Convert Subtitle FPS: 29.97,Original,Scales subtitle timestamps from source FPS to 29.97 NTSC frame rate.,CR-004,Planned
+FEAT-SUB-024,Subtitles,Save Subtitle with Sync,Menu > Subtitles > Subtitle Saving > Apply subtitle sync (Alt+S),N/A,Writes adjusted subtitle sync offsets permanently into subtitle file.,CR-004,Planned
+FEAT-SUB-025,Subtitles,Save Subtitle As...,Menu > Subtitles > Subtitle Saving > Save subtitle as... (Ctrl+Alt+S),N/A,"Opens save file dialog to export subtitle track to SRT, ASS, or VTT.",CR-004,Planned
+FEAT-SUB-026,Subtitles,Online Subtitle Search,Menu > Subtitles > Subtitle Searching > Download Subtitles...,N/A,Queries online open subtitle providers for matching hashes/titles.,CR-004,Planned
+FEAT-SUB-027,Subtitles,Copy Subtitle to Clipboard,Menu > Subtitles > Copy current subtitle to clipboard,N/A,Copies currently displayed subtitle text to system clipboard.,CR-004,Planned
+FEAT-SUB-028,Subtitles,Force Subtitle Under Video,Menu > Subtitles > Force subtitles to display under the video,Disabled,Positions subtitle text inside letterbox black bar below video frame.,CR-004,Planned
+FEAT-SUB-029,Subtitles,Enable ASS/SSA Animations,Menu > Subtitles > Enable ASS/SSA subtitle animations,Enabled,"Enables libass vector rendering, positioning tags, and effects for advanced ASS scripts.",CR-004,Planned
+FEAT-VID-001,Video,Select Video Stream,Menu > Video > Select Video Stream (V),Stream 1,Opens list to choose between multiple alternate video streams.,CR-004,Planned
+FEAT-VID-002,Video,Cycle Video Stream,Menu > Video > Select Video Stream > Cycle Video Stream (Alt+V),Stream 1,Cycles to the subsequent video stream track.,CR-004,Planned
+FEAT-VID-003,Video,Video Renderer Selection,Menu > Video > Video Renderer,Auto select,"Configures rendering backend (OpenGL, Vulkan, EGL / Wayland).",CR-004,Planned
+FEAT-VID-004,Video,Hardware Acceleration API,Menu > Video > Hardware Acceleration,Auto (VA-API / NVDEC),"Selects hardware decoding driver (VA-API, NVDEC, VDPAU).",CR-004,Planned
+FEAT-VID-005,Video,Deinterlacing Mode,Menu > Video > Deinterlacing > Cycle Deinterlacing Mode (Ctrl+I),Auto,"Cycles deinterlace filter between Auto, Enabled, and Disabled.",CR-004,Planned
+FEAT-VID-006,Video,Video Transform Filter,Menu > Video > Video Transform Filter (Ctrl+X),Always Use,"Toggles software video filter pipeline for color, crop, and effects.",CR-004,Planned
+FEAT-VID-007,Video,Pixel Shaders Pre-Resize,Menu > Video > Pixel Shaders > Use Pre-Resize Pixel Shaders (Shift+P),Disabled,Toggles custom GLSL shader effects executed prior to video scaling.,CR-004,Planned
+FEAT-VID-008,Video,Pixel Shaders Post-Resize,Menu > Video > Pixel Shaders > Use Post-Resize Pixel Shaders (Ctrl+Alt+P),Disabled,Toggles custom GLSL shader effects executed after video scaling.,CR-004,Planned
+FEAT-VID-009,Video,HDR Tone Mapping,Menu > Video > Pixel Shaders > Enable SMPTE ST 2084 HDR Correction,Auto,"Applies HDR to SDR tone-mapping algorithms (mobius, bt.2390, clip).",CR-004,Planned
+FEAT-VID-010,Video,Flip Vertical,Menu > Video > Video Effects > Flip Vertical (Ctrl+P),Disabled,Vertically inverts the video raster 180 degrees.,CR-004,Planned
+FEAT-VID-011,Video,Flip Horizontal,Menu > Video > Video Effects > Flip Horizontal (Ctrl+Z),Disabled,Horizontally mirrors the video frame left to right.,CR-004,Planned
+FEAT-VID-012,Video,Soften Filter,Menu > Video > Video Effects > Soften (Ctrl+B),Disabled,Applies mild spatial blur convolution matrix to soften video noise.,CR-004,Planned
+FEAT-VID-013,Video,Sharpen Filter,Menu > Video > Video Effects > Sharpen (Ctrl+R),Disabled,Applies unsharp masking filter to enhance fine edge detail.,CR-004,Planned
+FEAT-VID-014,Video,Deblock Filter,Menu > Video > Video Effects > Deblock (Ctrl+H),Disabled,Activates post-processing deblocking filter for macroblocked video streams.,CR-004,Planned
+FEAT-VID-015,Video,Denoise 3D,Menu > Video > Video Effects > Denoise 3D (Ctrl+N),Disabled,Activates spatio-temporal noise reduction filter.,CR-004,Planned
+FEAT-VID-016,Video,Temporal Denoise,Menu > Video > Video Effects > Temporal Denoise (Ctrl+M),Disabled,Activates recursive temporal frame averaging denoiser.,CR-004,Planned
+FEAT-VID-017,Video,Level Control,Menu > Video > Video Effects > Level Control (Ctrl+L),Disabled,Expands 16-235 TV luma levels to 0-255 PC levels.,CR-004,Planned
+FEAT-VID-018,Video,Color Controls: Reset,Menu > Video > Disable/Last used Color Controls (Q),Neutral (50%),"Resets Brightness, Contrast, Saturation, and Hue to factory defaults.",CR-004,Planned
+FEAT-VID-019,Video,Brightness Decrease,Menu > Video > Decrease Brightness by 1% (W),50%,Decreases video luma brightness offset by 1 percent.,CR-004,Planned
+FEAT-VID-020,Video,Brightness Increase,Menu > Video > Increase Brightness by 1% (E),50%,Increases video luma brightness offset by 1 percent.,CR-004,Planned
+FEAT-VID-021,Video,Contrast Decrease,Menu > Video > Decrease Contrast by 1% (R),50%,Decreases video contrast gain slope by 1 percent.,CR-004,Planned
+FEAT-VID-022,Video,Contrast Increase,Menu > Video > Increase Contrast by 1% (T),50%,Increases video contrast gain slope by 1 percent.,CR-004,Planned
+FEAT-VID-023,Video,Saturation Decrease,Menu > Video > Decrease Saturation by 1% (Y),50%,Decreases color chroma saturation intensity by 1 percent.,CR-004,Planned
+FEAT-VID-024,Video,Saturation Increase,Menu > Video > Increase Saturation by 1% (U),50%,Increases color chroma saturation intensity by 1 percent.,CR-004,Planned
+FEAT-VID-025,Video,Hue Decrease,Menu > Video > Decrease Hue by 1% (I),50%,Rotates color hue angle counterclockwise by 1 percent.,CR-004,Planned
+FEAT-VID-026,Video,Hue Increase,Menu > Video > Increase Hue by 1% (O),50%,Rotates color hue angle clockwise by 1 percent.,CR-004,Planned
+FEAT-VID-027,Video,Screen Rotation Cycle,Menu > Video > Screen Rotation > Cycle Screen Rotation (Alt+K),0 deg,"Cycles orientation angle between 0, 90, 180, and 270 degrees.",CR-004,Planned
+FEAT-VID-028,Video,Bottom Margin Cycle,Menu > Video > Bottom Margin > Cycle Bottom Margin (Ctrl+Alt+B),None,Cycles letterbox bottom margin for subtitles between 0% and 30%.,CR-004,Planned
+FEAT-VID-029,Video,Extend/Crop Dialog,Menu > Video > Extend/Crop > Extend/Crop Video... (Ctrl+Q),N/A,Opens interactive cropping and pan-and-scan aspect alignment tool.,CR-004,Planned
+FEAT-AUD-001,Audio,Select Audio Stream,Menu > Audio > Select Audio Stream (A),Stream 1,Lists available audio streams for selection with language and codec labels.,CR-004,Planned
+FEAT-AUD-002,Audio,Cycle Audio Stream,Menu > Audio > Select Audio Stream > Cycle Audio Stream (Alt+A),Stream 1,Cycles to the subsequent audio track.,CR-004,Planned
+FEAT-AUD-003,Audio,Audio Renderer,Menu > Audio > Audio Renderer,Auto select,"Selects audio output server (PipeWire, PulseAudio, ALSA).",CR-004,Planned
+FEAT-AUD-004,Audio,Speaker Layout,Menu > Audio > Output Speakers,Auto (Source matching),"Sets target downmixing or upmixing channel layout (Stereo, 5.1, 7.1).",CR-004,Planned
+FEAT-AUD-005,Audio,Increase Volume,Menu > Audio > Increase Volume (Up),100%,Increments playback volume by 2% steps up to 200% digital boost.,CR-004,Planned
+FEAT-AUD-006,Audio,Decrease Volume,Menu > Audio > Decrease Volume (Down),100%,Decrements playback volume by 2% steps down to 0%.,CR-004,Planned
+FEAT-AUD-007,Audio,Mute Audio,Menu > Audio > Mute (M),Unmuted,Mutes all audio output instantly; pressing again restores previous volume level.,CR-004,Planned
+FEAT-AUD-008,Audio,Audio PreAmp Up,Menu > Audio > Playback Volume > Increase PreAmp,0 dB,Increases software pre-amplification gain before processing.,CR-004,Planned
+FEAT-AUD-009,Audio,Audio PreAmp Down,Menu > Audio > Playback Volume > Decrease PreAmp,0 dB,Decreases software pre-amplification gain before processing.,CR-004,Planned
+FEAT-AUD-010,Audio,Use Equalizer,Menu > Audio > Use Equalizer (Shift+E),Disabled,Toggles 10-band graphic equalizer filter.,CR-004,Planned
+FEAT-AUD-011,Audio,Equalizer Presets,Menu > Audio > Equalizer Presets,Flat,"Applies preset curves (Rock, Pop, Classical, Voice, Bass Boost, Treble).",CR-004,Planned
+FEAT-AUD-012,Audio,Audio Sync: Delay 0.05s,"Menu > Audio > Audio Sync > Decrease audio sync by 0.05s (Shift+,)",0.0s,Delays audio stream by 50ms relative to video presentation.,CR-004,Planned
+FEAT-AUD-013,Audio,Audio Sync: Advance 0.05s,Menu > Audio > Audio Sync > Increase audio sync by 0.05s (Shift+.),0.0s,Advances audio stream by 50ms relative to video presentation.,CR-004,Planned
+FEAT-AUD-014,Audio,Audio Sync: Reset,Menu > Audio > Audio Sync > Default Audio Sync (Shift+/),0.0s,Resets audio synchronization offset to 0.0 seconds.,CR-004,Planned
+FEAT-AUD-015,Audio,Normalizer,Menu > Audio > Audio Effects > Normalizer (Shift+N),Disabled,Dynamically compresses audio dynamic range to smooth quiet and loud sounds.,CR-004,Planned
+FEAT-AUD-016,Audio,Crystality,Menu > Audio > Audio Effects > Crystality (Shift+C),Disabled,High-frequency psychoacoustic exciter filter to brighten dull audio.,CR-004,Planned
+FEAT-AUD-017,Audio,Noise Reduction,Menu > Audio > Audio Effects > Noise Reduction (Shift+D),Disabled,Applies spectral noise gate filter to suppress background hiss.,CR-004,Planned
+FEAT-AUD-018,Audio,Freeverb Reverb,Menu > Audio > Audio Effects > Freeverb (Shift+R),Disabled,Spatial reverb filter for simulated acoustic ambiance.,CR-004,Planned
+FEAT-AUD-019,Audio,Voice Removal,Menu > Audio > Audio Effects > Voice Removal (Shift+V),Disabled,Attenuates center-panned vocal frequencies for karaoke playback.,CR-004,Planned
+FEAT-AUD-020,Audio,Voice Emphasis,Menu > Audio > Audio Effects > Voice Emphasis (Shift+A),Disabled,Boosts dialog frequency band (1 kHz - 4 kHz) for speech clarity.,CR-004,Planned
+FEAT-AUD-021,Audio,Swap Stereo Channels,Menu > Audio > Audio Effects > Swap Stereo Channels (Shift+T),Disabled,Reverses left and right stereo speaker outputs.,CR-004,Planned
+FEAT-AUD-022,Audio,Built-in Audio Transform Filter,Menu > Audio > Use Built-in Audio Transform Filter (Shift+X),Enabled,Master toggle for internal audio DSP chain and format conversion.,CR-004,Planned
+FEAT-FILT-001,Filters,Manage Filters,Menu > Filters > Manage Filters... (Ctrl+F),N/A,Opens dialog displaying active filter chain and decoder configuration options.,CR-004,Planned
+FEAT-FILT-002,Filters,Active Filter Graph Display,Menu > Filters > [Active Filter Chain],Dynamic,"Contextually enumerates current demuxer, video decoder, audio decoder, and video sink.",CR-004,Planned
+FEAT-FILT-003,Filters,Source/Splitter Configuration,Menu > Filters > Filter Management > Built-in Source/Splitter,FFmpeg,Configures demuxer backend plugins and stream buffering properties.,CR-004,Planned
+FEAT-FILT-004,Filters,Video Decoder Configuration,Menu > Filters > Filter Management > Built-in Video Codec,FFmpeg / VA-API,Configures video decoding engines and hardware decoding acceleration fallbacks.,CR-004,Planned
+FEAT-FILT-005,Filters,Audio Decoder Configuration,Menu > Filters > Filter Management > Built-in Audio Codec,FFmpeg / Float,"Configures audio decoding engines, bitstream pass-through, and DRC behavior.",CR-004,Planned
+FEAT-FILT-006,Filters,Custom Filter Priority,Menu > Filters > Filter Management > Filter Priority,Merit Based,Configures custom filter selection precedence and fallback chains.,CR-004,Planned
+FEAT-FILT-007,Filters,Add Custom Filter...,Menu > Filters > Filter Management > Add External Filter...,N/A,Allows registering custom external audio/video processing shared libraries (.so).,CR-004,Planned
+FEAT-FILT-008,Filters,Blocklist Filter,Menu > Filters > Filter Management > Block Filter,None,Blacklists problematic system decoders or demuxers from being loaded.,CR-004,Planned
+FEAT-FILT-009,Filters,Audio DRC (Dynamic Range Compression),Menu > Filters > Audio Decoder > Apply DRC for AC3/E-AC3,Enabled,Applies Dolby Dynamic Range Compression metadata to compress volume spikes.,CR-004,Planned
+FEAT-FILT-010,Filters,Audio Bitstream Pass-Through,"Menu > Filters > Audio Decoder > Pass-through (S/PDIF, HDMI)",Disabled,Enables raw IEC 61937 bitstream transmission of AC3/DTS to external AVRs.,CR-004,Planned
+FEAT-FILT-011,Filters,Video Post-Processing Filter Chain,Menu > Filters > Video Processing Filters,Enabled,"Manages mpv vf filter graph (lavfi, dejudder, yadif, zscale).",CR-004,Planned
+FEAT-FILT-012,Filters,Audio Post-Processing Filter Chain,Menu > Filters > Audio Processing Filters,Enabled,"Manages mpv af filter graph (lavfi, volume, scaletempo, pan).",CR-004,Planned
+FEAT-BMK-001,Bookmarks,Add Bookmark,Menu > Playback > Chapter/Bookmark > Add Bookmark (P),N/A,Saves a bookmark marker at current video timestamp into local database or companion file.,CR-004,Planned
+FEAT-BMK-002,Bookmarks,Previous Bookmark/Chapter,Menu > Playback > Chapter/Bookmark > Prev Bookmark/Chapter (Shift+PgUp),N/A,Seeks to the preceding bookmark or chapter point in timeline.,CR-004,Planned
+FEAT-BMK-003,Bookmarks,Next Bookmark/Chapter,Menu > Playback > Chapter/Bookmark > Next Bookmark/Chapter (Shift+PgDn),N/A,Seeks to the following bookmark or chapter point in timeline.,CR-004,Planned
+FEAT-BMK-004,Bookmarks,Edit Bookmarks...,Menu > Playback > Chapter/Bookmark > Edit Bookmarks...,N/A,"Opens bookmark management window to edit titles, delete entries, and sort markers.",CR-004,Planned
+FEAT-BMK-005,Bookmarks,Clear Bookmarks for Item,Menu > Playback > Chapter/Bookmark > Clear bookmarks of the related item,N/A,Removes all saved bookmark points associated with the currently playing file.,CR-004,Planned
+FEAT-BMK-006,Bookmarks,Clear All Bookmarks,Menu > Playback > Chapter/Bookmark > Clear all bookmarks,N/A,Purges the entire bookmark repository across all recorded media files.,CR-004,Planned
+FEAT-BMK-007,Bookmarks,Bookmark Navigator,Menu > Open > Navigate > Bookmarks...,N/A,Displays full-screen or OSD bookmark visual browser with thumbnail previews.,CR-004,Planned
+FEAT-BMK-008,Bookmarks,View Bookmarks as Thumbnails,Menu > Playback > Chapter/Bookmark > View bookmarks as thumbnails,Enabled,Renders captured video frame thumbnails next to bookmark timestamps.,CR-004,Planned
+FEAT-BMK-009,Bookmarks,Show Bookmark Markers on Seekbar,Menu > Playback > Show markers of bookmark/chapter on nav bar,Enabled,Draws vertical tick marks on timeline seekbar indicating bookmark positions.,CR-004,Planned
+FEAT-BMK-010,Bookmarks,Store Bookmarks in Companion Files,Menu > Playback > Chapter/Bookmark > Store bookmarks into .pbf files,Disabled,Writes bookmark data into a portable companion file (.pbf) beside media file.,CR-004,Planned
+FEAT-BMK-011,Bookmarks,Prompt Before Adding Bookmark,Menu > Playback > Chapter/Bookmark > Prompt before adding a bookmark,Disabled,Displays title naming dialog prompt each time a new bookmark is created.,CR-004,Planned
+FEAT-BMK-012,Bookmarks,Play Bookmarks as Separate Items,Menu > Playback > Chapter/Bookmark > Play bookmarks as separate files,Disabled,Exposes bookmark segments as distinct virtual items within playlist view.,CR-004,Planned
+FEAT-CAP-001,Capture,Save Source Frame,Menu > Video > Video Capture > Save Current Source Frame (Ctrl+E),N/A,"Saves unscaled, unshaded native decoded video frame to configured image folder.",CR-004,Planned
+FEAT-CAP-002,Capture,Save Screen Frame,Menu > Video > Video Capture > Save Current Screen Frame (Ctrl+Alt+E),N/A,"Saves rendered frame including scaling, aspect ratio correction, and subtitles.",CR-004,Planned
+FEAT-CAP-003,Capture,Save Source Frame As...,Menu > Video > Video Capture > Save Current Source Frame As...,N/A,Prompts file chooser dialog to save native video frame to chosen destination.,CR-004,Planned
+FEAT-CAP-004,Capture,Save Screen Frame As...,Menu > Video > Video Capture > Save Current Screen Frame As...,N/A,Prompts file chooser dialog to save rendered frame to chosen destination.,CR-004,Planned
+FEAT-CAP-005,Capture,Copy Source Frame to Clipboard,Menu > Video > Video Capture > Copy Current Source Frame to Clipboard (Ctrl+C),N/A,Copies native raw decoded frame into system clipboard image buffer.,CR-004,Planned
+FEAT-CAP-006,Capture,Copy Screen Frame to Clipboard,Menu > Video > Video Capture > Copy Current Screen Frame to Clipboard (Ctrl+Alt+C),N/A,Copies rendered screen frame with subtitles into system clipboard image buffer.,CR-004,Planned
+FEAT-CAP-007,Capture,Consecutive Image Capture,Menu > Video > Video Capture > Capture Consecutive Images... (Ctrl+G),N/A,"Opens burst capture configuration dialog for frame count, interval, and dimensions.",CR-004,Planned
+FEAT-CAP-008,Capture,Start/Stop Consecutive Capture,Menu > Video > Video Capture > Start/Stop Consecutive Image Capturing,Stopped,Toggles active continuous frame capture burst sequence.,CR-004,Planned
+FEAT-CAP-009,Capture,Create Thumbnail Image Sheet,Menu > Video > Video Capture > Create Thumbnail Image... (Alt+N),N/A,Generates composite thumbnail contact sheet grid with file metadata header.,CR-004,Planned
+FEAT-CAP-010,Capture,Set Image Storage Folder...,Menu > Video > Video Capture > Set Image Storage Folder...,~/Pictures/outplayer,Sets destination filesystem folder for captured image files.,CR-004,Planned
+FEAT-CAP-011,Capture,Open Image Storage Folder,Menu > Video > Video Capture > Open Image Storage Folder,N/A,Launches desktop file manager displaying captured screenshots directory.,CR-004,Planned
+FEAT-CAP-012,Capture,Store Images in Play Folder,Menu > Video > Video Capture > Store captured images into play folders,Disabled,Saves screenshots directly into the directory containing current media file.,CR-004,Planned
+FEAT-CAP-013,Capture,Capture Format: PNG,Menu > Video > Video Capture > Save images in PNG format,Enabled,Sets screenshot output compression format to lossless PNG.,CR-004,Planned
+FEAT-CAP-014,Capture,Capture Format: JPEG,Menu > Video > Video Capture > Save images in JPEG format,Disabled,Sets screenshot output format to compressed JPEG.,CR-004,Planned
+FEAT-CAP-015,Capture,Capture Format: BMP,Menu > Video > Video Capture > Save images in BMP format,Disabled,Sets screenshot output format to uncompressed BMP raster.,CR-004,Planned
+FEAT-CAP-016,Capture,Include Timestamp in Filename,Menu > Video > Video Capture > Include file elapsed time in filename,Enabled,Appends HH-MM-SS media timestamp into saved screenshot filename.,CR-004,Planned
+FEAT-CAP-017,Capture,Include Subtitles in Image,Menu > Video > Video Capture > Include message and subtitles in image,Enabled,Determines whether burned-in subtitles and OSD text appear in screen captures.,CR-004,Planned
+FEAT-CAP-018,Capture,Delete Last Saved Frame,Menu > Video > Video Capture > Delete the last saved frame,N/A,Deletes the most recently generated capture file from disk.,CR-004,Planned
+FEAT-CAP-019,Capture,Record Stream...,Menu > Video > Video Recording > Record Stream... (Ctrl+A),N/A,Opens stream recording configuration for direct container/codec remux dumping.,CR-004,Planned
+FEAT-CAP-020,Capture,Start/Stop Stream Recording,Menu > Video > Video Recording > Start/Stop Stream Recording (Ctrl+Shift+A),Stopped,Toggles lossless bitstream dumping of playing network or broadcast stream.,CR-004,Planned
+FEAT-CAP-021,Capture,Record Video...,Menu > Video > Video Recording > Record Video... (Alt+C),N/A,Opens real-time re-encoding video capture dialog for MP4/MKV recording.,CR-004,Planned
+FEAT-CAP-022,Capture,Start/Stop Video Recording,Menu > Video > Video Recording > Start/Stop Video Recording,Stopped,Toggles real-time video encoding capture session.,CR-004,Planned
+FEAT-CAP-023,Capture,Record Audio...,Menu > Audio > Audio Recording > Record Audio... (Shift+G),N/A,Opens real-time audio capture dialog to encode playback stream to WAV/MP3/FLAC.,CR-004,Planned
+FEAT-CAP-024,Capture,Start/Stop Audio Recording,Menu > Audio > Audio Recording > Start/Stop Audio Recording,Stopped,Toggles real-time audio recording session.,CR-004,Planned
+FEAT-SKIN-001,Skins,Default Dark Skin,Menu > Skins > Default Dark Skin,Enabled,Applies default modern dark theme UI skin with frameless controls.,CR-004,Planned
+FEAT-SKIN-002,Skins,Touch Skin Mode,Menu > Skins > Touch skin,Disabled,"Enlarges button targets, timeline height, and touch margins for tablet/touch devices.",CR-004,Planned
+FEAT-SKIN-003,Skins,Color Themes: HSB,Menu > Skins > Color Themes > HSB color theme,Enabled,Modulates UI skin accent tint via Hue/Saturation/Brightness sliders.,CR-004,Planned
+FEAT-SKIN-004,Skins,Color Themes: RGB,Menu > Skins > Color Themes > RGB color theme,Disabled,Modulates UI skin accent tint via Red/Green/Blue color balance.,CR-004,Planned
+FEAT-SKIN-005,Skins,Customize Skin Colors...,Menu > Skins > Color Themes > Customize...,N/A,"Opens color picker to specify custom primary, secondary, and accent colors.",CR-004,Planned
+FEAT-SKIN-006,Skins,Window Opacity: 100%,Menu > Skins > Opacity > Main Window > 100%,100%,Fully opaque player window presentation.,CR-004,Planned
+FEAT-SKIN-007,Skins,Window Opacity: 80%,Menu > Skins > Opacity > Main Window > 80%,Disabled,Sets window alpha channel transparency to 80% via composite manager.,CR-004,Planned
+FEAT-SKIN-008,Skins,Window Opacity: 60%,Menu > Skins > Opacity > Main Window > 60%,Disabled,Sets window alpha channel transparency to 60% via composite manager.,CR-004,Planned
+FEAT-SKIN-009,Skins,On Screen Control (OSC),Menu > Skins > On Screen Control,Enabled,Overlays floating playback controls over the video surface during mouse hover.,CR-004,Planned
+FEAT-SKIN-010,Skins,Auto Hide Main Skin,Menu > Skins > Auto hide main skin while video screen is active,Enabled,Fades out control bar and title headers when mouse pointer is stationary.,CR-004,Planned
+FEAT-SKIN-011,Skins,Auto Resize Video on Popups,Menu > Skins > Auto resize video depending on fullscreen pop-ups,Disabled,Dynamically shifts video viewport when side panels or playlist are toggled.,CR-004,Planned
+FEAT-SKIN-012,Skins,Video Skin at Startup,Menu > Skins > Use video skin at program start,Enabled,Starts player in compact frameless video-focused interface mode.,CR-004,Planned
+FEAT-SKIN-013,Skins,Remember Window Pos & Size per Mode,Menu > Skins > Remember window pos. && size of each skin mode,Enabled,"Preserves independent geometry state for standard, minimal, and fullscreen modes.",CR-004,Planned
+FEAT-SKIN-014,Skins,Skin Settings...,Menu > Skins > Skin Settings...,N/A,Opens preferences tab for custom Qt skin stylesheets and layout profiles.,CR-004,Planned
+FEAT-AR-001,Aspect Ratio,Keep Aspect Ratio,Menu > Aspect Ratio > Keep Aspect Ratio (Recommended),Enabled,Constrains video raster to native aspect ratio with pillarbox/letterbox bars.,CR-004,Planned
+FEAT-AR-002,Aspect Ratio,Stretch to Window,Menu > Aspect Ratio > Stretch,Disabled,Stretches video to fill entire window area ignoring source aspect ratio.,CR-004,Planned
+FEAT-AR-003,Aspect Ratio,Stretch by Keeping Aspect Ratio,Menu > Aspect Ratio > Stretch by Keeping Aspect Ratio,Disabled,Scales and centers video filling maximum window bounds while preserving aspect ratio.,CR-004,Planned
+FEAT-AR-004,Aspect Ratio,Cycle Aspect Ratio,Menu > Aspect Ratio > Cycle Aspect Ratio (Ctrl+F6),Auto,"Cycles through presets (Keep AR, 4:3, 16:9, 16:10, 1.85:1, 2.35:1).",CR-004,Planned
+FEAT-AR-005,Aspect Ratio,Aspect Ratio 4:3,Menu > Aspect Ratio > 4:3,Disabled,Overrides video display aspect ratio to standard television 4:3.,CR-004,Planned
+FEAT-AR-006,Aspect Ratio,Aspect Ratio 16:9,Menu > Aspect Ratio > 16:9,Disabled,Overrides video display aspect ratio to standard widescreen 16:9.,CR-004,Planned
+FEAT-AR-007,Aspect Ratio,Aspect Ratio 16:10,Menu > Aspect Ratio > 16:10,Disabled,Overrides video display aspect ratio to computer monitor 16:10.,CR-004,Planned
+FEAT-AR-008,Aspect Ratio,Aspect Ratio 1.85:1,Menu > Aspect Ratio > 1.85:1,Disabled,Overrides video display aspect ratio to theatrical widescreen 1.85:1.,CR-004,Planned
+FEAT-AR-009,Aspect Ratio,Aspect Ratio 2.35:1,Menu > Aspect Ratio > 2.35:1,Disabled,Overrides video display aspect ratio to anamorphic cinemascope 2.35:1.,CR-004,Planned
+FEAT-AR-010,Aspect Ratio,Custom Aspect Ratio...,Menu > Aspect Ratio > Set Custom Aspect Ratio...,N/A,Opens dialog to input arbitrary custom pixel or display aspect ratio (e.g. 21:9).,CR-004,Planned
+FEAT-AR-011,Aspect Ratio,Default Original DAR,Menu > Aspect Ratio > Default Original DAR,Enabled,Uses display aspect ratio embedded in container/stream metadata header.,CR-004,Planned
+FEAT-AR-012,Aspect Ratio,Reserve Bottom Margin for Subtitles,Menu > Aspect Ratio > Provide Bottom Margin for Subtitles,Disabled,Shrinks video vertically to create bottom letterbox margin reserved for subtitles.,CR-004,Planned
+FEAT-AR-013,Aspect Ratio,Reserve 1 Line for Subtitles,Menu > Aspect Ratio > As Bottom Margin > Reserve 1 line,Disabled,Reserves height equivalent to 1 line of subtitle text below video.,CR-004,Planned
+FEAT-AR-014,Aspect Ratio,Reserve 2 Lines for Subtitles,Menu > Aspect Ratio > As Bottom Margin > Reserve 2 lines,Disabled,Reserves height equivalent to 2 lines of subtitle text below video.,CR-004,Planned
+FEAT-AR-015,Aspect Ratio,Aspect Ratio Settings...,Menu > Aspect Ratio > Aspect Ratio Settings...,N/A,Opens aspect ratio preferences tab for display and device compensation.,CR-004,Planned
+FEAT-WIN-001,Window Size,Minimum Size,Menu > Window Size > Minimum size (`),N/A,Shrinks player window to minimal compact footprint showing only essential controls.,CR-004,Planned
+FEAT-WIN-002,Window Size,Window Size: 0.5x,Menu > Window Size > 0.5x video output size (1),N/A,Resizes window to 50% of the native video resolution.,CR-004,Planned
+FEAT-WIN-003,Window Size,Window Size: 1.0x,Menu > Window Size > 1.0x video output size (2),1.0x,Resizes window to exactly 100% (1:1 pixel match) of native video resolution.,CR-004,Planned
+FEAT-WIN-004,Window Size,Window Size: 1.5x,Menu > Window Size > 1.5x video output size (3),N/A,Resizes window to 150% of the native video resolution.,CR-004,Planned
+FEAT-WIN-005,Window Size,Window Size: 2.0x,Menu > Window Size > 2.0x video output size (4),N/A,Resizes window to 200% of the native video resolution.,CR-004,Planned
+FEAT-WIN-006,Window Size,Maximum Size,Menu > Window Size > Maximum size (5),N/A,Expands window to maximum available work area bounded by desktop work area.,CR-004,Planned
+FEAT-WIN-007,Window Size,Fit to Video Aspect Ratio,Menu > Window Size > Fit to video aspect ratio (8),N/A,Adjusts current window dimensions to exactly conform to active video aspect ratio.,CR-004,Planned
+FEAT-WIN-008,Window Size,Custom Window Size,Menu > Window Size > Custom size (9),N/A,Resizes player to predefined custom user dimensions.,CR-004,Planned
+FEAT-WIN-009,Window Size,Set Custom Window Size...,Menu > Window Size > Set Custom Window Size... (0),N/A,Opens dialog to specify width and height values for custom window sizing.,CR-004,Planned
+FEAT-WIN-010,Window Size,Maximize/Restore Desktop,Menu > Window Size > Maximize (to Desktop) / Restore (6),Restored,Toggles maximization respecting desktop panels and dock.,CR-004,Planned
+FEAT-WIN-011,Window Size,Maximize/Restore Screen,Menu > Window Size > Maximize (to Screen) / Restore (7),Restored,Toggles borderless windowed maximization covering entire active screen.,CR-004,Planned
+FEAT-WIN-012,Window Size,Fullscreen (Keep AR),Menu > Fullscreen (Keep AR) (Enter or Alt+Enter),Windowed,Switches to exclusive fullscreen mode preserving video aspect ratio.,CR-004,Planned
+FEAT-WIN-013,Window Size,Fullscreen (Stretch),Menu > Fullscreen (Stretch) (Ctrl+Enter),Windowed,Switches to fullscreen mode stretching video across entire display.,CR-004,Planned
+FEAT-WIN-014,Window Size,Fullscreen (Stretch Keep AR),Menu > Window Size > Fullscreen (Stretch by Keeping AR) (Ctrl+Alt+Enter),Windowed,Switches to fullscreen mode zooming to fill display while maintaining AR.,CR-004,Planned
+FEAT-WIN-015,Window Size,Desktop Mode,Menu > Window Size > Desktop Mode (Shift+Enter),Disabled,Embeds video playback surface behind desktop icons as background wallpaper.,CR-004,Planned
+FEAT-WIN-016,Window Size,Minimize Window,Menu > Window Size > Minimize (to Taskbar/Tray),N/A,Minimizes player window to taskbar or system tray icon.,CR-004,Planned
+FEAT-WIN-017,Window Size,Center Window on Screen,Menu > Window Size > Move Window > Place on Screen Center (Ctrl+Alt+Numpad 5),N/A,Moves player window directly to the center of the current display monitor.,CR-004,Planned
+FEAT-WIN-018,Window Size,Stay on Top: Cycle,Menu > Misc > Stay on Top > Cycle Stay on Top (Ctrl+T),Never,"Cycles window topmost state between Never, Always, and While Playing.",CR-004,Planned
+FEAT-WIN-019,Window Size,Stay on Top: Always,Menu > Misc > Stay on Top > Always,Disabled,Keeps player window pinned above all other desktop application windows.,CR-004,Planned
+FEAT-WIN-020,Window Size,Stay on Top: While Playing,Menu > Misc > Stay on Top > While playing,Disabled,Automatically pins player window topmost only while media is actively playing.,CR-004,Planned
+FEAT-HELP-001,Help,Playback/System Info...,Menu > Playback/System Info... (Ctrl+F1),N/A,"Opens comprehensive dialog detailing container, video/audio decoders, render context, and dropped frames.",CR-004,Planned
+FEAT-HELP-002,Help,About outPlayer...,Menu > About... (F1),N/A,"Displays application information dialog with version, build date, license, and component versions.",CR-004,Planned
+FEAT-HELP-003,Help,Command Line Reference,Menu > About > Command Line,N/A,"Opens documentation viewer showing supported CLI switches, arguments, and syntax.",CR-004,Planned
+FEAT-HELP-004,Help,Keyboard Shortcuts Reference,Menu > About > Keyboard Shortcut,N/A,Opens searchable reference table listing all active keybindings and actions.,CR-004,Planned
+FEAT-HELP-005,Help,Version History,Menu > About > Version History,N/A,"Displays changelog of releases, features, bugfixes, and enhancements.",CR-004,Planned
+FEAT-HELP-006,Help,Check for Updates,Menu > Misc > Check for updates,N/A,Queries GitHub releases API to verify whether a newer outPlayer release is available.,CR-004,Planned
+FEAT-HELP-007,Help,Official Website,Menu > Misc > Go to website...,N/A,Launches default system browser to project homepage and documentation portal.,CR-004,Planned
+FEAT-HELP-008,Help,OSD Full Playback Info,Menu > Misc > Display Full Playback/Audio Tag Info on Screen (Tab),Off,"Overlays live technical telemetry (codecs, bitrate, framerate, buffer, dropped frames) on video.",CR-004,Planned
+FEAT-HELP-009,Help,OSD Short Playback Info,Menu > Misc > Show Short Playback Info on Screen (Shift+Tab),Off,"Overlays compact one-line status (time, duration, volume, resolution) on video.",CR-004,Planned
+FEAT-HELP-010,Help,OSD Misc Info,Menu > Misc > Display Misc Info on Screen (Scroll Lock),Off,Overlays current system time and CPU/memory resource utilization on video.,CR-004,Planned
+FEAT-HELP-011,Help,Preferences Dialog,Menu > Preferences... (F5),N/A,"Opens master configuration modal covering General, Playback, Video, Audio, Subtitles, and Hotkeys.",CR-004,Planned
+FEAT-HELP-012,Help,Playlist Window,Menu > Playlist... (F6),N/A,Toggles auxiliary playlist panel docking or floating window.,CR-004,Planned
+FEAT-HELP-013,Help,Control Panel Window,Menu > Control Panel... (F7),N/A,"Toggles auxiliary quick-adjust control panel for audio, video, subtitle, and playback adjustments.",CR-004,Planned
+FEAT-HELP-014,Help,Exit Application,Menu > Exit (Alt+F4),N/A,Saves current playback state and cleanly terminates the player application.,CR-004,Planned

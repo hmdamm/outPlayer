@@ -82,3 +82,11 @@ The observer role is scheduled to execute black-box behavioral captures accordin
 - **Action:** Cataloged visible container types, video codecs, audio decoders, subtitle renderers, and network streaming protocols supported by the reference player. Formulated a 1:1 Linux compatibility matrix powered by `libmpv` and modern FFmpeg decoders with VA-API / NVDEC hardware acceleration.
 - **Artifacts Produced:** Authored `docs/spec/formats.md` (Specification SPEC-FORMATS-001).
 - **Integrity Statement:** Specifications established through non-invasive black-box UI inspection of public file association dialogues and published open-source codec specifications. No binary reverse engineering was performed.
+
+### Entry CR-004: Context Menu & Main Menu Feature Inventory
+- **Date:** 2026-11-11
+- **Role:** Observer
+- **Reference Target:** PotPlayer Context / Main Menu UI and plain-text language definitions (`C:\Program Files\DAUM\PotPlayer\Language\English.ini`).
+- **Action:** Audited and cataloged the comprehensive menu hierarchy of the reference player across all core operational areas: Open, Play, Subtitles, Video, Audio, Filters, Bookmarks, Capture, Skins, Aspect Ratio, Window Size, and Help. Extracted menu paths, default keyboard shortcuts, default states, and observed functional behaviors into a structured, machine-verifiable CSV dataset. Formulated modern Linux-native implementation mappings using Qt 6 actions, `libmpv` properties/commands, and FreeDesktop/XDG standards.
+- **Artifacts Produced:** Authored `docs/spec/features.csv` (258 feature entries across 12 functional areas).
+- **Integrity Statement:** Derived strictly from non-invasive black-box UI observation and human-readable plain-text localization strings (`English.ini`). No binary decompilation, disassembly, API hooking, or memory inspection was performed.
