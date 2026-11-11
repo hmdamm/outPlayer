@@ -123,13 +123,7 @@ void VideoWidget::onMpvUpdate(void* ctx)
 
 void VideoWidget::maybeUpdate()
 {
-    if (!m_mpv_gl) {
-        return;
-    }
-    uint64_t flags = mpv_render_context_update(m_mpv_gl);
-    if (flags & MPV_RENDER_UPDATE_FRAME) {
-        repaint();
-    }
+    update();
 }
 
 } // namespace outplayer::ui

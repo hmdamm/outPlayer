@@ -15,8 +15,7 @@ target_include_directories(outplayer_core
 
 target_link_libraries(outplayer_core
     PUBLIC
-        Qt6::Widgets
-        Qt6::OpenGLWidgets
+        Qt6::Core
         PkgConfig::MPV
 )
 
@@ -55,4 +54,6 @@ qt_add_executable(outplayer
 target_link_libraries(outplayer
     PRIVATE
         outplayer_ui
+        Qt6::Widgets
+        Qt6::OpenGLWidgets
 )

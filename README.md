@@ -50,6 +50,7 @@ sudo apt-get install -y \
     qt6-base-dev \
     libqt6openglwidgets6-dev \
     libmpv-dev \
+    ffmpeg \
     xvfb
 ```
 
@@ -62,6 +63,7 @@ sudo dnf install -y \
     pkgconf-pkg-config \
     qt6-qtbase-devel \
     mpv-libs-devel \
+    ffmpeg \
     xorg-x11-server-Xvfb
 ```
 
@@ -73,6 +75,7 @@ sudo pacman -S --needed \
     ninja \
     qt6-base \
     mpv \
+    ffmpeg \
     xorg-server-xvfb
 ```
 
