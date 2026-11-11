@@ -47,6 +47,20 @@ VideoWidget::~VideoWidget()
     }
 }
 
+bool VideoWidget::ensureInitialized()
+{
+    if (m_mpv_gl) {
+        return true;
+    }
+    if (!m_engine || !m_engine->mpvHandle()) {
+        return false;
+    }
+    winId();
+    makeCurrent();
+    doneCurrent();
+    return m_mpv_gl != nullptr;
+}
+
 void VideoWidget::initializeGL()
 {
     if (m_mpv_gl || !m_engine || !m_engine->mpvHandle()) {
@@ -62,6 +76,10 @@ void VideoWidget::initializeGL()
 
     int err = mpv_render_context_create(&m_mpv_gl, m_engine->mpvHandle(), params);
     if (err >= 0 && m_mpv_gl) {
+        // Dynamically switch VO to libmpv now that OpenGL render context is created
+        m_engine->setVo(QStringLiteral("libmpv"));
+        // Set video-timing-offset to 0 to prevent render cadence delays
+        m_engine->setProperty(QStringLiteral("video-timing-offset"), QStringLiteral("0"));
         mpv_render_context_set_update_callback(m_mpv_gl, &VideoWidget::onMpvUpdate, this);
     }
 }
@@ -72,10 +90,13 @@ void VideoWidget::paintGL()
         return;
     }
 
-    GLint fbo = static_cast<GLint>(defaultFramebufferObject());
     int w = static_cast<int>(width() * devicePixelRatioF());
     int h = static_cast<int>(height() * devicePixelRatioF());
+    if (w <= 0 || h <= 0) {
+        return;
+    }
 
+    GLint fbo = static_cast<GLint>(defaultFramebufferObject());
     mpv_opengl_fbo mpv_fbo{fbo, w, h, 0};
     int flip_y = 1;
 
@@ -85,7 +106,10 @@ void VideoWidget::paintGL()
         {MPV_RENDER_PARAM_INVALID, nullptr}
     };
 
-    mpv_render_context_render(m_mpv_gl, params);
+    int err = mpv_render_context_render(m_mpv_gl, params);
+    if (err >= 0) {
+        ++m_frameCount;
+    }
 }
 
 void VideoWidget::onMpvUpdate(void* ctx)
@@ -94,22 +118,17 @@ void VideoWidget::onMpvUpdate(void* ctx)
     if (!self) {
         return;
     }
-    QMetaObject::invokeMethod(self, [self]() {
-        self->maybeUpdate();
-    }, Qt::QueuedConnection);
+    QMetaObject::invokeMethod(self, &VideoWidget::maybeUpdate, Qt::QueuedConnection);
 }
 
 void VideoWidget::maybeUpdate()
 {
-    if (window() && window()->isMinimized()) {
-        makeCurrent();
-        paintGL();
-        if (context() && context()->surface()) {
-            context()->swapBuffers(context()->surface());
-        }
-        doneCurrent();
-    } else {
-        update();
+    if (!m_mpv_gl) {
+        return;
+    }
+    uint64_t flags = mpv_render_context_update(m_mpv_gl);
+    if (flags & MPV_RENDER_UPDATE_FRAME) {
+        repaint();
     }
 }
 

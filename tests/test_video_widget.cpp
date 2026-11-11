@@ -25,6 +25,9 @@ void TestVideoWidget::testInitAndRender()
     widget.resize(640, 480);
     widget.show();
     QVERIFY(widget.isVisible());
+    QVERIFY(widget.ensureInitialized());
+    QVERIFY(widget.renderContext() != nullptr);
+    QCOMPARE(engine.getPropertyString(QStringLiteral("vo")), QStringLiteral("libmpv"));
 }
 
 void TestVideoWidget::testPlaybackFrame()
@@ -35,9 +38,14 @@ void TestVideoWidget::testPlaybackFrame()
     widget.resize(640, 480);
     widget.show();
     QVERIFY(widget.isVisible());
+    QVERIFY(widget.ensureInitialized());
+    QVERIFY(widget.renderContext() != nullptr);
+    QCOMPARE(engine.getPropertyString(QStringLiteral("vo")), QStringLiteral("libmpv"));
 
     QVERIFY(engine.loadFile(QStringLiteral("lavfi://nullsrc=s=640x360:d=1")));
-    QTest::qWait(200);
+
+    // Verify frames are actually delivered to VideoWidget and rendered
+    QTRY_VERIFY_WITH_TIMEOUT(widget.frameCount() > 0, 3000);
 }
 
 void TestVideoWidget::testMainWindow()
@@ -51,7 +59,11 @@ void TestVideoWidget::testMainWindow()
     QVERIFY(window.isVisible());
 
     QVERIFY(window.openMedia(QStringLiteral("lavfi://nullsrc=s=640x360:d=1")));
-    QTest::qWait(200);
+    QVERIFY(window.videoWidget()->renderContext() != nullptr);
+    QCOMPARE(window.engine()->getPropertyString(QStringLiteral("vo")), QStringLiteral("libmpv"));
+
+    // Verify frames rendered through MainWindow
+    QTRY_VERIFY_WITH_TIMEOUT(window.videoWidget()->frameCount() > 0, 3000);
 }
 
 void TestVideoWidget::testVideoWidgetNullEngine()
@@ -59,9 +71,11 @@ void TestVideoWidget::testVideoWidgetNullEngine()
     outplayer::ui::VideoWidget widget(nullptr);
     QCOMPARE(widget.engine(), nullptr);
     QCOMPARE(widget.renderContext(), nullptr);
+    QCOMPARE(widget.frameCount(), 0ULL);
     widget.resize(320, 240);
     widget.show();
     QVERIFY(widget.isVisible());
+    QVERIFY(!widget.ensureInitialized());
     widget.maybeUpdate();
 }
 

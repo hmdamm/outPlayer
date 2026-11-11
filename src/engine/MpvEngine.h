@@ -32,6 +32,10 @@ public:
 
     [[nodiscard]] mpv_handle* mpvHandle() const noexcept { return m_mpv; }
 
+    bool setProperty(const QString& name, const QString& value);
+    [[nodiscard]] QString getPropertyString(const QString& name) const;
+    void setVo(const QString& vo);
+
 public slots:
     void handleMpvEvents();
 
