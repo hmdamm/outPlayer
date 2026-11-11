@@ -2,27 +2,10 @@
 # outplayer_core library
 # ==============================================================================
 
-# Provide minimal dummy source if engine sources are not yet implemented (Task 3)
-if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/engine/MpvEngine.cpp")
-    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/dummy_core.cpp"
-        "// Placeholder dummy implementation for outplayer_core\n"
-        "namespace outplayer {\n"
-        "namespace dummy {\n"
-        "void init() {}\n"
-        "}\n"
-        "}\n"
-    )
-    set(OUTPLAYER_CORE_SOURCES "${CMAKE_CURRENT_BINARY_DIR}/dummy_core.cpp")
-else()
-    set(OUTPLAYER_CORE_SOURCES
-        engine/IPlaybackEngine.h
-        engine/MpvEngine.h
-        engine/MpvEngine.cpp
-    )
-endif()
-
 qt_add_library(outplayer_core STATIC
-    ${OUTPLAYER_CORE_SOURCES}
+    engine/IPlaybackEngine.h
+    engine/MpvEngine.h
+    engine/MpvEngine.cpp
 )
 
 target_include_directories(outplayer_core

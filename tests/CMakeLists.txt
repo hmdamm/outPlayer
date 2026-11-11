@@ -22,15 +22,17 @@ target_link_libraries(test_dummy
 
 add_test(NAME test_dummy COMMAND test_dummy)
 
-# Hook for Task 3: test_mpv_engine target when test_mpv_engine.cpp exists
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test_mpv_engine.cpp")
-    qt_add_executable(test_mpv_engine
-        test_mpv_engine.cpp
-    )
-    target_link_libraries(test_mpv_engine
-        PRIVATE
-            outplayer_core
-            Qt6::Test
-    )
-    add_test(NAME test_mpv_engine COMMAND test_mpv_engine)
-endif()
+# ==============================================================================
+# Task 3: test_mpv_engine target
+# ==============================================================================
+qt_add_executable(test_mpv_engine
+    test_mpv_engine.cpp
+)
+
+target_link_libraries(test_mpv_engine
+    PRIVATE
+        outplayer_core
+        Qt6::Test
+)
+
+add_test(NAME test_mpv_engine COMMAND test_mpv_engine)
