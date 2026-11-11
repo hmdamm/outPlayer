@@ -73,3 +73,48 @@ Key components:
   - Excellent headless testability through synthetic video sources (`lavfi://nullsrc`).
 - **Negative:**
   - Custom UI skinning and autohiding control overlays require custom widget painting and event filters rather than declarative QML transitions.
+
+---
+
+## ADR 003: Phase 0 Hello Player Gate Clearance & Video Surface Verification
+
+- **Status:** Accepted
+- **Date:** 2026-11-11
+- **Deciders:** Lead Architect & AntiGravity Pair Programmer
+
+### Context
+Phase 0 establishes the baseline development environment, modern C++20 build pipeline, decoupled playback engine (`IPlaybackEngine` / `MpvEngine`), and a working video presentation surface (`VideoWidget`) integrated with `mpv_render_context` inside `MainWindow`.
+
+Before transitioning into Phase 1 (Black-Box Feature Inventory) and Phase 2 (Core Architecture & Command Engine), formal clearance of the Phase 0 Gate requires empirical verification that:
+1. The project builds cleanly with zero compiler warnings or errors on Linux/WSL2.
+2. The entire unit and integration test suite executes cleanly under an automated headless display server (`xvfb`).
+3. The standalone `outplayer` binary successfully initializes `mpv_render_context`, renders video frames to an OpenGL surface, and handles media lifecycle to completion.
+4. Clean-room protocol and licensing constraints are strictly upheld.
+
+### Decision
+We formally accept Phase 0 as complete and declare the Phase 0 Gate cleared based on the following verified test evidence:
+1. **Toolchain & Build Cleanliness:**
+   - Linux environment: Kali Linux on WSL2 (x86_64, Linux kernel 6.6+).
+   - Toolchain: GCC 15 (C++20), CMake 3.31.6, Ninja, Qt 6.8.2, libmpv 0.41.0.
+   - Build command `cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=Debug && cmake --build build` executed with zero errors and zero compiler warnings.
+2. **100% Automated Test Pass Rate:**
+   - Headless test execution via `xvfb-run -a ctest --test-dir build --output-on-failure`:
+     - `test_dummy`: Passed (0.03s)
+     - `test_mpv_engine`: Passed (0.90s) — verified playback state transitions (IDLE, LOADING, PLAYING, PAUSED, STOPPED), seeking, volume/mute control, speed control, and asynchronous observer callbacks.
+     - `test_video_widget`: Passed (1.36s) — verified `VideoWidget` OpenGL surface initialization, FBO setup, `mpv_render_context` binding, and frame update notification signaling.
+     - Result: 3/3 passed (100%), 0 failures.
+3. **End-to-End Synthetic Media Playback:**
+   - Standalone execution command: `xvfb-run -a ./build/src/outplayer --test-run lavfi://nullsrc=s=640x360:d=1`
+   - Verified that `outplayer` created the OpenGL context via Mesa llvmpipe (OpenGL 4.6 Compatibility Profile), allocated FBO format `rgba16f`, decoded synthetic video at 640x360 @ 25fps, presented frames through `mpv_render_context_render()`, reached container EOF, and exited cleanly with return code 0.
+4. **Governance & Legal Integrity:**
+   - Governance structure verified by `python tests/test_project_scaffold.py`.
+   - Code is licensed under GPL-3.0-or-later with LGPL-3.0 dynamic linking to Qt 6.
+   - No proprietary binary symbols, headers, or decompiled artifacts are present in the repository.
+
+### Consequences
+- **Positive:**
+  - Robust, verified foundation for both UI rendering and headless engine automation.
+  - Test suite operates reliably in headless environments, enabling CI/CD automation without physical GPU displays.
+  - Phase 1 (Observer Role black-box specification inventory) and Phase 2 (Command Registry and Settings architecture) can begin on a proven codebase.
+- **Negative:**
+  - Continuous testing under headless environments requires `xvfb-run` or headless EGL configuration.
