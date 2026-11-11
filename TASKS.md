@@ -8,7 +8,7 @@ This document tracks the roadmap, phase progression, and verification evidence f
 
 | Phase | Description | Status | Target Gate |
 |---|---|---|---|
-| **Phase 0** | Development Environment & "Hello Player" | In Progress | Working `outplayer` binary rendering video via `mpv_render_context` and unit test suite passing. |
+| **Phase 0** | Development Environment & "Hello Player" | Complete | Working `outplayer` binary rendering video via `mpv_render_context` and unit test suite passing. |
 | **Phase 1** | Black-Box Feature Inventory (Observer Role) | Not Started | Complete UI/hotkey/format spec inventory in `docs/spec/` with evidence logged in `docs/clean-room-log.md`. |
 | **Phase 2** | Core Architecture & Command Engine | Not Started | Decoupled architecture (`IPlaybackEngine`, `CommandRegistry`, `SettingsManager`) with passing unit tests. |
 | **Phase 3** | Vertical Slices Implementation | Not Started | 12 vertical feature slices implemented via TDD with 100% test coverage for implemented features. |
@@ -19,7 +19,8 @@ This document tracks the roadmap, phase progression, and verification evidence f
 
 ## Phase 0: Development Environment & "Hello Player"
 
-**Gate Requirement:** Working `outplayer` binary playing video on Linux/WSL and unit test suite passing cleanly under `ctest` / `xvfb-run`.
+**Gate Requirement:** Working `outplayer` binary playing video on Linux/WSL and unit test suite passing cleanly under `ctest` / `xvfb-run`.  
+**Phase Gate Status:** **CLEARED / COMPLETE** (ADR 003)
 
 | Task ID | Description | Status | Assignee / Role | Target Deliverables | Verification Evidence |
 |---|---|---|---|---|---|
@@ -27,7 +28,22 @@ This document tracks the roadmap, phase progression, and verification evidence f
 | **P0-T2** | CMake Build System with Qt 6 & libmpv | Done | Implementer | `CMakeLists.txt`, `src/CMakeLists.txt`, `tests/CMakeLists.txt` | `wsl cmake -B build -S . -G Ninja` succeeds, commit `8617263` |
 | **P0-T3** | Core Playback Engine Interface & libmpv Wrapper | Done | Implementer | `src/engine/IPlaybackEngine.h`, `src/engine/MpvEngine.h`, `src/engine/MpvEngine.cpp`, `tests/test_mpv_engine.cpp` | `wsl ctest -R test_mpv_engine` PASS, commit `73a084e` |
 | **P0-T4** | VideoWidget (mpv_render_context) & MainWindow Shell | Done | Implementer | `src/ui/VideoWidget.h`, `src/ui/VideoWidget.cpp`, `src/ui/MainWindow.h`, `src/ui/MainWindow.cpp`, `src/main.cpp`, `tests/test_video_widget.cpp` | `wsl xvfb-run -a ctest -R test_video_widget` PASS, commits `2e9a280`..`9470275` |
-| **P0-T5** | Phase 0 Verification & Gate Clearance | Not Started | Implementer | Verification runs, synthetic media playback test, status documentation updates | `wsl xvfb-run -a ./build/src/outplayer --test-run` exit code 0 |
+| **P0-T5** | Phase 0 Verification & Gate Clearance | Done | Implementer | Verification runs, synthetic media playback test, status documentation updates | `wsl xvfb-run -a ./build/src/outplayer --test-run lavfi://nullsrc=s=640x360:d=1` exit code 0; 3/3 tests pass (100%) |
+
+### Phase 0 Gate Clearance Evidence
+- **Build Cleanliness:**
+  - `wsl cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=Debug` & `wsl cmake --build build`: 0 errors, 0 warnings.
+- **Unit & Integration Test Suite (`wsl xvfb-run -a ctest --test-dir build --output-on-failure`):**
+  - `test_dummy`: PASSED (0.03s)
+  - `test_mpv_engine`: PASSED (0.90s)
+  - `test_video_widget`: PASSED (1.36s)
+  - Result: 100% tests passed, 0 tests failed out of 3 (Total Test time = 2.43s).
+- **End-to-End Synthetic Media Playback (`wsl xvfb-run -a ./build/src/outplayer --test-run lavfi://nullsrc=s=640x360:d=1`):**
+  - Exit code: `0`
+  - Render Surface: `QOpenGLWidget` + `mpv_render_context` using OpenGL FBO (`rgba16f`, Mesa llvmpipe desktop OpenGL 4.6).
+  - Stream lifecycle: Demuxed `lavfi` source (640x360 @ 25fps), initialized `libmpv` video output, painted video frames to widget surface, received EOF, exited cleanly.
+- **Governance & Scaffolding Verification:**
+  - `python tests/test_project_scaffold.py`: PASSED (governance files, licenses, ADRs, clean-room logs, directories verified).
 
 ---
 
