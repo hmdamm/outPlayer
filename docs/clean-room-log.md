@@ -66,3 +66,19 @@ The observer role is scheduled to execute black-box behavioral captures accordin
 - **Action:** Verified presence and integrity of clean reference installation at target path. Confirmed default settings baseline.
 - **Artifacts Produced:** Established clean-room governance charter and observation protocol in `docs/clean-room-log.md`.
 - **Integrity Statement:** No reverse engineering, decompilation, or binary analysis tools were executed against the reference binary. All specifications will be generated through visual observation of running application behavior.
+
+### Entry CR-002: Command-Line Interface Documentation Audit
+- **Date:** 2026-11-11
+- **Role:** Observer
+- **Reference Target:** `C:\Program Files\DAUM\PotPlayer\CmdLine64.txt`
+- **Action:** Audited and cataloged the complete command-line interface documentation shipped with the reference installation across all language code-pages (CP0 English, CP949 Korean, etc.). Mapped all 28 CLI switches, parameters, argument formats, and stdin pipe behaviors to Linux-standard GNU long options and compatibility aliases.
+- **Artifacts Produced:** Authored `docs/spec/cli.md` (Specification SPEC-CLI-001).
+- **Integrity Statement:** Derived entirely from shipped plain-text documentation (`CmdLine64.txt`). No disassembly, decompilation, debugging, or memory tracing of executable binaries was performed.
+
+### Entry CR-003: Media Formats & Streaming Protocols Matrix
+- **Date:** 2026-11-11
+- **Role:** Observer
+- **Reference Target:** PotPlayer UI File Association Preferences (`F5 > Association`) and public `libmpv`/FFmpeg/libass specifications.
+- **Action:** Cataloged visible container types, video codecs, audio decoders, subtitle renderers, and network streaming protocols supported by the reference player. Formulated a 1:1 Linux compatibility matrix powered by `libmpv` and modern FFmpeg decoders with VA-API / NVDEC hardware acceleration.
+- **Artifacts Produced:** Authored `docs/spec/formats.md` (Specification SPEC-FORMATS-001).
+- **Integrity Statement:** Specifications established through non-invasive black-box UI inspection of public file association dialogues and published open-source codec specifications. No binary reverse engineering was performed.
