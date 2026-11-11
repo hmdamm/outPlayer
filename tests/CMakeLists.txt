@@ -36,3 +36,18 @@ target_link_libraries(test_mpv_engine
 )
 
 add_test(NAME test_mpv_engine COMMAND test_mpv_engine)
+
+# ==============================================================================
+# Task 4: test_video_widget target
+# ==============================================================================
+qt_add_executable(test_video_widget
+    test_video_widget.cpp
+)
+
+target_link_libraries(test_video_widget
+    PRIVATE
+        outplayer_ui
+        Qt6::Test
+)
+
+add_test(NAME test_video_widget COMMAND test_video_widget)
