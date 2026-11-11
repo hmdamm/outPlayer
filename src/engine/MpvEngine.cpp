@@ -137,7 +137,12 @@ bool MpvEngine::loadFile(const QString& url)
         return false;
     }
 
-    const QByteArray utf8 = url.toUtf8();
+    QString targetUrl = url;
+    if (targetUrl.startsWith(QStringLiteral("lavfi://"))) {
+        targetUrl = QStringLiteral("av://lavfi:") + targetUrl.mid(8);
+    }
+
+    const QByteArray utf8 = targetUrl.toUtf8();
     const char* cmd[] = {"loadfile", utf8.constData(), nullptr};
     int err = mpv_command(m_mpv, cmd);
     return err >= 0;
