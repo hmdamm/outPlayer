@@ -44,6 +44,9 @@ bool MainWindow::openMedia(const QString& pathOrUrl)
     if (!m_engine) {
         return false;
     }
+    if (m_videoWidget) {
+        m_videoWidget->ensureInitialized();
+    }
     return m_engine->loadFile(pathOrUrl);
 }
 

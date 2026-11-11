@@ -25,6 +25,9 @@ public:
 
     [[nodiscard]] engine::MpvEngine* engine() const noexcept { return m_engine; }
     [[nodiscard]] mpv_render_context* renderContext() const noexcept { return m_mpv_gl; }
+    [[nodiscard]] uint64_t frameCount() const noexcept { return m_frameCount; }
+
+    bool ensureInitialized();
 
 public slots:
     void maybeUpdate();
@@ -38,6 +41,7 @@ private:
 
     engine::MpvEngine* m_engine{nullptr};
     mpv_render_context* m_mpv_gl{nullptr};
+    uint64_t m_frameCount{0};
 };
 
 } // namespace outplayer::ui

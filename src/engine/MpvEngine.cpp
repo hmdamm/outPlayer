@@ -241,4 +241,34 @@ bool MpvEngine::isPaused() const
     return m_paused;
 }
 
+bool MpvEngine::setProperty(const QString& name, const QString& value)
+{
+    if (!m_mpv) {
+        return false;
+    }
+    const QByteArray nameUtf8 = name.toUtf8();
+    const QByteArray valUtf8 = value.toUtf8();
+    return mpv_set_property_string(m_mpv, nameUtf8.constData(), valUtf8.constData()) >= 0;
+}
+
+QString MpvEngine::getPropertyString(const QString& name) const
+{
+    if (!m_mpv) {
+        return {};
+    }
+    const QByteArray nameUtf8 = name.toUtf8();
+    char* val = mpv_get_property_string(m_mpv, nameUtf8.constData());
+    if (!val) {
+        return {};
+    }
+    QString result = QString::fromUtf8(val);
+    mpv_free(val);
+    return result;
+}
+
+void MpvEngine::setVo(const QString& vo)
+{
+    setProperty(QStringLiteral("vo"), vo);
+}
+
 } // namespace outplayer::engine
