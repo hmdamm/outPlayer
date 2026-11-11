@@ -26,7 +26,7 @@ This document tracks the roadmap, phase progression, and verification evidence f
 | **P0-T1** | Scaffolding, Governance Documents & Clean-Room Log | Done | Implementer | `TASKS.md`, `docs/decisions.md`, `docs/clean-room-log.md`, `THIRD_PARTY_NOTICES.md`, `.gitignore`, `README.md`, `tests/test_project_scaffold.py` | `python tests/test_project_scaffold.py` PASS, commit `772c1e2` |
 | **P0-T2** | CMake Build System with Qt 6 & libmpv | Done | Implementer | `CMakeLists.txt`, `src/CMakeLists.txt`, `tests/CMakeLists.txt` | `wsl cmake -B build -S . -G Ninja` succeeds, commit `8617263` |
 | **P0-T3** | Core Playback Engine Interface & libmpv Wrapper | Done | Implementer | `src/engine/IPlaybackEngine.h`, `src/engine/MpvEngine.h`, `src/engine/MpvEngine.cpp`, `tests/test_mpv_engine.cpp` | `wsl ctest -R test_mpv_engine` PASS, commit `73a084e` |
-| **P0-T4** | VideoWidget (mpv_render_context) & MainWindow Shell | Not Started | Implementer | `src/ui/VideoWidget.h`, `src/ui/VideoWidget.cpp`, `src/ui/MainWindow.h`, `src/ui/MainWindow.cpp`, `src/main.cpp`, `tests/test_video_widget.cpp` | `wsl xvfb-run -a ctest -R test_video_widget` PASS |
+| **P0-T4** | VideoWidget (mpv_render_context) & MainWindow Shell | Done | Implementer | `src/ui/VideoWidget.h`, `src/ui/VideoWidget.cpp`, `src/ui/MainWindow.h`, `src/ui/MainWindow.cpp`, `src/main.cpp`, `tests/test_video_widget.cpp` | `wsl xvfb-run -a ctest -R test_video_widget` PASS, commits `2e9a280`..`9470275` |
 | **P0-T5** | Phase 0 Verification & Gate Clearance | Not Started | Implementer | Verification runs, synthetic media playback test, status documentation updates | `wsl xvfb-run -a ./build/src/outplayer --test-run` exit code 0 |
 
 ---
