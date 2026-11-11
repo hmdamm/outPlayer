@@ -23,7 +23,7 @@ This document tracks the roadmap, phase progression, and verification evidence f
 
 | Task ID | Description | Status | Assignee / Role | Target Deliverables | Verification Evidence |
 |---|---|---|---|---|---|
-| **P0-T1** | Scaffolding, Governance Documents & Clean-Room Log | In Progress | Implementer | `TASKS.md`, `docs/decisions.md`, `docs/clean-room-log.md`, `THIRD_PARTY_NOTICES.md`, `.gitignore`, `README.md`, `tests/test_project_scaffold.py` | `python tests/test_project_scaffold.py` PASS |
+| **P0-T1** | Scaffolding, Governance Documents & Clean-Room Log | Done | Implementer | `TASKS.md`, `docs/decisions.md`, `docs/clean-room-log.md`, `THIRD_PARTY_NOTICES.md`, `.gitignore`, `README.md`, `tests/test_project_scaffold.py` | `python tests/test_project_scaffold.py` PASS, commit `772c1e2` |
 | **P0-T2** | CMake Build System with Qt 6 & libmpv | Not Started | Implementer | `CMakeLists.txt`, `src/CMakeLists.txt`, `tests/CMakeLists.txt` | `wsl cmake -B build -S . -G Ninja` succeeds |
 | **P0-T3** | Core Playback Engine Interface & libmpv Wrapper | Not Started | Implementer | `src/engine/IPlaybackEngine.h`, `src/engine/MpvEngine.h`, `src/engine/MpvEngine.cpp`, `tests/test_mpv_engine.cpp` | `wsl ctest -R test_mpv_engine` PASS |
 | **P0-T4** | VideoWidget (mpv_render_context) & MainWindow Shell | Not Started | Implementer | `src/ui/VideoWidget.h`, `src/ui/VideoWidget.cpp`, `src/ui/MainWindow.h`, `src/ui/MainWindow.cpp`, `src/main.cpp`, `tests/test_video_widget.cpp` | `wsl xvfb-run -a ctest -R test_video_widget` PASS |
