@@ -57,7 +57,7 @@ This document tracks the roadmap, phase progression, and verification evidence f
 | **P1-T2** | Context Menu & Main Menu Hierarchy Inventory | Done | Observer | `docs/spec/features.csv` (menu section) | `python tests/test_phase1_specs.py` PASS (258 items), commit `116a356` |
 | **P1-T3** | Hotkey Map & Keybinding Matrix | Done | Observer | `docs/spec/hotkeys.csv` | `python tests/test_phase1_specs.py` PASS (253 shortcuts), commit `e264b83` |
 | **P1-T4** | Preferences (F5) Tree & Linux Deviations | Done | Observer | `docs/spec/features.csv` (prefs), `docs/spec/linux-deviations.md` | `python tests/test_phase1_specs.py` PASS (87 prefs items, 9 adaptations), commit `50aa00e` |
-| **P1-T5** | Playlist (F6) & Control Panel (F7) Inventory | Not Started | Observer | `docs/spec/features.csv` (aux windows), `docs/spec/ui-layout.md` | Dimensional & behavior layout metrics |
+| **P1-T5** | Playlist (F6) & Control Panel (F7) Inventory | Done | Observer | `docs/spec/features.csv` (aux windows), `docs/spec/ui-layout.md` | `python tests/test_phase1_specs.py` PASS (geometry & palette), commit `f5c8c06` |
 | **P1-T6** | Media Formats, CLI & Network Protocols | Done | Observer | `docs/spec/formats.md`, `docs/spec/cli.md` | `python tests/test_phase1_specs.py` PASS, commit `a2b611d` |
 
 ---
