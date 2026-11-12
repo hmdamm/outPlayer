@@ -81,3 +81,21 @@ target_link_libraries(test_video_widget
 )
 
 add_test(NAME test_video_widget COMMAND test_video_widget)
+
+# ==============================================================================
+# Task 5: test_input_manager target
+# ==============================================================================
+qt_add_executable(test_input_manager
+    test_input_manager.cpp
+)
+
+target_link_libraries(test_input_manager
+    PRIVATE
+        outplayer_input
+        outplayer_core
+        Qt6::Test
+        Qt6::Widgets
+)
+
+add_test(NAME test_input_manager COMMAND test_input_manager)
+

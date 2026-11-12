@@ -25,6 +25,26 @@ target_link_libraries(outplayer_core
 )
 
 # ==============================================================================
+# outplayer_input library
+# ==============================================================================
+
+qt_add_library(outplayer_input STATIC
+    input/InputManager.h
+    input/InputManager.cpp
+)
+
+target_include_directories(outplayer_input
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+target_link_libraries(outplayer_input
+    PUBLIC
+        outplayer_core
+        Qt6::Widgets
+)
+
+# ==============================================================================
 # outplayer_ui library
 # ==============================================================================
 
@@ -59,6 +79,7 @@ qt_add_executable(outplayer
 target_link_libraries(outplayer
     PRIVATE
         outplayer_ui
+        outplayer_input
         Qt6::Widgets
         Qt6::OpenGLWidgets
 )
