@@ -80,6 +80,53 @@ def test_task2():
 
     print(f"Task 2 spec verification passed ({len(rows)} menu features across {len(found_areas)} areas).")
 
+def test_task3():
+    import csv
+    csv_path = "docs/spec/hotkeys.csv"
+    assert os.path.exists(csv_path), "hotkeys.csv missing"
+
+    with open(csv_path, "r", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        required_columns = ["id", "function_name", "key", "modifiers", "scope", "menu_path", "command_id"]
+        assert reader.fieldnames == required_columns, f"Invalid columns: {reader.fieldnames} != {required_columns}"
+        rows = list(reader)
+
+    assert len(rows) >= 100, f"Expected at least 100 hotkeys, got {len(rows)}"
+
+    seen_ids = set()
+    shortcuts = set()
+    for i, r in enumerate(rows, 1):
+        for col in required_columns:
+            assert r[col] is not None and r[col].strip() != "", f"Empty field '{col}' at row {i} (id: {r.get('id')})"
+        assert r["id"] not in seen_ids, f"Duplicate id '{r['id']}' at row {i}"
+        seen_ids.add(r["id"])
+
+        mod = r["modifiers"].strip()
+        key = r["key"].strip()
+        full_key = f"{mod}+{key}" if mod != "None" else key
+        shortcuts.add(full_key)
+
+    canonical_shortcuts = [
+        "Space", "Enter", "Z", "X", "C", "Left", "Right", "Up", "Down",
+        "PageUp", "PageDown", "[", "]", "Ctrl+O", "F5", "F6", "F7", "Tab"
+    ]
+    for cs in canonical_shortcuts:
+        assert cs in shortcuts, f"Canonical shortcut '{cs}' missing in hotkeys.csv"
+
+    # Verify presence of mouse actions
+    mouse_actions = {"LeftClick", "LeftDblClick", "WheelUp", "WheelDown", "MiddleClick"}
+    found_mouse = {r["key"] for r in rows if r["key"] in mouse_actions}
+    missing_mouse = mouse_actions - found_mouse
+    assert not missing_mouse, f"Missing mouse actions in hotkeys.csv: {missing_mouse}"
+
+    # Verify clean room audit entry CR-005
+    with open("docs/clean-room-log.md", "r", encoding="utf-8") as f:
+        log_content = f.read()
+    assert "### Entry CR-005:" in log_content, "CR-005 missing in clean-room-log.md"
+
+    print(f"Task 3 spec verification passed ({len(rows)} hotkey/mouse mappings verified).")
+
 if __name__ == "__main__":
     test_task1()
     test_task2()
+    test_task3()

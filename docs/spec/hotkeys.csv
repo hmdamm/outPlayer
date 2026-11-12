@@ -1,0 +1,254 @@
+id,function_name,key,modifiers,scope,menu_path,command_id
+HK-001,Play/Pause Playback,Space,None,Window,Menu > Playback > Play/Pause Playback,CMD_PLAY_PAUSE
+HK-002,Pause Playback,Space,Ctrl,Window,Menu > Playback > Pause Playback,CMD_PLAY_PAUSE_EXPLICIT
+HK-003,Stop Playback,Space,Ctrl+Shift,Window,Menu > Playback > Stop Playback,CMD_PLAY_STOP
+HK-004,Seek Backward Short (5 sec),Left,None,Window,Menu > Playback > Jump > 5s Backward,CMD_SEEK_BACKWARD_SHORT
+HK-005,Seek Forward Short (5 sec),Right,None,Window,Menu > Playback > Jump > 5s Forward,CMD_SEEK_FORWARD_SHORT
+HK-006,Seek Backward Medium (30 sec),Left,Ctrl,Window,Menu > Playback > Jump > 30s Backward,CMD_SEEK_BACKWARD_MEDIUM
+HK-007,Seek Forward Medium (30 sec),Right,Ctrl,Window,Menu > Playback > Jump > 30s Forward,CMD_SEEK_FORWARD_MEDIUM
+HK-008,Seek Backward Long (1 min),Left,Alt,Window,Menu > Playback > Jump > 1m Backward,CMD_SEEK_BACKWARD_1MIN
+HK-009,Seek Forward Long (1 min),Right,Alt,Window,Menu > Playback > Jump > 1m Forward,CMD_SEEK_FORWARD_1MIN
+HK-010,Seek Backward Extra Long (5 min),Left,Ctrl+Alt,Window,Menu > Playback > Jump > 5m Backward,CMD_SEEK_BACKWARD_5MIN
+HK-011,Seek Forward Extra Long (5 min),Right,Ctrl+Alt,Window,Menu > Playback > Jump > 5m Forward,CMD_SEEK_FORWARD_5MIN
+HK-012,Seek Backward Keyframe (5 sec),Left,Shift,Window,Menu > Playback > Jump > Keyframe Backward,CMD_SEEK_BACKWARD_KEYFRAME
+HK-013,Seek Forward Keyframe (5 sec),Right,Shift,Window,Menu > Playback > Jump > Keyframe Forward,CMD_SEEK_FORWARD_KEYFRAME
+HK-014,Previous Keyframe,Left,Ctrl+Shift,Window,Menu > Playback > Jump > Previous keyframe,CMD_SEEK_PREV_KEYFRAME
+HK-015,Next Keyframe,Right,Ctrl+Shift,Window,Menu > Playback > Jump > Next keyframe,CMD_SEEK_NEXT_KEYFRAME
+HK-016,Previous Frame (Step Backward),D,None,Window,Menu > Playback > Jump > Previous Frame,CMD_FRAME_PREV
+HK-017,Next Frame (Step Forward),F,None,Window,Menu > Playback > Jump > Next Frame,CMD_FRAME_NEXT
+HK-018,Jump to Starting Point (00:00:00),BackSpace,None,Window,Menu > Playback > Jump > Starting point,CMD_SEEK_START
+HK-019,Jump to Middle Point (50%),BackSpace,Ctrl,Window,Menu > Playback > Jump > Middle point,CMD_SEEK_MIDDLE
+HK-020,Jump to 30 Sec Before Ending,BackSpace,Shift,Window,Menu > Playback > Jump > 30 Sec. before ending,CMD_SEEK_END_30SEC
+HK-021,Seek to Beginning of Media,Home,None,Window,Menu > Playback > Jump > Beginning,CMD_SEEK_BEGINNING
+HK-022,Seek to End of Media,End,None,Window,Menu > Playback > Jump > End,CMD_SEEK_END
+HK-023,Play Previous Item in Playlist,PageUp,None,Window,Menu > Playback > Play Previous Item,CMD_PLAYLIST_PREV
+HK-024,Play Next Item in Playlist,PageDown,None,Window,Menu > Playback > Play Next Item,CMD_PLAYLIST_NEXT
+HK-025,Force Previous Channel/Album,PageUp,Ctrl,Window,Menu > Playback > Force Previous Channel,CMD_CHANNEL_PREV
+HK-026,Force Next Channel/Album,PageDown,Ctrl,Window,Menu > Playback > Force Next Channel,CMD_CHANNEL_NEXT
+HK-027,Browse Scenes by Time Intervals,Z,Shift,Window,Menu > Playback > Jump > Browse Scenes by Time Intervals...,CMD_SCENE_BROWSE_TIME
+HK-028,Browse Scenes by Marker Positions,Z,Alt,Window,Menu > Playback > Jump > Browse Scenes by Marker Positions...,CMD_SCENE_BROWSE_MARKER
+HK-029,Playback Speed Normal (1.0x),Z,None,Window,Menu > Playback > Playback Speed > Default/Last used,CMD_SPEED_NORMAL
+HK-030,Decrease Playback Speed (-0.1x),X,None,Window,Menu > Playback > Playback Speed > Decrease speed,CMD_SPEED_DOWN
+HK-031,Increase Playback Speed (+0.1x),C,None,Window,Menu > Playback > Playback Speed > Increase speed,CMD_SPEED_UP
+HK-032,Set A-B Repeat Starting Point (A),[,None,Window,Menu > Playback > A-B Repeat > Set Starting Point (A),CMD_REPEAT_AB_START
+HK-033,Reset Point A,[,Shift,Window,Menu > Playback > A-B Repeat > Reset Point A,CMD_REPEAT_AB_RESET_A
+HK-034,Move Point A 0.1 Sec Backward,[,Ctrl,Window,Menu > Playback > A-B Repeat > Move Point A 0.1 Sec. Backward,CMD_REPEAT_AB_A_BACKWARD
+HK-035,Move Point A 0.1 Sec Forward,[,Alt,Window,Menu > Playback > A-B Repeat > Move Point A 0.1 Sec. Forward,CMD_REPEAT_AB_A_FORWARD
+HK-036,Set A-B Repeat Ending Point (B),],None,Window,Menu > Playback > A-B Repeat > Set Ending Point (B),CMD_REPEAT_AB_END
+HK-037,Reset Point B,],Shift,Window,Menu > Playback > A-B Repeat > Reset Point B,CMD_REPEAT_AB_RESET_B
+HK-038,Move Point B 0.1 Sec Backward,],Ctrl,Window,Menu > Playback > A-B Repeat > Move Point B 0.1 Sec. Backward,CMD_REPEAT_AB_B_BACKWARD
+HK-039,Move Point B 0.1 Sec Forward,],Alt,Window,Menu > Playback > A-B Repeat > Move Point B 0.1 Sec. Forward,CMD_REPEAT_AB_B_FORWARD
+HK-040,Move A-B Points 0.1 Sec Backward,[,Ctrl+Alt,Window,Menu > Playback > A-B Repeat > Move A-B Points 0.1 Sec. Backward,CMD_REPEAT_AB_MOVE_BACKWARD
+HK-041,Move A-B Points 0.1 Sec Forward,],Ctrl+Alt,Window,Menu > Playback > A-B Repeat > Move A-B Points 0.1 Sec. Forward,CMD_REPEAT_AB_MOVE_FORWARD
+HK-042,Repeat Current Subtitle Section,\,None,Window,Menu > Playback > A-B Repeat > Repeat current subtitle section,CMD_REPEAT_AB_SUBTITLE
+HK-043,Clear A-B Repeat Range,\,Shift,Window,Menu > Playback > A-B Repeat > Clear A-B Repeat,CMD_REPEAT_AB_CLEAR
+HK-044,Increase Volume (+2%),Up,None,Window,Menu > Audio > Volume > Increase Volume,CMD_VOLUME_UP
+HK-045,Decrease Volume (-2%),Down,None,Window,Menu > Audio > Volume > Decrease Volume,CMD_VOLUME_DOWN
+HK-046,Mute Master Audio,M,None,Window,Menu > Audio > Volume > Mute,CMD_VOLUME_MUTE
+HK-047,Mute Wave Volume,M,Ctrl+Alt,Window,Menu > Audio > Volume > Wave Mute,CMD_VOLUME_WAVE_MUTE
+HK-048,Wave Volume Up,Up,Shift,Window,Menu > Audio > Volume > Wave Volume Up,CMD_VOLUME_WAVE_UP
+HK-049,Wave Volume Down,Down,Shift,Window,Menu > Audio > Volume > Wave Volume Down,CMD_VOLUME_WAVE_DOWN
+HK-050,Cycle Audio Track / Stream,A,None,Window,Menu > Audio > Select Audio Stream,CMD_AUDIO_CYCLE
+HK-051,Cycle Audio Stream (Secondary),C,Shift,Window,Menu > Audio > Audio Stream Cycle,CMD_AUDIO_CYCLE_STREAM
+HK-052,Audio Sync 0.05 Sec Faster,",",Shift,Window,Menu > Audio > Audio Sync > 0.05 Sec. Faster,CMD_AUDIO_SYNC_FASTER
+HK-053,Audio Sync 0.05 Sec Slower,.,Shift,Window,Menu > Audio > Audio Sync > 0.05 Sec. Slower,CMD_AUDIO_SYNC_SLOWER
+HK-054,Audio Sync Reset (0.0s),/,Shift,Window,Menu > Audio > Audio Sync > Default/Last used,CMD_AUDIO_SYNC_RESET
+HK-055,Toggle Audio Equalizer,M,Shift,Window,Menu > Audio > Equalizer > Toggle Equalizer,CMD_AUDIO_EQ_TOGGLE
+HK-056,Toggle Audio Normalizer,N,Shift,Window,Menu > Audio > Volume Control > Normalizer,CMD_AUDIO_NORMALIZE
+HK-057,Cycle Voice Removal Filter,B,Shift,Window,Menu > Audio > Voice Removal,CMD_AUDIO_VOICE_REMOVE
+HK-058,Cycle Audio Processing Filters,V,Shift,Window,Menu > Audio > Audio Processing Effects,CMD_AUDIO_CYCLE_FILTER
+HK-059,Audio Processing Settings...,X,Shift,Window,Menu > Audio > Audio Processing Settings...,CMD_AUDIO_SETTINGS
+HK-060,Show/Hide Subtitles,H,Alt,Window,Menu > Subtitles > Show/Hide Subtitles,CMD_SUB_TOGGLE_VISIBILITY
+HK-061,Cycle Subtitle Track / Stream,L,None,Window,Menu > Subtitles > Select Subtitle Stream,CMD_SUB_CYCLE
+HK-062,Cycle Second Subtitle Stream,L,Alt,Window,Menu > Subtitles > Second Subtitles > Select Subtitle Stream,CMD_SUB_CYCLE_SECOND
+HK-063,Toggle Second Subtitle Visibility,K,Alt,Window,Menu > Subtitles > Second Subtitles > Show/Hide Second Subtitle,CMD_SUB_TOGGLE_SECOND
+HK-064,Subtitle Sync 0.5 Sec Faster,",",None,Window,Menu > Subtitles > Subtitle Sync > 0.5 Sec. Faster,CMD_SUB_SYNC_FASTER
+HK-065,Subtitle Sync 0.5 Sec Slower,.,None,Window,Menu > Subtitles > Subtitle Sync > 0.5 Sec. Slower,CMD_SUB_SYNC_SLOWER
+HK-066,Subtitle Sync Reset (0.0s),/,None,Window,Menu > Subtitles > Subtitle Sync > Default/Last used,CMD_SUB_SYNC_RESET
+HK-067,Move Subtitle Left,Left,Alt,Window,Menu > Subtitles > Subtitle Position > Move Left,CMD_SUB_POS_LEFT
+HK-068,Move Subtitle Right,Right,Alt,Window,Menu > Subtitles > Subtitle Position > Move Right,CMD_SUB_POS_RIGHT
+HK-069,Move Subtitle Up,Up,Alt,Window,Menu > Subtitles > Subtitle Position > Move Up,CMD_SUB_POS_UP
+HK-070,Move Subtitle Down,Down,Alt,Window,Menu > Subtitles > Subtitle Position > Move Down,CMD_SUB_POS_DOWN
+HK-071,Increase Subtitle Font Size,PageUp,Alt,Window,Menu > Subtitles > Subtitle Size > Increase Size,CMD_SUB_SIZE_UP
+HK-072,Decrease Subtitle Font Size,PageDown,Alt,Window,Menu > Subtitles > Subtitle Size > Decrease Size,CMD_SUB_SIZE_DOWN
+HK-073,Reset Subtitle Size and Position,Home,Alt,Window,Menu > Subtitles > Subtitle Size > Reset Size,CMD_SUB_SIZE_RESET
+HK-074,Load Subtitle File...,O,Alt,Window,Menu > Subtitles > Load Subtitle...,CMD_SUB_LOAD
+HK-075,Reload Subtitle File,Y,Ctrl+Alt,Window,Menu > Subtitles > Reload Subtitle,CMD_SUB_RELOAD
+HK-076,Save Subtitle as Video Filename,S,Ctrl+Shift,Window,Menu > Subtitles > Save Subtitles > Save subtitle as video filename,CMD_SUB_SAVE_AS_VIDEO
+HK-077,Save Subtitle As...,S,Ctrl+Alt,Window,Menu > Subtitles > Save Subtitles > Save subtitle as...,CMD_SUB_SAVE_AS
+HK-078,Open Subtitle Explorer / Browser,I,Alt,Window,Menu > Subtitles > Browse Subtitles...,CMD_SUB_EXPLORER
+HK-079,Jump to Current Subtitle Position,Home,Ctrl,Window,Menu > Subtitles > Jump to Subtitle > Current subtitle position,CMD_SEEK_CURRENT_SUB
+HK-080,Jump to Previous Subtitle Sync Point,PageUp,Ctrl,Window,Menu > Subtitles > Jump to Subtitle > Previous subtitle,CMD_SEEK_PREV_SUB
+HK-081,Jump to Next Subtitle Sync Point,PageDown,Ctrl,Window,Menu > Subtitles > Jump to Subtitle > Next subtitle,CMD_SEEK_NEXT_SUB
+HK-082,Decrease Brightness (-1%),Q,None,Window,Menu > Video > Video Effects > Decrease Brightness,CMD_VIDEO_BRIGHTNESS_DOWN
+HK-083,Increase Brightness (+1%),W,None,Window,Menu > Video > Video Effects > Increase Brightness,CMD_VIDEO_BRIGHTNESS_UP
+HK-084,Reset Brightness,E,None,Window,Menu > Video > Video Effects > Reset Brightness,CMD_VIDEO_BRIGHTNESS_RESET
+HK-085,Decrease Contrast (-1%),R,None,Window,Menu > Video > Video Effects > Decrease Contrast,CMD_VIDEO_CONTRAST_DOWN
+HK-086,Increase Contrast (+1%),T,None,Window,Menu > Video > Video Effects > Increase Contrast,CMD_VIDEO_CONTRAST_UP
+HK-087,Reset Contrast,Y,None,Window,Menu > Video > Video Effects > Reset Contrast,CMD_VIDEO_CONTRAST_RESET
+HK-088,Decrease Saturation (-1%),U,None,Window,Menu > Video > Video Effects > Decrease Saturation,CMD_VIDEO_SATURATION_DOWN
+HK-089,Increase Saturation (+1%),I,None,Window,Menu > Video > Video Effects > Increase Saturation,CMD_VIDEO_SATURATION_UP
+HK-090,Reset Saturation,O,None,Window,Menu > Video > Video Effects > Reset Saturation,CMD_VIDEO_SATURATION_RESET
+HK-091,Cycle Video Track / Stream,V,None,Window,Menu > Video > Select Video Stream,CMD_VIDEO_CYCLE
+HK-092,Cycle Deinterlacing Mode,I,Ctrl,Window,Menu > Video > Deinterlacing > Cycle Deinterlacing Mode,CMD_VIDEO_CYCLE_DEINTERLACE
+HK-093,Cycle Built-in Video Transform Filter,X,Ctrl,Window,Menu > Video > Video Processing > Cycle Video Transform Filter,CMD_VIDEO_CYCLE_TRANSFORM
+HK-094,Rotate Video 90 Deg Clockwise,R,Ctrl,Window,Menu > Video > Screen Rotation > Rotate 90 deg,CMD_VIDEO_ROTATE_90
+HK-095,Toggle Post-Resize Pixel Shaders,P,Ctrl+Alt,Window,Menu > Video > Pixel Shader > Use Post-Resize Pixel Shaders,CMD_SHADER_POST_RESIZE
+HK-096,Toggle Pre-Resize Pixel Shaders,S,Ctrl+Alt,Window,Menu > Video > Pixel Shader > Use Pre-Resize Pixel Shaders,CMD_SHADER_PRE_RESIZE
+HK-097,Hardware Acceleration Toggle (DXVA/VA-API),H,Ctrl+Alt,Window,Menu > Video > Video Processing > Hardware Acceleration Toggle,CMD_VIDEO_TOGGLE_HWACCEL
+HK-098,Cycle Video Processing Mode,J,Alt,Window,Menu > Video > Video Processing > Cycle Processing Mode,CMD_VIDEO_CYCLE_FILTER
+HK-099,Fullscreen (Keep AR),Enter,None,Window,Menu > Window Size > Fullscreen (Keep AR),CMD_WINDOW_FULLSCREEN
+HK-100,Fullscreen (Keep AR Alt),Enter,Alt,Window,Menu > Window Size > Fullscreen (Keep AR),CMD_WINDOW_FULLSCREEN_ALT
+HK-101,Fullscreen (Stretch),Enter,Ctrl,Window,Menu > Window Size > Fullscreen (Stretch),CMD_WINDOW_FULLSCREEN_STRETCH
+HK-102,Fullscreen (Stretch by Keeping AR),Enter,Ctrl+Alt,Window,Menu > Window Size > Fullscreen (Stretch by Keeping AR),CMD_WINDOW_FULLSCREEN_STRETCH_AR
+HK-103,Desktop Background Mode,Enter,Shift,Window,Menu > Window Size > Desktop Mode,CMD_WINDOW_DESKTOP_MODE
+HK-104,Window Size 0.5x (Half Size),1,Alt,Window,Menu > Window Size > 0.5x,CMD_WINDOW_HALF
+HK-105,Window Size 1.0x (Normal Size),2,Alt,Window,Menu > Window Size > 1.0x (Default),CMD_WINDOW_NORMAL
+HK-106,Window Size 1.5x (1.5x Size),3,Alt,Window,Menu > Window Size > 1.5x,CMD_WINDOW_1_5X
+HK-107,Window Size 2.0x (Double Size),4,Alt,Window,Menu > Window Size > 2.0x,CMD_WINDOW_DOUBLE
+HK-108,Window Size Fit to Screen,5,Alt,Window,Menu > Window Size > Fit to Screen,CMD_WINDOW_FIT_SCREEN
+HK-109,Window Size Maximum Window Size,6,Alt,Window,Menu > Window Size > Maximum Window Size,CMD_WINDOW_MAXIMUM
+HK-110,Cycle Aspect Ratio Mode,F5,Ctrl,Window,Menu > Aspect Ratio > Keep Aspect Ratio,CMD_ASPECT_RATIO_PRESET
+HK-111,Cycle Aspect Ratio Preset,F6,Ctrl,Window,Menu > Aspect Ratio > Cycle Aspect Ratio,CMD_ASPECT_RATIO_CYCLE
+HK-112,Aspect Ratio Custom Preset 1,1,Ctrl,Window,Menu > Aspect Ratio > Aspect Ratio 1,CMD_ASPECT_RATIO_1
+HK-113,Aspect Ratio Custom Preset 2 (4:3),2,Ctrl,Window,Menu > Aspect Ratio > Aspect Ratio 2 (4:3),CMD_ASPECT_RATIO_2
+HK-114,Aspect Ratio Custom Preset 3 (16:9),3,Ctrl,Window,Menu > Aspect Ratio > Aspect Ratio 3 (16:9),CMD_ASPECT_RATIO_3
+HK-115,Aspect Ratio Custom Preset 4 (1.85:1),4,Ctrl,Window,Menu > Aspect Ratio > Aspect Ratio 4 (1.85:1),CMD_ASPECT_RATIO_4
+HK-116,Aspect Ratio Custom Preset 5 (2.35:1),5,Ctrl,Window,Menu > Aspect Ratio > Aspect Ratio 5 (2.35:1),CMD_ASPECT_RATIO_5
+HK-117,Aspect Ratio Custom Preset 6,6,Ctrl,Window,Menu > Aspect Ratio > Aspect Ratio 6,CMD_ASPECT_RATIO_6
+HK-118,Aspect Ratio Custom Preset 7,7,Ctrl,Window,Menu > Aspect Ratio > Aspect Ratio 7,CMD_ASPECT_RATIO_7
+HK-119,Increase Window Size,Numpad_Add,Ctrl+Alt,Window,Menu > Window Size > Increase Window Size,CMD_WINDOW_SIZE_INCREASE
+HK-120,Decrease Window Size,Numpad_Subtract,Ctrl+Alt,Window,Menu > Window Size > Decrease Window Size,CMD_WINDOW_SIZE_DECREASE
+HK-121,Center Window on Screen,Numpad5,Ctrl+Alt,Window,Menu > Window Size > Window Positioning > Place on Screen Center,CMD_WINDOW_POS_CENTER
+HK-122,Place Window on Top Left Corner,Numpad7,Ctrl+Alt,Window,Menu > Window Size > Window Positioning > Place on Top Left Corner,CMD_WINDOW_POS_TOP_LEFT
+HK-123,Place Window on Top Right Corner,Numpad9,Ctrl+Alt,Window,Menu > Window Size > Window Positioning > Place on Top Right Corner,CMD_WINDOW_POS_TOP_RIGHT
+HK-124,Place Window on Bottom Left Corner,Numpad1,Ctrl+Alt,Window,Menu > Window Size > Window Positioning > Place on Bottom Left Corner,CMD_WINDOW_POS_BOTTOM_LEFT
+HK-125,Place Window on Bottom Right Corner,Numpad3,Ctrl+Alt,Window,Menu > Window Size > Window Positioning > Place on Bottom Right Corner,CMD_WINDOW_POS_BOTTOM_RIGHT
+HK-126,Move Window Left,Numpad4,Ctrl+Alt,Window,Menu > Window Size > Window Positioning > Move Left,CMD_WINDOW_MOVE_LEFT
+HK-127,Move Window Right,Numpad6,Ctrl+Alt,Window,Menu > Window Size > Window Positioning > Move Right,CMD_WINDOW_MOVE_RIGHT
+HK-128,Move Window Up,Numpad8,Ctrl+Alt,Window,Menu > Window Size > Window Positioning > Move Up,CMD_WINDOW_MOVE_UP
+HK-129,Move Window Down,Numpad2,Ctrl+Alt,Window,Menu > Window Size > Window Positioning > Move Down,CMD_WINDOW_MOVE_DOWN
+HK-130,Zoom In Video Frame,Numpad_Add,Ctrl,Window,Menu > Pan & Scan > Zoom In,CMD_VIDEO_ZOOM_IN
+HK-131,Zoom Out Video Frame,Numpad_Subtract,Ctrl,Window,Menu > Pan & Scan > Zoom Out,CMD_VIDEO_ZOOM_OUT
+HK-132,Reset Video Frame Zoom & Pan,Numpad5,Ctrl,Window,Menu > Pan & Scan > Actual Position,CMD_VIDEO_ZOOM_RESET
+HK-133,Pan Video Frame Left,Numpad4,Ctrl,Window,Menu > Pan & Scan > Move Left,CMD_VIDEO_PAN_LEFT
+HK-134,Pan Video Frame Right,Numpad6,Ctrl,Window,Menu > Pan & Scan > Move Right,CMD_VIDEO_PAN_RIGHT
+HK-135,Pan Video Frame Up,Numpad8,Ctrl,Window,Menu > Pan & Scan > Move Up,CMD_VIDEO_PAN_UP
+HK-136,Pan Video Frame Down,Numpad2,Ctrl,Window,Menu > Pan & Scan > Move Down,CMD_VIDEO_PAN_DOWN
+HK-137,Copy Current Frame to Clipboard,C,Ctrl,Window,Menu > Capture > Copy Current Frame to Clipboard,CMD_CAPTURE_COPY_FRAME
+HK-138,Save Current Frame to File,E,Ctrl,Window,Menu > Capture > Save Current Frame to File,CMD_CAPTURE_SAVE_FRAME
+HK-139,Consecutive Image Capture Dialog...,G,Ctrl,Window,Menu > Capture > Consecutive Image Capture...,CMD_CAPTURE_CONSECUTIVE
+HK-140,Record Audio Stream Dialog...,A,Ctrl+Alt,Window,Menu > Capture > Record Audio Stream...,CMD_CAPTURE_AUDIO
+HK-141,Record Video Stream Dialog...,C,Ctrl+Alt,Window,Menu > Capture > Record Video Stream...,CMD_CAPTURE_VIDEO
+HK-142,Record Stream...,A,Ctrl,Window,Menu > Capture > Record Stream...,CMD_RECORD_STREAM
+HK-143,Start/Stop Stream Recording,A,Ctrl+Shift,Window,Menu > Capture > Start/Stop Stream Recording,CMD_RECORD_STREAM_TOGGLE
+HK-144,Start/Stop Broadcast Recording,F6,Ctrl+Alt,Window,Menu > Open > Device > Start/Stop Broadcast Recording,CMD_CAPTURE_BROADCAST_TOGGLE
+HK-145,Show/Hide Capture1 Area,F1,Ctrl+Alt,Window,Menu > Open > Device > Show/Hide Capture1 Area,CMD_CAPTURE_AREA1_TOGGLE
+HK-146,Show/Hide Capture2 Area,F2,Ctrl+Alt,Window,Menu > Open > Device > Show/Hide Capture2 Area,CMD_CAPTURE_AREA2_TOGGLE
+HK-147,Screen Capture Settings...,F5,Ctrl+Alt,Window,Menu > Open > Device > Screen Capture Settings...,CMD_CAPTURE_SETTINGS
+HK-148,About outPlayer,F1,None,Window,Menu > Help > About...,CMD_ABOUT
+HK-149,Playback & System Info Dialog...,F1,Ctrl,Window,Menu > Playback/System Info...,CMD_PLAYBACK_INFO
+HK-150,Open Folder Dialog...,F2,None,Window,Menu > Open > Open Folder...,CMD_OPEN_FOLDER
+HK-151,Open File(s) Quick Dialog...,F3,None,Window,Menu > Open File(s)...,CMD_OPEN_FILE
+HK-152,Close Current Playback,F4,None,Window,Menu > Close Playback,CMD_CLOSE_PLAYBACK
+HK-153,Preferences Configuration Dialog...,F5,None,Window,Menu > Preferences...,CMD_PREFERENCES
+HK-154,Toggle Playlist Panel/Window,F6,None,Window,Menu > Playlist...,CMD_PLAYLIST
+HK-155,Toggle Control Panel,F7,None,Window,Menu > Control Panel...,CMD_CONTROL_PANEL
+HK-156,Broadcast Window...,F8,None,Window,Menu > Open > Broadcast Window...,CMD_BROADCAST_WINDOW
+HK-157,Chat Window...,F9,None,Window,Menu > Open > Chat Window...,CMD_CHAT_WINDOW
+HK-158,Manage Broadcast Dialog...,F10,None,Window,Menu > Open > Manage Broadcast...,CMD_MANAGE_BROADCAST
+HK-159,Start/Stop Broadcasting,F11,None,Window,Menu > Open > Start/Stop Broadcasting,CMD_START_BROADCAST
+HK-160,Navigate Files Overlay,F12,None,Window,Menu > Open > Navigate > Files...,CMD_NAVIGATE_FILES
+HK-161,Navigate Menus Dialog,F12,Ctrl,Window,Menu > Open > Navigate > Menus...,CMD_NAVIGATE_MENUS
+HK-162,Toggle Playback Info Overlay (OSD),Tab,None,Window,Menu > Playback > Show Playback Info on Screen,CMD_OSD_TOGGLE
+HK-163,Cycle OSD Display Mode,Tab,Ctrl,Window,Menu > Playback > Cycle OSD Mode,CMD_OSD_CYCLE
+HK-164,Show Short Playback Info Overlay,Tab,Shift,Window,Menu > Playback > Show Short Playback Info on Screen,CMD_OSD_SHORT_INFO
+HK-165,Open File(s) Standard Dialog...,O,Ctrl,Window,Menu > Open > Open File(s)...,CMD_OPEN_FILE_STD
+HK-166,Open Streaming URL Dialog...,U,Ctrl,Window,Menu > Open > Open URL...,CMD_OPEN_URL
+HK-167,Open FTP/WebDAV/HTTP Server...,F12,Alt,Window,Menu > Open > Open FTP/WebDAV/HTTP...,CMD_OPEN_FTP
+HK-168,Open DVD Drive / Folder...,D,Ctrl,Window,Menu > Open > Open DVD,CMD_OPEN_DVD
+HK-169,Open Blu-ray Drive / Folder...,D,Ctrl+Alt,Window,Menu > Open > Open Blu-ray,CMD_OPEN_BLURAY
+HK-170,Open Screen Capture Window,S,Ctrl,Window,Menu > Open > Open Screen Capture,CMD_OPEN_SCREEN_CAPTURE
+HK-171,Open Webcam / Other Device,J,Ctrl,Window,Menu > Open > Open Webcam/Other Device,CMD_OPEN_WEBCAM
+HK-172,Open Analog TV Device,W,Ctrl,Window,Menu > Open > Open Analog TV,CMD_OPEN_ANALOG_TV
+HK-173,Open Digital TV (BDA device),K,Ctrl,Window,Menu > Open > Open Digital TV (BDA device),CMD_OPEN_DIGITAL_TV
+HK-174,Device Configuration Settings...,D,Alt,Window,Menu > Open > Device Settings...,CMD_DEVICE_SETTINGS
+HK-175,Reopen Current / Last Played Item,Y,Ctrl,Window,Menu > Open > Reopen Current/Last Item,CMD_REOPEN_LAST
+HK-176,Add Current Item to Favorites,Insert,Alt,Window,Menu > Favorites > Add Current Item to Favorites,CMD_FAVORITES_ADD_ITEM
+HK-177,Add Current Folder to Favorites,Insert,Ctrl,Window,Menu > Favorites > Add Current Folder to Favorites,CMD_FAVORITES_ADD_FOLDER
+HK-178,Add Bookmark at Current Position,P,Ctrl,Window,Menu > Bookmarks > Add to Bookmarks,CMD_BOOKMARK_ADD
+HK-179,Manage Bookmarks Window,P,None,Window,Menu > Bookmarks > Bookmark Manager...,CMD_BOOKMARK_MANAGE
+HK-180,Jump to Bookmark 1,F1,Shift,Window,Menu > Bookmarks > Jump to Bookmark 1,CMD_BOOKMARK_JUMP_1
+HK-181,Jump to Bookmark 2,F2,Shift,Window,Menu > Bookmarks > Jump to Bookmark 2,CMD_BOOKMARK_JUMP_2
+HK-182,Jump to Bookmark 3,F3,Shift,Window,Menu > Bookmarks > Jump to Bookmark 3,CMD_BOOKMARK_JUMP_3
+HK-183,Jump to Bookmark 4,F4,Shift,Window,Menu > Bookmarks > Jump to Bookmark 4,CMD_BOOKMARK_JUMP_4
+HK-184,Jump to Bookmark 5,F5,Shift,Window,Menu > Bookmarks > Jump to Bookmark 5,CMD_BOOKMARK_JUMP_5
+HK-185,Jump to Bookmark 6,F6,Shift,Window,Menu > Bookmarks > Jump to Bookmark 6,CMD_BOOKMARK_JUMP_6
+HK-186,Jump to Bookmark 7,F7,Shift,Window,Menu > Bookmarks > Jump to Bookmark 7,CMD_BOOKMARK_JUMP_7
+HK-187,Jump to Bookmark 8,F8,Shift,Window,Menu > Bookmarks > Jump to Bookmark 8,CMD_BOOKMARK_JUMP_8
+HK-188,Jump to Bookmark 9,F9,Shift,Window,Menu > Bookmarks > Jump to Bookmark 9,CMD_BOOKMARK_JUMP_9
+HK-189,Jump to Bookmark 10,F10,Shift,Window,Menu > Bookmarks > Jump to Bookmark 10,CMD_BOOKMARK_JUMP_10
+HK-190,Jump to Bookmark 11,F11,Shift,Window,Menu > Bookmarks > Jump to Bookmark 11,CMD_BOOKMARK_JUMP_11
+HK-191,Jump to Bookmark 12,F12,Shift,Window,Menu > Bookmarks > Jump to Bookmark 12,CMD_BOOKMARK_JUMP_12
+HK-192,Minimize or Exit Fullscreen,Escape,None,Window,Menu > Window > Minimize or Exit Fullscreen,CMD_WINDOW_ESCAPE
+HK-193,Exit Application,F4,Alt,Window,Menu > Exit,CMD_EXIT
+HK-194,Playlist: Add New Album,N,Ctrl,Playlist,Playlist Menu > Add a new album...,CMD_PLAYLIST_NEW_ALBUM
+HK-195,Playlist: Edit Album Title,R,Ctrl,Playlist,Playlist Menu > Edit album...,CMD_PLAYLIST_EDIT_ALBUM
+HK-196,Playlist: Delete Album,D,Ctrl,Playlist,Playlist Menu > Delete album,CMD_PLAYLIST_DELETE_ALBUM
+HK-197,Playlist: Clear Playback Queue,Q,Ctrl,Playlist,Playlist Menu > Clear playback queue,CMD_PLAYLIST_CLEAR_QUEUE
+HK-198,Playlist: Add File(s),I,Ctrl,Playlist,Playlist Menu > Add file(s)...,CMD_PLAYLIST_ADD_FILES
+HK-199,Playlist: Add Folder,O,Ctrl,Playlist,Playlist Menu > Add folder...,CMD_PLAYLIST_ADD_FOLDER
+HK-200,Playlist: Add URL,U,Ctrl,Playlist,Playlist Menu > Add URL...,CMD_PLAYLIST_ADD_URL
+HK-201,Playlist: Edit Title of Selected Items,E,Ctrl,Playlist,Playlist Menu > Edit title of selected items...,CMD_PLAYLIST_EDIT_TITLE
+HK-202,Playlist: Open File Location in File Manager,F,Ctrl,Playlist,Playlist Menu > Open file location of selected item,CMD_PLAYLIST_LOCATE_FILE
+HK-203,Playlist: Search Titles and Filenames,S,Ctrl,Playlist,Playlist Menu > Search title and filenames…,CMD_PLAYLIST_SEARCH
+HK-204,Playlist: Rename Selected File,M,Ctrl,Playlist,Playlist Menu > Rename filename of selected items...,CMD_PLAYLIST_RENAME_FILE
+HK-205,Playlist: Copy Selected Items,C,Ctrl,Playlist,Playlist Menu > Copy,CMD_PLAYLIST_COPY_PATH
+HK-206,Playlist: Paste Items,V,Ctrl,Playlist,Playlist Menu > Paste,CMD_PLAYLIST_PASTE
+HK-207,Playlist: Paste Recent Items List,V,Ctrl+Alt,Playlist,Playlist Menu > Paste recent items list,CMD_PLAYLIST_PASTE_RECENT
+HK-208,Playlist: Remove Selected Items,Delete,None,Playlist,Playlist Menu > Remove selected items,CMD_PLAYLIST_REMOVE_SELECTED
+HK-209,Playlist: Remove Unselected Items,Delete,Ctrl,Playlist,Playlist Menu > Remove unselected items,CMD_PLAYLIST_REMOVE_UNSELECTED
+HK-210,Playlist: Remove Nonexistent Items,T,Ctrl,Playlist,Playlist Menu > Remove nonexistent items,CMD_PLAYLIST_REMOVE_NONEXISTENT
+HK-211,Playlist: Delete Physical Files from Disk,Delete,Ctrl+Shift,Playlist,Playlist Menu > Delete files (e.g. subtitles/bookmarks),CMD_PLAYLIST_DELETE_PHYSICAL
+HK-212,Playlist: Select All Items,A,Ctrl,Playlist,Playlist Menu > Select All,CMD_PLAYLIST_SELECT_ALL
+HK-213,Playlist: Invert Selection,J,Ctrl,Playlist,Playlist Menu > Invert Selection,CMD_PLAYLIST_INVERT_SELECT
+HK-214,Playlist: Sort Ascending (A to Z),1,Ctrl,Playlist,Playlist Menu > Sort > Ascending order (A to Z),CMD_PLAYLIST_SORT_ASC
+HK-215,Playlist: Sort Descending (Z to A),2,Ctrl,Playlist,Playlist Menu > Sort > Descending order (Z to A),CMD_PLAYLIST_SORT_DESC
+HK-216,Playlist: Sort by Title,3,Ctrl,Playlist,Playlist Menu > Sort > Title,CMD_PLAYLIST_SORT_TITLE
+HK-217,Playlist: Sort by Filename,4,Ctrl,Playlist,Playlist Menu > Sort > Name,CMD_PLAYLIST_SORT_NAME
+HK-218,Playlist: Sort by Extension,5,Ctrl,Playlist,Playlist Menu > Sort > Extension,CMD_PLAYLIST_SORT_EXT
+HK-219,Playlist: Sort by File Size,6,Ctrl,Playlist,Playlist Menu > Sort > Size,CMD_PLAYLIST_SORT_SIZE
+HK-220,Playlist: Sort by Duration,7,Ctrl,Playlist,Playlist Menu > Sort > Duration,CMD_PLAYLIST_SORT_DURATION
+HK-221,Playlist: Sort by Date Modified,8,Ctrl,Playlist,Playlist Menu > Sort > Date,CMD_PLAYLIST_SORT_DATE
+HK-222,Playlist: Shuffle / Randomize Items,9,Ctrl,Playlist,Playlist Menu > Sort > Randomly,CMD_PLAYLIST_SORT_RANDOM
+HK-223,Playlist: Sort by Folder,0,Ctrl,Playlist,Playlist Menu > Sort > Sort by folder,CMD_PLAYLIST_SORT_FOLDER
+HK-224,Playlist: File Information Dialog,F1,Ctrl,Playlist,Playlist Menu > File information...,CMD_PLAYLIST_FILE_INFO
+HK-225,Playlist: Playlist Settings...,F5,None,Playlist,Playlist Menu > Playlist settings...,CMD_PLAYLIST_SETTINGS
+HK-226,Playlist: Close Playlist Panel,F6,None,Playlist,Playlist Menu > Close Playlist,CMD_PLAYLIST_CLOSE
+HK-227,Mouse Left Button Single Click (Play/Pause),LeftClick,None,Window,N/A,CMD_MOUSE_LEFT_CLICK
+HK-228,Mouse Left Button Double Click (Fullscreen Toggle),LeftDblClick,None,Window,N/A,CMD_MOUSE_LEFT_DBLCLICK
+HK-229,Mouse Right Button Single Click (Context Menu),RightClick,None,Window,N/A,CMD_MOUSE_RIGHT_CLICK
+HK-230,Mouse Wheel Button Single Click (Toggle Mute),MiddleClick,None,Window,N/A,CMD_MOUSE_MIDDLE_CLICK
+HK-231,Mouse Wheel Button Double Click (Window Normal 100%),MiddleDblClick,None,Window,N/A,CMD_MOUSE_MIDDLE_DBLCLICK
+HK-232,Mouse Wheel Up (Volume +2%),WheelUp,None,Window,N/A,CMD_MOUSE_WHEEL_UP
+HK-233,Mouse Wheel Down (Volume -2%),WheelDown,None,Window,N/A,CMD_MOUSE_WHEEL_DOWN
+HK-234,Mouse Wheel Tilt Left (Seek Backward 5s),WheelLeft,None,Window,N/A,CMD_MOUSE_WHEEL_LEFT
+HK-235,Mouse Wheel Tilt Right (Seek Forward 5s),WheelRight,None,Window,N/A,CMD_MOUSE_WHEEL_RIGHT
+HK-236,Mouse Extra Button 1 (XButton 1 - Previous Item),XButton1,None,Window,N/A,CMD_MOUSE_XBUTTON1
+HK-237,Mouse Extra Button 2 (XButton 2 - Next Item),XButton2,None,Window,N/A,CMD_MOUSE_XBUTTON2
+HK-238,Ctrl + Mouse Wheel Up (Zoom In / Scale Up),WheelUp,Ctrl,Window,N/A,CMD_MOUSE_CTRL_WHEEL_UP
+HK-239,Ctrl + Mouse Wheel Down (Zoom Out / Scale Down),WheelDown,Ctrl,Window,N/A,CMD_MOUSE_CTRL_WHEEL_DOWN
+HK-240,Shift + Mouse Wheel Up (Increase Playback Speed +0.1x),WheelUp,Shift,Window,N/A,CMD_MOUSE_SHIFT_WHEEL_UP
+HK-241,Shift + Mouse Wheel Down (Decrease Playback Speed -0.1x),WheelDown,Shift,Window,N/A,CMD_MOUSE_SHIFT_WHEEL_DOWN
+HK-242,Alt + Mouse Wheel Up (Subtitle Font Size Up),WheelUp,Alt,Window,N/A,CMD_MOUSE_ALT_WHEEL_UP
+HK-243,Alt + Mouse Wheel Down (Subtitle Font Size Down),WheelDown,Alt,Window,N/A,CMD_MOUSE_ALT_WHEEL_DOWN
+HK-244,Ctrl + Left Drag (Pan Image / Zoom),LeftDrag,Ctrl,Window,N/A,CMD_MOUSE_CTRL_DRAG_PAN
+HK-245,Alt + Left Drag (Pan / Stretch Image),LeftDrag,Alt,Window,N/A,CMD_MOUSE_ALT_DRAG_PAN
+HK-246,Ctrl + Alt + Left Drag (Subtitle Screen Position),LeftDrag,Ctrl+Alt,Window,N/A,CMD_MOUSE_CTRL_ALT_DRAG_SUB
+HK-247,Global: Play/Pause Playback,MediaPlayPause,None,Global,N/A,CMD_GLOBAL_PLAY_PAUSE
+HK-248,Global: Stop Playback,MediaStop,None,Global,N/A,CMD_GLOBAL_STOP
+HK-249,Global: Next Track,MediaNextTrack,None,Global,N/A,CMD_GLOBAL_NEXT
+HK-250,Global: Previous Track,MediaPreviousTrack,None,Global,N/A,CMD_GLOBAL_PREV
+HK-251,Global: Volume Up,VolumeUp,None,Global,N/A,CMD_GLOBAL_VOLUME_UP
+HK-252,Global: Volume Down,VolumeDown,None,Global,N/A,CMD_GLOBAL_VOLUME_DOWN
+HK-253,Global: Volume Mute,VolumeMute,None,Global,N/A,CMD_GLOBAL_MUTE
