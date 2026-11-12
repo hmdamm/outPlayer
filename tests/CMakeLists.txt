@@ -150,5 +150,24 @@ target_link_libraries(test_osd_overlay
 
 add_test(NAME test_osd_overlay COMMAND test_osd_overlay)
 
+# ==============================================================================
+# Task 4: test_main_window_ui target
+# ==============================================================================
+qt_add_executable(test_main_window_ui
+    test_main_window_ui.cpp
+)
+
+target_link_libraries(test_main_window_ui
+    PRIVATE
+        outplayer_ui
+        outplayer_input
+        outplayer_core
+        Qt6::Test
+        Qt6::Widgets
+)
+
+add_test(NAME test_main_window_ui COMMAND test_main_window_ui)
+
+
 
 
