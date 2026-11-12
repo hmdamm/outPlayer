@@ -38,7 +38,8 @@ const QSet<QString>& audioExtensions()
         QStringLiteral("ogg"),  QStringLiteral("m4a"),  QStringLiteral("aac"),
         QStringLiteral("opus"), QStringLiteral("wma"),  QStringLiteral("aiff"),
         QStringLiteral("ape"),  QStringLiteral("wv"),   QStringLiteral("ra"),
-        QStringLiteral("alac"), QStringLiteral("oga"),  QStringLiteral("ogx")
+        QStringLiteral("alac"), QStringLiteral("oga"),  QStringLiteral("ogx"),
+        QStringLiteral("ac3"),  QStringLiteral("dts"),  QStringLiteral("mid")
     };
     return s_audio;
 }
