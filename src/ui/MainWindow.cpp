@@ -1,12 +1,18 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "ui/MainWindow.h"
 
+#include <QContextMenuEvent>
 #include <QCursor>
+#include <QDragEnterEvent>
+#include <QDropEvent>
 #include <QEvent>
 #include <QFileInfo>
+#include <QHBoxLayout>
+#include <QMimeData>
 #include <QMouseEvent>
 #include <QResizeEvent>
 #include <QTimer>
+#include <QUrl>
 #include <QWindow>
 
 #include <algorithm>
@@ -15,9 +21,14 @@
 #include "core/SettingsManager.h"
 #include "engine/MpvEngine.h"
 #include "input/InputManager.h"
+#include "playlist/PlaylistItem.h"
+#include "playlist/PlaylistModel.h"
+#include "ui/ContextMenuManager.h"
 #include "ui/ControlBar.h"
 #include "ui/CustomTitleBar.h"
+#include "ui/MediaOpenController.h"
 #include "ui/OsdOverlay.h"
+#include "ui/PlaylistDock.h"
 #include "ui/TimeFormatter.h"
 #include "ui/VideoWidget.h"
 
@@ -26,6 +37,8 @@ namespace outplayer::ui {
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , m_engine(std::make_unique<engine::MpvEngine>())
+    , m_contextMenuManager(std::make_unique<ContextMenuManager>(this))
+    , m_mediaOpenController(std::make_unique<MediaOpenController>(m_engine.get(), this))
 {
     m_engine->initialize();
 
@@ -34,14 +47,30 @@ MainWindow::MainWindow(QWidget* parent)
         setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
     }
 
+    setAcceptDrops(true);
     setMouseTracking(true);
     resize(1280, 720);
     QMainWindow::setWindowTitle(QStringLiteral("outPlayer"));
 
+    // Central layout containing VideoWidget and PlaylistDock horizontally
+    m_centralContainer = new QWidget(this);
+    auto* centralLayout = new QHBoxLayout(m_centralContainer);
+    centralLayout->setContentsMargins(0, 0, 0, 0);
+    centralLayout->setSpacing(0);
+
     // Center video presentation canvas
-    m_videoWidget = new VideoWidget(m_engine.get(), this);
+    m_videoWidget = new VideoWidget(m_engine.get(), m_centralContainer);
     m_videoWidget->setMouseTracking(true);
-    setCentralWidget(m_videoWidget);
+    m_videoWidget->setAcceptDrops(true);
+    centralLayout->addWidget(m_videoWidget, 1);
+
+    // Playlist model and dock
+    m_playlistModel = new playlist::PlaylistModel(this);
+    m_playlistDock = new PlaylistDock(m_playlistModel, m_centralContainer);
+    m_playlistDock->hide(); // hidden by default until toggled
+    centralLayout->addWidget(m_playlistDock, 0);
+
+    setCentralWidget(m_centralContainer);
 
     // OSD overlay layer atop the video canvas
     m_osdOverlay = new OsdOverlay(m_videoWidget);
@@ -91,6 +120,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     setupEngineConnections();
     setupCommandHandlers();
+    setupNavigationConnections();
 
     updateChromeLayout();
 }
@@ -125,6 +155,11 @@ VideoWidget* MainWindow::videoWidget() const noexcept
     return m_videoWidget;
 }
 
+QWidget* MainWindow::centralWidget() const noexcept
+{
+    return m_videoWidget;
+}
+
 CustomTitleBar* MainWindow::titleBar() const noexcept
 {
     return m_titleBar;
@@ -143,6 +178,26 @@ OsdOverlay* MainWindow::osdOverlay() const noexcept
 input::InputManager* MainWindow::inputManager() const noexcept
 {
     return m_inputManager.get();
+}
+
+PlaylistDock* MainWindow::playlistDock() const noexcept
+{
+    return m_playlistDock;
+}
+
+playlist::PlaylistModel* MainWindow::playlistModel() const noexcept
+{
+    return m_playlistModel;
+}
+
+ContextMenuManager* MainWindow::contextMenuManager() const noexcept
+{
+    return m_contextMenuManager.get();
+}
+
+MediaOpenController* MainWindow::mediaOpenController() const noexcept
+{
+    return m_mediaOpenController.get();
 }
 
 bool MainWindow::isChromeVisible() const noexcept
@@ -189,6 +244,25 @@ void MainWindow::setChromeVisible(bool visible)
     }
 }
 
+void MainWindow::setPlaylistVisible(bool visible)
+{
+    if (!m_playlistDock) {
+        return;
+    }
+    m_playlistDock->setVisible(visible);
+    if (visible) {
+        m_playlistDock->raise();
+    }
+    updateChromeLayout();
+}
+
+void MainWindow::togglePlaylist()
+{
+    if (m_playlistDock) {
+        setPlaylistVisible(!m_playlistDock->isVisible());
+    }
+}
+
 void MainWindow::toggleFullScreen()
 {
     if (isFullScreen()) {
@@ -219,8 +293,178 @@ bool MainWindow::openMedia(const QString& pathOrUrl)
         if (!m_engine->isPaused()) {
             m_autohideTimer->start(2500);
         }
+
+        if (m_playlistModel) {
+            const auto current = m_playlistModel->currentItem();
+            if (!current.has_value() || current->filePath != pathOrUrl) {
+                int existingRow = -1;
+                for (int i = 0; i < m_playlistModel->rowCount(); ++i) {
+                    const QModelIndex idx = m_playlistModel->index(i, 0);
+                    if (idx.data(playlist::PlaylistModel::FilePathRole).toString() == pathOrUrl) {
+                        existingRow = i;
+                        break;
+                    }
+                }
+                if (existingRow >= 0) {
+                    m_playlistModel->setCurrentIndex(existingRow);
+                } else {
+                    playlist::PlaylistItem item;
+                    item.filePath = pathOrUrl;
+                    item.title = fileName;
+                    m_playlistModel->addItem(item);
+                    m_playlistModel->setCurrentIndex(m_playlistModel->rowCount() - 1);
+                }
+            }
+        }
     }
     return loaded;
+}
+
+void MainWindow::openFiles(const QStringList& files, bool playFirst)
+{
+    if (files.isEmpty() || !m_playlistModel) {
+        return;
+    }
+    const int startIdx = m_playlistModel->rowCount();
+    QList<playlist::PlaylistItem> items;
+    items.reserve(files.size());
+    for (const auto& path : files) {
+        playlist::PlaylistItem item;
+        item.filePath = path;
+        item.title = QFileInfo(path).fileName();
+        if (item.title.isEmpty()) {
+            item.title = path;
+        }
+        items.append(item);
+    }
+    m_playlistModel->addItems(items);
+
+    if (playFirst || startIdx == 0 || m_playlistModel->currentIndex() < 0) {
+        playPlaylistItem(startIdx);
+    }
+}
+
+void MainWindow::openFolder(const QString& folderPath, bool playFirst)
+{
+    if (folderPath.isEmpty() || !m_playlistModel) {
+        return;
+    }
+    const QStringList files = MediaOpenController::scanDirectory(folderPath, true);
+    if (!files.isEmpty()) {
+        openFiles(files, playFirst);
+    }
+}
+
+void MainWindow::playPlaylistItem(int row)
+{
+    if (!m_playlistModel || row < 0 || row >= m_playlistModel->rowCount()) {
+        return;
+    }
+
+    m_playlistModel->setCurrentIndex(row);
+    const auto optItem = m_playlistModel->currentItem();
+    if (!optItem.has_value()) {
+        return;
+    }
+
+    if (m_videoWidget) {
+        m_videoWidget->ensureInitialized();
+    }
+
+    if (m_engine) {
+        m_engine->loadFile(optItem->filePath);
+        QString fileName = QFileInfo(optItem->filePath).fileName();
+        if (fileName.isEmpty()) {
+            fileName = optItem->filePath;
+        }
+        setWindowTitle(fileName + QStringLiteral(" - outPlayer"));
+
+        if (!m_engine->isPaused()) {
+            m_autohideTimer->start(2500);
+        }
+    }
+}
+
+void MainWindow::playNext()
+{
+    if (!m_playlistModel) {
+        return;
+    }
+    const int nextIdx = m_playlistModel->nextIndex();
+    if (nextIdx >= 0) {
+        playPlaylistItem(nextIdx);
+    }
+}
+
+void MainWindow::playPrevious()
+{
+    if (!m_playlistModel) {
+        return;
+    }
+    const int prevIdx = m_playlistModel->previousIndex();
+    if (prevIdx >= 0) {
+        playPlaylistItem(prevIdx);
+    }
+}
+
+void MainWindow::dragEnterEvent(QDragEnterEvent* event)
+{
+    if (event->mimeData() && (event->mimeData()->hasUrls() || event->mimeData()->hasText())) {
+        event->acceptProposedAction();
+    } else {
+        event->ignore();
+    }
+}
+
+void MainWindow::dropEvent(QDropEvent* event)
+{
+    const QMimeData* mimeData = event->mimeData();
+    if (!mimeData) {
+        event->ignore();
+        return;
+    }
+
+    QStringList filesToAdd;
+    if (mimeData->hasUrls()) {
+        const QList<QUrl> urls = mimeData->urls();
+        for (const auto& url : urls) {
+            if (url.isLocalFile()) {
+                const QString localPath = url.toLocalFile();
+                QFileInfo fi(localPath);
+                if (fi.isDir()) {
+                    filesToAdd.append(MediaOpenController::scanDirectory(localPath, true));
+                } else if (fi.isFile() && MediaOpenController::isMediaFile(localPath)) {
+                    filesToAdd.append(localPath);
+                }
+            } else {
+                filesToAdd.append(url.toString());
+            }
+        }
+    } else if (mimeData->hasText()) {
+        const QString text = mimeData->text().trimmed();
+        if (!text.isEmpty()) {
+            filesToAdd.append(text);
+        }
+    }
+
+    if (!filesToAdd.isEmpty()) {
+        const bool wasEmpty = (m_playlistModel && m_playlistModel->rowCount() == 0);
+        openFiles(filesToAdd, wasEmpty || !m_engine || m_engine->isPaused() || m_playlistModel->currentIndex() < 0);
+        event->acceptProposedAction();
+        return;
+    }
+
+    event->ignore();
+}
+
+void MainWindow::contextMenuEvent(QContextMenuEvent* event)
+{
+    if (m_contextMenuManager) {
+        m_contextMenuManager->showContextMenu(event->globalPos(), this, m_engine.get());
+        event->accept();
+        return;
+    }
+    QMainWindow::contextMenuEvent(event);
 }
 
 void MainWindow::setWindowTitle(const QString& title)
@@ -300,6 +544,7 @@ void MainWindow::setupEngineConnections()
     connect(m_engine.get(), &engine::IPlaybackEngine::playbackFinished, this, [this]() {
         m_autohideTimer->stop();
         setChromeVisible(true);
+        playNext();
     });
 
     connect(m_engine.get(), &engine::IPlaybackEngine::fileLoaded, this, [this]() {
@@ -420,6 +665,95 @@ void MainWindow::setupCommandHandlers()
     registerCommand(core::CommandId::CMD_CLOSE_PLAYBACK, [this](const QVariantMap&) {
         close();
     });
+
+    registerCommand(core::CommandId::CMD_PLAYLIST, [this](const QVariantMap&) {
+        togglePlaylist();
+    });
+
+    registerCommand(core::CommandId::CMD_PLAYLIST_CLOSE, [this](const QVariantMap&) {
+        setPlaylistVisible(false);
+    });
+
+    registerCommand(core::CommandId::CMD_PLAYLIST_NEXT, [this](const QVariantMap&) {
+        playNext();
+    });
+
+    registerCommand(core::CommandId::CMD_PLAYLIST_PREV, [this](const QVariantMap&) {
+        playPrevious();
+    });
+
+    registerCommand(core::CommandId::CMD_MOUSE_RIGHT_CLICK, [this](const QVariantMap&) {
+        m_contextMenuManager->showContextMenu(QCursor::pos(), this, m_engine.get());
+    });
+}
+
+void MainWindow::setupNavigationConnections()
+{
+    // Playlist Dock close button
+    connect(m_playlistDock, &PlaylistDock::closeRequested, this, [this]() {
+        setPlaylistVisible(false);
+    });
+
+    // Playlist Dock item activation (double-click or Enter)
+    connect(m_playlistDock, &PlaylistDock::playItemRequested, this, &MainWindow::playPlaylistItem);
+
+    // Playlist Dock add actions
+    connect(m_playlistDock, &PlaylistDock::addFilesRequested, this, [this]() {
+        const QStringList files = m_mediaOpenController->promptOpenFiles(this);
+        if (!files.isEmpty()) {
+            openFiles(files, false /* only play if empty */);
+        }
+    });
+
+    connect(m_playlistDock, &PlaylistDock::addFolderRequested, this, [this]() {
+        const QString folder = m_mediaOpenController->promptOpenFolder(this);
+        if (!folder.isEmpty()) {
+            openFolder(folder, false /* only play if empty */);
+        }
+    });
+
+    connect(m_playlistDock, &PlaylistDock::addUrlRequested, this, [this]() {
+        const QString url = m_mediaOpenController->promptOpenUrl(this);
+        if (!url.isEmpty()) {
+            playlist::PlaylistItem item;
+            item.filePath = url;
+            item.title = url;
+            m_playlistModel->addItem(item);
+            if (m_playlistModel->rowCount() == 1 || m_playlistModel->currentIndex() < 0) {
+                playPlaylistItem(0);
+            }
+        }
+    });
+
+    // TitleBar logo click -> context menu
+    connect(m_titleBar, &CustomTitleBar::logoClicked, this, [this]() {
+        const QPoint pos = m_titleBar->mapToGlobal(QPoint(10, m_titleBar->height()));
+        m_contextMenuManager->showContextMenu(pos, this, m_engine.get());
+    });
+
+    // Context menu dialog actions
+    connect(m_contextMenuManager.get(), &ContextMenuManager::openFilesRequested, this, [this]() {
+        const QStringList files = m_mediaOpenController->promptOpenFiles(this);
+        if (!files.isEmpty()) {
+            openFiles(files, true /* play first */);
+        }
+    });
+
+    connect(m_contextMenuManager.get(), &ContextMenuManager::openFolderRequested, this, [this]() {
+        const QString folder = m_mediaOpenController->promptOpenFolder(this);
+        if (!folder.isEmpty()) {
+            openFolder(folder, true /* play first */);
+        }
+    });
+
+    connect(m_contextMenuManager.get(), &ContextMenuManager::openUrlRequested, this, [this]() {
+        const QString url = m_mediaOpenController->promptOpenUrl(this);
+        if (!url.isEmpty()) {
+            openMedia(url);
+        }
+    });
+
+    connect(m_contextMenuManager.get(), &ContextMenuManager::togglePlaylistRequested, this, &MainWindow::togglePlaylist);
 }
 
 void MainWindow::registerCommand(core::CommandId id, core::CommandRegistry::Handler handler)
@@ -548,6 +882,18 @@ bool MainWindow::eventFilter(QObject* watched, QEvent* event)
             if (m_chromeVisible && cursor().shape() != Qt::ArrowCursor) {
                 unsetCursor();
             }
+        } else if (event->type() == QEvent::ContextMenu) {
+            auto* ce = static_cast<QContextMenuEvent*>(event);
+            if (m_contextMenuManager) {
+                m_contextMenuManager->showContextMenu(ce->globalPos(), this, m_engine.get());
+                return true;
+            }
+        } else if (event->type() == QEvent::DragEnter) {
+            dragEnterEvent(static_cast<QDragEnterEvent*>(event));
+            return true;
+        } else if (event->type() == QEvent::Drop) {
+            dropEvent(static_cast<QDropEvent*>(event));
+            return true;
         }
     }
 
@@ -560,7 +906,7 @@ void MainWindow::onAutohideTimeout()
         return;
     }
 
-    // Check if mouse is hovering over titlebar or controlbar
+    // Check if mouse is hovering over titlebar, controlbar, or playlist dock
     if (m_titleBar && m_titleBar->isVisible()) {
         const QPoint localPos = m_titleBar->mapFromGlobal(QCursor::pos());
         if (m_titleBar->rect().contains(localPos) && m_titleBar->underMouse()) {
@@ -571,6 +917,13 @@ void MainWindow::onAutohideTimeout()
     if (m_controlBar && m_controlBar->isVisible()) {
         const QPoint localPos = m_controlBar->mapFromGlobal(QCursor::pos());
         if (m_controlBar->rect().contains(localPos) && m_controlBar->underMouse()) {
+            m_autohideTimer->start(2500);
+            return;
+        }
+    }
+    if (m_playlistDock && m_playlistDock->isVisible()) {
+        const QPoint localPos = m_playlistDock->mapFromGlobal(QCursor::pos());
+        if (m_playlistDock->rect().contains(localPos) && m_playlistDock->underMouse()) {
             m_autohideTimer->start(2500);
             return;
         }

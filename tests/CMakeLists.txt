@@ -234,4 +234,23 @@ target_link_libraries(test_playlist_dock
 
 add_test(NAME test_playlist_dock COMMAND test_playlist_dock)
 
+# ==============================================================================
+# Task 5 (Phase 3B): test_main_window_navigation target
+# ==============================================================================
+qt_add_executable(test_main_window_navigation
+    test_main_window_navigation.cpp
+)
+
+target_link_libraries(test_main_window_navigation
+    PRIVATE
+        outplayer_ui
+        outplayer_playlist
+        outplayer_input
+        outplayer_core
+        Qt6::Test
+        Qt6::Widgets
+)
+
+add_test(NAME test_main_window_navigation COMMAND test_main_window_navigation)
+
 
