@@ -48,7 +48,7 @@ graph TD
         IPlaybackEngine["IPlaybackEngine (Abstract Playback Interface)"]
         MpvEngine["MpvEngine (RAII libmpv Wrapper & Property Cache)"]
         MpvClient["mpv/client.h (mpv_handle)"]
-        IPlaybackEngine <|-- MpvEngine
+        MpvEngine -.->|implements| IPlaybackEngine
         MpvEngine --> MpvClient
     end
 
@@ -156,6 +156,8 @@ Settings are structured hierarchically using standard INI syntax backed by `QSet
 [General]
 AllowMultipleInstances=false
 RememberPlaybackPosition=true
+
+[Playback]
 Volume=100.0
 Muted=false
 
