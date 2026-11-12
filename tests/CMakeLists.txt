@@ -168,6 +168,24 @@ target_link_libraries(test_main_window_ui
 
 add_test(NAME test_main_window_ui COMMAND test_main_window_ui)
 
+# ==============================================================================
+# Task 1 (Phase 3B): test_context_menu target
+# ==============================================================================
+qt_add_executable(test_context_menu
+    test_context_menu.cpp
+)
+
+target_link_libraries(test_context_menu
+    PRIVATE
+        outplayer_ui
+        outplayer_core
+        Qt6::Test
+        Qt6::Widgets
+)
+
+add_test(NAME test_context_menu COMMAND test_context_menu)
+
+
 
 
 
