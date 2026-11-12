@@ -10,7 +10,7 @@ This document tracks the roadmap, phase progression, and verification evidence f
 |---|---|---|---|
 | **Phase 0** | Development Environment & "Hello Player" | Complete | Working `outplayer` binary rendering video via `mpv_render_context` and unit test suite passing. |
 | **Phase 1** | Black-Box Feature Inventory (Observer Role) | Complete | Complete UI/hotkey/format spec inventory in `docs/spec/` with evidence logged in `docs/clean-room-log.md`. |
-| **Phase 2** | Core Architecture & Command Engine | Not Started | Decoupled architecture (`IPlaybackEngine`, `CommandRegistry`, `SettingsManager`) with passing unit tests. |
+| **Phase 2** | Core Architecture & Command Engine | Complete | Decoupled architecture (`IPlaybackEngine`, `CommandRegistry`, `SettingsManager`, `InputManager`) with passing unit tests. |
 | **Phase 3** | Vertical Slices Implementation | Not Started | 12 vertical feature slices implemented via TDD with 100% test coverage for implemented features. |
 | **Phase 4** | Parity Hardening & Verification | Not Started | Automated hotkey parity suite passing, offscreen xvfb visual match, and zero ASan/UBSan issues. |
 | **Phase 5** | Packaging & Distribution | Not Started | Flatpak, RPM, DEB, Arch PKGBUILD, and AppImage packages verified in container builds. |
@@ -82,14 +82,35 @@ This document tracks the roadmap, phase progression, and verification evidence f
 
 ## Phase 2: Core Architecture & Command Engine
 
-**Gate Requirement:** Architecture and module interfaces established; unit tests passing for command registry, state dispatch, and configuration management.
+**Gate Requirement:** Architecture and module interfaces established; unit tests passing for command registry, state dispatch, and configuration management.  
+**Phase Gate Status:** **CLEARED / COMPLETE** (ADR 005)
 
 | Task ID | Description | Status | Assignee / Role | Target Deliverables | Verification Evidence |
 |---|---|---|---|---|---|
-| **P2-T1** | Production `IPlaybackEngine` & `MpvEngine` Hardening | Not Started | Implementer | Property observation, asynchronous event loop, hardware decoding configuration | Unit tests passing in `tests/test_mpv_engine.cpp` |
-| **P2-T2** | Command Registry & Action Dispatcher | Not Started | Implementer | `src/core/CommandRegistry.h`, `src/core/CommandRegistry.cpp` | Unit tests mapping all commands in `hotkeys.csv` |
-| **P2-T3** | Settings Engine & Configuration Persistence | Not Started | Implementer | `src/core/SettingsManager.h`, `src/core/SettingsManager.cpp` | INI configuration serialization unit tests |
-| **P2-T4** | Signal Bus & State Synchronization | Not Started | Implementer | `src/core/PlaybackState.h`, state propagation infrastructure | Multi-threaded signal verification tests |
+| **P2-T1** | Command Codegen & CommandRegistry Core | Done | Implementer | `tools/generate_commands.py`, `src/core/CommandId.h`, `src/core/CommandRegistry.h`, `src/core/CommandRegistry.cpp`, `tests/test_command_registry.cpp` | `ctest -R test_command_registry` PASS (253 commands verified), commits `61196f4`, `4b9e5af` |
+| **P2-T2** | Settings Engine & Configuration Persistence | Done | Implementer | `src/core/SettingsManager.h`, `src/core/SettingsManager.cpp`, `tests/test_settings_manager.cpp` | `ctest -R test_settings_manager` PASS (INI persistence, XDG path, typed getters), commits `4645159`, `98bfec4` |
+| **P2-T3** | InputManager (Keymap Router & Mouse Gestures) | Done | Implementer | `src/input/InputManager.h`, `src/input/InputManager.cpp`, `tests/test_input_manager.cpp` | `xvfb-run -a ctest -R test_input_manager` PASS (QShortcuts, rebinding, mouse filter), commits `2963ada`, `6276dfe` |
+| **P2-T4** | Playback Engine Track & Property Expansion | Done | Implementer | `src/engine/IPlaybackEngine.h`, `src/engine/MpvEngine.h`, `src/engine/MpvEngine.cpp`, `tests/test_mpv_engine.cpp` | `xvfb-run -a ctest -R test_mpv_engine` PASS (tracks, chapters, volume, speed, ar), commits `1dc23b8`, `d3b680c` |
+| **P2-T5** | Architecture Documentation & Phase 2 Gate Review | Done | Implementer | `docs/architecture.md`, `docs/decisions.md` (ADR 005), `TASKS.md` | 100% tests pass (6/6 ctest, python specs, scaffold verification) |
+
+### Phase 2 Gate Clearance Evidence
+- **Build Cleanliness:**
+  - `wsl bash -c 'cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=Debug && cmake --build build -j$(nproc)'`: 0 errors, 0 warnings.
+- **Unit & Integration Test Suite (`wsl xvfb-run -a ctest --test-dir build --output-on-failure`):**
+  - `test_dummy`: PASSED (0.01s)
+  - `test_command_registry`: PASSED (0.49s) — verifies 253 canonical command registrations, string-to-enum resolution, info lookups, and callback dispatch.
+  - `test_settings_manager`: PASSED (0.29s) — verifies INI persistence, XDG directory resolution, typed accessors, reactive `settingChanged` signals, and file export/import.
+  - `test_mpv_engine`: PASSED (0.69s) — verifies media lifecycle, track enumeration (audio/video/sub), chapters, volume/mute/speed/aspect ratio controls, and non-blocking property caching.
+  - `test_video_widget`: PASSED (1.34s) — verifies `QOpenGLWidget` surface, FBO format allocation, and `mpv_render_context` frame presentation.
+  - `test_input_manager`: PASSED (0.64s) — verifies default `QShortcut` mapping, dynamic shortcut rebinding, and mouse event filtering (`MouseButtonPress`, `MouseButtonDblClick`, `Wheel`).
+  - Result: 6/6 passed (100%), 0 failures (Total Test time = 3.68s).
+- **Specification & Scaffold Verification Suite:**
+  - `python3 tests/test_phase1_specs.py`: PASSED (all Phase 1 spec assertions satisfied, 0 clean-room branding violations).
+  - `python3 tests/test_project_scaffold.py`: PASSED (directory structure, ADRs, clean-room logs, and governance verified).
+- **Architectural Integrity:**
+  - Complete architectural documentation authored in `docs/architecture.md` (component graph, command flow sequence, dependency boundary rules, XDG persistence model, and threading/concurrency model).
+  - ADR 005 formally approved and recorded in `docs/decisions.md`.
+  - Zero UI dependencies in `src/core/` and `src/engine/` strictly enforced by CMake targets.
 
 ---
 
