@@ -54,7 +54,7 @@ This document tracks the roadmap, phase progression, and verification evidence f
 | Task ID | Description | Status | Assignee / Role | Target Deliverables | Verification Evidence |
 |---|---|---|---|---|---|
 | **P1-T1** | Reference Installation & Environment Setup | Done | Observer | Setup Win10/11 PotPlayer 64-bit environment, baseline screenshots | Logged in `docs/clean-room-log.md` (CR-001, CR-002, CR-003) |
-| **P1-T2** | Context Menu & Main Menu Hierarchy Inventory | Not Started | Observer | `docs/spec/features.csv` (menu section) | Visual observation verification |
+| **P1-T2** | Context Menu & Main Menu Hierarchy Inventory | Done | Observer | `docs/spec/features.csv` (menu section) | `python tests/test_phase1_specs.py` PASS (258 items), commit `116a356` |
 | **P1-T3** | Hotkey Map & Keybinding Matrix | Not Started | Observer | `docs/spec/hotkeys.csv` | Full keyboard inspection against PotPlayer default table |
 | **P1-T4** | Preferences (F5) Tree & Linux Deviations | Not Started | Observer | `docs/spec/features.csv` (prefs), `docs/spec/linux-deviations.md` | Category-by-category UI tree audit |
 | **P1-T5** | Playlist (F6) & Control Panel (F7) Inventory | Not Started | Observer | `docs/spec/features.csv` (aux windows), `docs/spec/ui-layout.md` | Dimensional & behavior layout metrics |
