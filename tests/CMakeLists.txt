@@ -424,6 +424,30 @@ target_link_libraries(test_main_window_integration
 
 add_test(NAME test_main_window_integration COMMAND test_main_window_integration)
 
+# ==============================================================================
+# Phase 4 Task 1: test_hotkey_parity target
+# ==============================================================================
+qt_add_executable(test_hotkey_parity
+    test_hotkey_parity.cpp
+)
+
+target_compile_definitions(test_hotkey_parity
+    PRIVATE
+        PROJECT_SOURCE_DIR="${CMAKE_SOURCE_DIR}"
+)
+
+target_link_libraries(test_hotkey_parity
+    PRIVATE
+        outplayer_input
+        outplayer_core
+        Qt6::Test
+        Qt6::Widgets
+)
+
+add_test(NAME test_hotkey_parity COMMAND test_hotkey_parity)
+
+
+
 
 
 
