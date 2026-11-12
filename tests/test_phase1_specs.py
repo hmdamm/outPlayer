@@ -69,7 +69,10 @@ def test_task2():
     for i, r in enumerate(rows, 1):
         for col in required_columns:
             assert r[col] is not None and r[col].strip() != "", f"Empty field '{col}' at row {i} (id: {r.get('id')})"
-        assert r["evidence_ref"] == "CR-004", f"Invalid evidence_ref '{r['evidence_ref']}' at row {i}"
+        if r["area"] != "Preferences":
+            assert r["evidence_ref"] == "CR-004", f"Invalid evidence_ref '{r['evidence_ref']}' at row {i}"
+        else:
+            assert r["evidence_ref"] == "CR-006", f"Invalid evidence_ref '{r['evidence_ref']}' at row {i}"
         assert r["id"] not in seen_ids, f"Duplicate id '{r['id']}' at row {i}"
         seen_ids.add(r["id"])
 
@@ -126,7 +129,89 @@ def test_task3():
 
     print(f"Task 3 spec verification passed ({len(rows)} hotkey/mouse mappings verified).")
 
+def test_task4():
+    import csv
+    # 1. Verify docs/spec/linux-deviations.md exists and contains expected technical adaptations
+    deviations_path = "docs/spec/linux-deviations.md"
+    assert os.path.exists(deviations_path), "linux-deviations.md missing"
+    with open(deviations_path, "r", encoding="utf-8") as f:
+        dev_content = f.read()
+
+    assert "# Technical Deviations & Linux Architecture Ledger" in dev_content
+    # Adaptation: DirectShow/D3D -> VA-API/libmpv
+    assert "DirectShow" in dev_content and "D3D" in dev_content, "DirectShow/D3D missing in linux-deviations.md"
+    assert "VA-API" in dev_content and "libmpv" in dev_content, "VA-API/libmpv adaptation missing in linux-deviations.md"
+
+    # Adaptation: DirectSound/WASAPI -> PipeWire/PulseAudio/ALSA
+    assert ("DirectSound" in dev_content or "WASAPI" in dev_content), "DirectSound/WASAPI missing in linux-deviations.md"
+    assert "PipeWire" in dev_content and "PulseAudio" in dev_content and "ALSA" in dev_content, "PipeWire/PulseAudio/ALSA missing in linux-deviations.md"
+
+    # Adaptation: Exclusive Fullscreen -> Wayland Borderless
+    assert "Exclusive Fullscreen" in dev_content or "Exclusive full-screen" in dev_content or "exclusive fullscreen" in dev_content.lower(), "Exclusive Fullscreen missing in linux-deviations.md"
+    assert "Wayland Borderless" in dev_content or "Wayland" in dev_content, "Wayland Borderless missing in linux-deviations.md"
+
+    # Adaptation: Registry -> XDG QSettings
+    assert "Registry" in dev_content, "Windows Registry missing in linux-deviations.md"
+    assert "XDG" in dev_content and "QSettings" in dev_content, "XDG / QSettings missing in linux-deviations.md"
+
+    # Adaptation: Global Hotkeys -> XDG Portal / XGrabKey
+    assert ("XDG Portal" in dev_content or "GlobalShortcuts" in dev_content or "Global Shortcuts" in dev_content) and "XGrabKey" in dev_content, "Global Hotkeys portal/XGrabKey missing in linux-deviations.md"
+
+    # Evidence citation CR-006
+    assert "CR-006" in dev_content, "Evidence reference CR-006 missing in linux-deviations.md"
+
+    # 2. Verify docs/spec/features.csv contains preferences rows
+    csv_path = "docs/spec/features.csv"
+    assert os.path.exists(csv_path), "features.csv missing"
+    with open(csv_path, "r", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        rows = list(reader)
+
+    pref_rows = [r for r in rows if r["area"] == "Preferences"]
+    assert len(pref_rows) >= 50, f"Expected at least 50 preferences rows, got {len(pref_rows)}"
+
+    primary_categories = ["General", "Playback", "Video", "Audio", "Subtitles", "Filter", "Association"]
+    for cat in primary_categories:
+        cat_matches = [r for r in pref_rows if f"Preferences > {cat}" in r["path_or_hotkey"]]
+        assert len(cat_matches) > 0, f"Primary preferences category '{cat}' missing in features.csv"
+
+    # Verify subcategories for thoroughness
+    subcategories = [
+        "Preferences > General > Startup",
+        "Preferences > General > Skin",
+        "Preferences > General > Keyboard",
+        "Preferences > General > Mouse",
+        "Preferences > General > OSD",
+        "Preferences > Playback > Aspect Ratio",
+        "Preferences > Playback > Jump",
+        "Preferences > Playback > Speed",
+        "Preferences > Playback > Time",
+        "Preferences > Video > Renderers",
+        "Preferences > Video > Colors",
+        "Preferences > Video > Deinterlacing",
+        "Preferences > Video > HW Acceleration",
+        "Preferences > Audio > Renderers",
+        "Preferences > Audio > Equalizer",
+        "Preferences > Audio > Normalizer",
+        "Preferences > Audio > Volume",
+        "Preferences > Subtitles > Font",
+        "Preferences > Subtitles > Location",
+        "Preferences > Subtitles > Sync",
+        "Preferences > Subtitles > Processing",
+    ]
+    for subcat in subcategories:
+        sub_matches = [r for r in pref_rows if subcat in r["path_or_hotkey"]]
+        assert len(sub_matches) > 0, f"Preferences subcategory '{subcat}' missing in features.csv"
+
+    # 3. Verify clean room audit entry CR-006
+    with open("docs/clean-room-log.md", "r", encoding="utf-8") as f:
+        log_content = f.read()
+    assert "### Entry CR-006:" in log_content, "CR-006 missing in clean-room-log.md"
+
+    print(f"Task 4 spec verification passed ({len(pref_rows)} preferences rows across {len(primary_categories)} categories).")
+
 if __name__ == "__main__":
     test_task1()
     test_task2()
     test_task3()
+    test_task4()
