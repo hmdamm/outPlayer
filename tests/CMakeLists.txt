@@ -217,3 +217,21 @@ target_link_libraries(test_playlist_model
 
 add_test(NAME test_playlist_model COMMAND test_playlist_model)
 
+# ==============================================================================
+# Task 4 (Phase 3B): test_playlist_dock target
+# ==============================================================================
+qt_add_executable(test_playlist_dock
+    test_playlist_dock.cpp
+)
+
+target_link_libraries(test_playlist_dock
+    PRIVATE
+        outplayer_ui
+        outplayer_playlist
+        Qt6::Test
+        Qt6::Widgets
+)
+
+add_test(NAME test_playlist_dock COMMAND test_playlist_dock)
+
+
