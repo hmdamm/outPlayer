@@ -336,6 +336,23 @@ target_link_libraries(test_main_window_av
 
 add_test(NAME test_main_window_av COMMAND test_main_window_av)
 
+# ==============================================================================
+# Phase 3D Task 1: test_theme_manager target
+# ==============================================================================
+qt_add_executable(test_theme_manager
+    test_theme_manager.cpp
+)
+
+target_link_libraries(test_theme_manager
+    PRIVATE
+        outplayer_ui
+        Qt6::Test
+        Qt6::Widgets
+)
+
+add_test(NAME test_theme_manager COMMAND test_theme_manager)
+
+
 
 
 
