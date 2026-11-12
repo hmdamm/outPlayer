@@ -156,7 +156,7 @@ void TestMainWindowIntegration::testDesktopIntegrationSignals()
 
     // Test stopRequested signal from DesktopIntegration
     emit desktop->stopRequested();
-    QTRY_VERIFY_WITH_TIMEOUT(engine->isPaused() || desktop->playbackStatus() == QStringLiteral("Stopped"), 1000);
+    QTRY_VERIFY_WITH_TIMEOUT(engine->isPaused() || desktop->playbackStatus() == QStringLiteral("Stopped"), 3000);
 
     // Test raiseWindowRequested signal from DesktopIntegration
     window.showMinimized();

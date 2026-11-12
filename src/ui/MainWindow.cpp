@@ -547,6 +547,7 @@ void MainWindow::stopPlayback()
 {
     m_userStopped = true;
     if (m_engine) {
+        m_engine->pause();
         m_engine->stop();
     }
 }
