@@ -6,12 +6,12 @@ HK-004,Seek Backward Short (5 sec),Left,None,Window,Menu > Playback > Jump > 5s 
 HK-005,Seek Forward Short (5 sec),Right,None,Window,Menu > Playback > Jump > 5s Forward,CMD_SEEK_FORWARD_SHORT
 HK-006,Seek Backward Medium (30 sec),Left,Ctrl,Window,Menu > Playback > Jump > 30s Backward,CMD_SEEK_BACKWARD_MEDIUM
 HK-007,Seek Forward Medium (30 sec),Right,Ctrl,Window,Menu > Playback > Jump > 30s Forward,CMD_SEEK_FORWARD_MEDIUM
-HK-008,Seek Backward Long (1 min),Left,Alt,Window,Menu > Playback > Jump > 1m Backward,CMD_SEEK_BACKWARD_1MIN
-HK-009,Seek Forward Long (1 min),Right,Alt,Window,Menu > Playback > Jump > 1m Forward,CMD_SEEK_FORWARD_1MIN
+HK-008,Seek Backward Long (1 min),Left,Shift,Window,Menu > Playback > Jump > 1m Backward,CMD_SEEK_BACKWARD_1MIN
+HK-009,Seek Forward Long (1 min),Right,Shift,Window,Menu > Playback > Jump > 1m Forward,CMD_SEEK_FORWARD_1MIN
 HK-010,Seek Backward Extra Long (5 min),Left,Ctrl+Alt,Window,Menu > Playback > Jump > 5m Backward,CMD_SEEK_BACKWARD_5MIN
 HK-011,Seek Forward Extra Long (5 min),Right,Ctrl+Alt,Window,Menu > Playback > Jump > 5m Forward,CMD_SEEK_FORWARD_5MIN
-HK-012,Seek Backward Keyframe (5 sec),Left,Shift,Window,Menu > Playback > Jump > Keyframe Backward,CMD_SEEK_BACKWARD_KEYFRAME
-HK-013,Seek Forward Keyframe (5 sec),Right,Shift,Window,Menu > Playback > Jump > Keyframe Forward,CMD_SEEK_FORWARD_KEYFRAME
+HK-012,Seek Backward Keyframe (5 sec),Left,Alt+Shift,Window,Menu > Playback > Jump > Keyframe Backward,CMD_SEEK_BACKWARD_KEYFRAME
+HK-013,Seek Forward Keyframe (5 sec),Right,Alt+Shift,Window,Menu > Playback > Jump > Keyframe Forward,CMD_SEEK_FORWARD_KEYFRAME
 HK-014,Previous Keyframe,Left,Ctrl+Shift,Window,Menu > Playback > Jump > Previous keyframe,CMD_SEEK_PREV_KEYFRAME
 HK-015,Next Keyframe,Right,Ctrl+Shift,Window,Menu > Playback > Jump > Next keyframe,CMD_SEEK_NEXT_KEYFRAME
 HK-016,Previous Frame (Step Backward),D,None,Window,Menu > Playback > Jump > Previous Frame,CMD_FRAME_PREV
@@ -23,8 +23,8 @@ HK-021,Seek to Beginning of Media,Home,None,Window,Menu > Playback > Jump > Begi
 HK-022,Seek to End of Media,End,None,Window,Menu > Playback > Jump > End,CMD_SEEK_END
 HK-023,Play Previous Item in Playlist,PageUp,None,Window,Menu > Playback > Play Previous Item,CMD_PLAYLIST_PREV
 HK-024,Play Next Item in Playlist,PageDown,None,Window,Menu > Playback > Play Next Item,CMD_PLAYLIST_NEXT
-HK-025,Force Previous Channel/Album,PageUp,Ctrl,Window,Menu > Playback > Force Previous Channel,CMD_CHANNEL_PREV
-HK-026,Force Next Channel/Album,PageDown,Ctrl,Window,Menu > Playback > Force Next Channel,CMD_CHANNEL_NEXT
+HK-025,Force Previous Channel/Album,PageUp,Ctrl+Alt,Window,Menu > Playback > Force Previous Channel,CMD_CHANNEL_PREV
+HK-026,Force Next Channel/Album,PageDown,Ctrl+Alt,Window,Menu > Playback > Force Next Channel,CMD_CHANNEL_NEXT
 HK-027,Browse Scenes by Time Intervals,Z,Shift,Window,Menu > Playback > Jump > Browse Scenes by Time Intervals...,CMD_SCENE_BROWSE_TIME
 HK-028,Browse Scenes by Marker Positions,Z,Alt,Window,Menu > Playback > Jump > Browse Scenes by Marker Positions...,CMD_SCENE_BROWSE_MARKER
 HK-029,Playback Speed Normal (1.0x),Z,None,Window,Menu > Playback > Playback Speed > Default/Last used,CMD_SPEED_NORMAL
@@ -94,7 +94,7 @@ HK-092,Cycle Deinterlacing Mode,I,Ctrl,Window,Menu > Video > Deinterlacing > Cyc
 HK-093,Cycle Built-in Video Transform Filter,X,Ctrl,Window,Menu > Video > Video Processing > Cycle Video Transform Filter,CMD_VIDEO_CYCLE_TRANSFORM
 HK-094,Rotate Video 90 Deg Clockwise,R,Ctrl,Window,Menu > Video > Screen Rotation > Rotate 90 deg,CMD_VIDEO_ROTATE_90
 HK-095,Toggle Post-Resize Pixel Shaders,P,Ctrl+Alt,Window,Menu > Video > Pixel Shader > Use Post-Resize Pixel Shaders,CMD_SHADER_POST_RESIZE
-HK-096,Toggle Pre-Resize Pixel Shaders,S,Ctrl+Alt,Window,Menu > Video > Pixel Shader > Use Pre-Resize Pixel Shaders,CMD_SHADER_PRE_RESIZE
+HK-096,Toggle Pre-Resize Pixel Shaders,P,Shift,Window,Menu > Video > Pixel Shader > Use Pre-Resize Pixel Shaders,CMD_SHADER_PRE_RESIZE
 HK-097,Hardware Acceleration Toggle (DXVA/VA-API),H,Ctrl+Alt,Window,Menu > Video > Video Processing > Hardware Acceleration Toggle,CMD_VIDEO_TOGGLE_HWACCEL
 HK-098,Cycle Video Processing Mode,J,Alt,Window,Menu > Video > Video Processing > Cycle Processing Mode,CMD_VIDEO_CYCLE_FILTER
 HK-099,Fullscreen (Keep AR),Enter,None,Window,Menu > Window Size > Fullscreen (Keep AR),CMD_WINDOW_FULLSCREEN
