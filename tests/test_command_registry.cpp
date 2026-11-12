@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include <QTest>
 #include <QSignalSpy>
 #include "core/CommandRegistry.h"
@@ -6,6 +7,9 @@
 class TestCommandRegistry : public QObject {
     Q_OBJECT
 private slots:
+    void cleanup() {
+        outplayer::core::CommandRegistry::instance().clearHandlers();
+    }
     void testCommandCatalog();
     void testExecuteCommand();
     void testExecuteCommandWithString();

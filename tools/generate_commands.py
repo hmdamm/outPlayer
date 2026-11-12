@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
 """
 tools/generate_commands.py
 Generates src/core/CommandId.h from docs/spec/hotkeys.csv.
