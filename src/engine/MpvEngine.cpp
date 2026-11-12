@@ -441,9 +441,14 @@ QList<MediaTrack> MpvEngine::tracks(const QString& type) const
         return m_tracks;
     }
 
+    QString normalizedType = type;
+    if (normalizedType.compare(QLatin1String("subtitle"), Qt::CaseInsensitive) == 0) {
+        normalizedType = QStringLiteral("sub");
+    }
+
     QList<MediaTrack> filtered;
     for (const auto& track : m_tracks) {
-        if (track.type.compare(type, Qt::CaseInsensitive) == 0) {
+        if (track.type.compare(normalizedType, Qt::CaseInsensitive) == 0) {
             filtered.append(track);
         }
     }
