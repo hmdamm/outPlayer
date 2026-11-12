@@ -90,3 +90,12 @@ The observer role is scheduled to execute black-box behavioral captures accordin
 - **Action:** Audited and cataloged the comprehensive menu hierarchy of the reference player across all core operational areas: Open, Play, Subtitles, Video, Audio, Filters, Bookmarks, Capture, Skins, Aspect Ratio, Window Size, and Help. Extracted menu paths, default keyboard shortcuts, default states, and observed functional behaviors into a structured, machine-verifiable CSV dataset. Formulated modern Linux-native implementation mappings using Qt 6 actions, `libmpv` properties/commands, and FreeDesktop/XDG standards.
 - **Artifacts Produced:** Authored `docs/spec/features.csv` (258 feature entries across 12 functional areas).
 - **Integrity Statement:** Derived strictly from non-invasive black-box UI observation and human-readable plain-text localization strings (`English.ini`). No binary decompilation, disassembly, API hooking, or memory inspection was performed.
+
+### Entry CR-005: Default Keyboard Shortcuts & Mouse Action Mapping
+- **Date:** 2026-11-12
+- **Role:** Observer
+- **Reference Target:** PotPlayer Preferences (`F5 > General > Keyboard`), Mouse Settings (`F5 > General > Mouse`), and plain-text configuration definitions (`C:\Program Files\DAUM\PotPlayer\Language\English.ini`).
+- **Action:** Audited and cataloged the complete default keyboard shortcuts and mouse input mapping of the reference player. Documented all default playback controls (Space, Left/Right seeks, frame steps, speed adjustments), A-B repeat ranges, audio volume and equalizer adjustments, subtitle timing/sync/position controls, video effects/shaders, window sizing/positioning presets, capture actions, dialog invocations, playlist-internal shortcuts, mouse wheel/click behaviors, and global multimedia hotkeys into a structured, machine-verifiable CSV specification (`docs/spec/hotkeys.csv`). Mapped each shortcut to clean, idiomatic command identifiers (`CMD_*`) suitable for input dispatching in Qt 6 and `libmpv`.
+- **Artifacts Produced:** Authored `docs/spec/hotkeys.csv` (253 shortcut, gesture, and mouse action mappings).
+- **Integrity Statement:** Derived exclusively through non-invasive black-box UI observation of preferences dialogs, published keyboard cheatsheets, and human-readable plain-text localization strings (`English.ini`). No binary disassembly, decompilation, debugging, memory tracing, or reverse-engineering tools were executed against executable binaries.
+
