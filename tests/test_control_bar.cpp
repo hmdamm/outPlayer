@@ -43,6 +43,36 @@ public:
     [[nodiscard]] QList<engine::ChapterInfo> chapters() const override { return m_chapters; }
     bool setChapter(int) override { return true; }
 
+    [[nodiscard]] int brightness() const override { return 0; }
+    void setBrightness(int) override {}
+    [[nodiscard]] int contrast() const override { return 0; }
+    void setContrast(int) override {}
+    [[nodiscard]] int saturation() const override { return 0; }
+    void setSaturation(int) override {}
+    [[nodiscard]] int hue() const override { return 0; }
+    void setHue(int) override {}
+    [[nodiscard]] int rotation() const override { return 0; }
+    void setRotation(int) override {}
+    [[nodiscard]] bool deinterlace() const override { return false; }
+    void setDeinterlace(bool) override {}
+    void resetVideoEqualizer() override {}
+
+    [[nodiscard]] double audioDelay() const override { return 0.0; }
+    void setAudioDelay(double) override {}
+    [[nodiscard]] double equalizerBand(int) const override { return 0.0; }
+    void setEqualizerBand(int, double) override {}
+    void resetAudioEqualizer() override {}
+    [[nodiscard]] bool isNormalizerEnabled() const override { return false; }
+    void setNormalizerEnabled(bool) override {}
+
+    [[nodiscard]] double subtitleDelay() const override { return 0.0; }
+    void setSubtitleDelay(double) override {}
+    [[nodiscard]] double subtitleScale() const override { return 1.0; }
+    void setSubtitleScale(double) override {}
+    bool loadSubtitle(const QString&) override { return true; }
+
+    bool captureFrame(const QString&) override { return true; }
+
     void simulatePositionChange(double pos) {
         m_position = pos;
         emit positionChanged(pos);

@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "engine/MpvEngine.h"
 
+#include <QDir>
+#include <QFileInfo>
 #include <QMetaObject>
+#include <QStringList>
 
 #include <algorithm>
 #include <cmath>
@@ -583,6 +586,236 @@ QString MpvEngine::getPropertyString(const QString& name) const
 void MpvEngine::setVo(const QString& vo)
 {
     setProperty(QStringLiteral("vo"), vo);
+}
+
+int MpvEngine::brightness() const
+{
+    return m_brightness;
+}
+
+void MpvEngine::setBrightness(int val)
+{
+    m_brightness = std::clamp(val, -100, 100);
+    if (m_mpv) {
+        mpv_set_property_string(m_mpv, "brightness", QByteArray::number(m_brightness).constData());
+    }
+    emit videoEqualizerChanged();
+}
+
+int MpvEngine::contrast() const
+{
+    return m_contrast;
+}
+
+void MpvEngine::setContrast(int val)
+{
+    m_contrast = std::clamp(val, -100, 100);
+    if (m_mpv) {
+        mpv_set_property_string(m_mpv, "contrast", QByteArray::number(m_contrast).constData());
+    }
+    emit videoEqualizerChanged();
+}
+
+int MpvEngine::saturation() const
+{
+    return m_saturation;
+}
+
+void MpvEngine::setSaturation(int val)
+{
+    m_saturation = std::clamp(val, -100, 100);
+    if (m_mpv) {
+        mpv_set_property_string(m_mpv, "saturation", QByteArray::number(m_saturation).constData());
+    }
+    emit videoEqualizerChanged();
+}
+
+int MpvEngine::hue() const
+{
+    return m_hue;
+}
+
+void MpvEngine::setHue(int val)
+{
+    m_hue = std::clamp(val, -100, 100);
+    if (m_mpv) {
+        mpv_set_property_string(m_mpv, "hue", QByteArray::number(m_hue).constData());
+    }
+    emit videoEqualizerChanged();
+}
+
+int MpvEngine::rotation() const
+{
+    return m_rotation;
+}
+
+void MpvEngine::setRotation(int degrees)
+{
+    int norm = ((degrees % 360) + 360) % 360;
+    norm = ((norm + 45) / 90 * 90) % 360;
+    m_rotation = norm;
+    if (m_mpv) {
+        mpv_set_property_string(m_mpv, "video-rotate", QByteArray::number(m_rotation).constData());
+    }
+    emit videoEqualizerChanged();
+}
+
+bool MpvEngine::deinterlace() const
+{
+    return m_deinterlace;
+}
+
+void MpvEngine::setDeinterlace(bool enable)
+{
+    m_deinterlace = enable;
+    if (m_mpv) {
+        mpv_set_property_string(m_mpv, "deinterlace", enable ? "yes" : "no");
+    }
+    emit videoEqualizerChanged();
+}
+
+void MpvEngine::resetVideoEqualizer()
+{
+    setBrightness(0);
+    setContrast(0);
+    setSaturation(0);
+    setHue(0);
+}
+
+double MpvEngine::audioDelay() const
+{
+    return m_audioDelay;
+}
+
+void MpvEngine::setAudioDelay(double seconds)
+{
+    m_audioDelay = seconds;
+    if (m_mpv) {
+        mpv_set_property_string(m_mpv, "audio-delay", QByteArray::number(m_audioDelay, 'f', 3).constData());
+    }
+    emit audioEqualizerChanged();
+}
+
+double MpvEngine::equalizerBand(int bandIndex) const
+{
+    if (bandIndex < 0 || bandIndex >= static_cast<int>(m_eqBands.size())) {
+        return 0.0;
+    }
+    return m_eqBands[bandIndex];
+}
+
+void MpvEngine::setEqualizerBand(int bandIndex, double gainDb)
+{
+    if (bandIndex < 0 || bandIndex >= static_cast<int>(m_eqBands.size())) {
+        return;
+    }
+    m_eqBands[bandIndex] = std::clamp(gainDb, -12.0, 12.0);
+    updateAudioFilters();
+    emit audioEqualizerChanged();
+}
+
+void MpvEngine::resetAudioEqualizer()
+{
+    m_eqBands.fill(0.0);
+    updateAudioFilters();
+    emit audioEqualizerChanged();
+}
+
+bool MpvEngine::isNormalizerEnabled() const
+{
+    return m_normalizerEnabled;
+}
+
+void MpvEngine::setNormalizerEnabled(bool enable)
+{
+    m_normalizerEnabled = enable;
+    updateAudioFilters();
+    emit audioEqualizerChanged();
+}
+
+void MpvEngine::updateAudioFilters()
+{
+    if (!m_mpv) {
+        return;
+    }
+    QStringList filters;
+
+    bool hasEq = false;
+    for (double gain : m_eqBands) {
+        if (std::abs(gain) > 1e-3) {
+            hasEq = true;
+            break;
+        }
+    }
+
+    if (hasEq) {
+        QStringList bandParams;
+        for (int i = 0; i < 10; ++i) {
+            bandParams.append(QStringLiteral("g%1=%2").arg(i + 1).arg(m_eqBands[i], 0, 'f', 1));
+        }
+        filters.append(QStringLiteral("equalizer=%1").arg(bandParams.join(u':')));
+    }
+
+    if (m_normalizerEnabled) {
+        filters.append(QStringLiteral("lavfi=[dynaudnorm]"));
+    }
+
+    QString afStr = filters.join(u',');
+    QByteArray afBytes = afStr.toUtf8();
+    mpv_set_property_string(m_mpv, "af", afBytes.constData());
+}
+
+double MpvEngine::subtitleDelay() const
+{
+    return m_subtitleDelay;
+}
+
+void MpvEngine::setSubtitleDelay(double seconds)
+{
+    m_subtitleDelay = seconds;
+    if (m_mpv) {
+        mpv_set_property_string(m_mpv, "sub-delay", QByteArray::number(m_subtitleDelay, 'f', 3).constData());
+    }
+    emit subtitleSettingsChanged();
+}
+
+double MpvEngine::subtitleScale() const
+{
+    return m_subtitleScale;
+}
+
+void MpvEngine::setSubtitleScale(double scale)
+{
+    m_subtitleScale = std::clamp(scale, 0.5, 3.0);
+    if (m_mpv) {
+        mpv_set_property_string(m_mpv, "sub-scale", QByteArray::number(m_subtitleScale, 'f', 2).constData());
+    }
+    emit subtitleSettingsChanged();
+}
+
+bool MpvEngine::loadSubtitle(const QString& filePath)
+{
+    if (!m_mpv || filePath.isEmpty()) {
+        return false;
+    }
+    const QByteArray pathUtf8 = filePath.toUtf8();
+    const char* cmd[] = {"sub-add", pathUtf8.constData(), "auto", nullptr};
+    return mpv_command(m_mpv, cmd) >= 0;
+}
+
+bool MpvEngine::captureFrame(const QString& destinationPath)
+{
+    if (!m_mpv || destinationPath.isEmpty()) {
+        return false;
+    }
+    QFileInfo fi(destinationPath);
+    QDir dir = fi.dir();
+    if (!dir.exists()) {
+        dir.mkpath(QStringLiteral("."));
+    }
+    const QByteArray pathUtf8 = destinationPath.toUtf8();
+    const char* cmd[] = {"screenshot-to-file", pathUtf8.constData(), "video", nullptr};
+    return mpv_command(m_mpv, cmd) >= 0;
 }
 
 } // namespace outplayer::engine
