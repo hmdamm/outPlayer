@@ -385,6 +385,26 @@ target_link_libraries(test_device_stream_manager
 
 add_test(NAME test_device_stream_manager COMMAND test_device_stream_manager)
 
+# ==============================================================================
+# Phase 3D Task 4: test_desktop_integration target
+# ==============================================================================
+qt_add_executable(test_desktop_integration
+    test_desktop_integration.cpp
+)
+
+target_link_libraries(test_desktop_integration
+    PRIVATE
+        outplayer_ui
+        outplayer_playlist
+        outplayer_core
+        Qt6::Test
+        Qt6::Widgets
+        Qt6::DBus
+)
+
+add_test(NAME test_desktop_integration COMMAND test_desktop_integration)
+
+
 
 
 
