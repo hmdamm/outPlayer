@@ -85,6 +85,8 @@ qt_add_library(outplayer_ui STATIC
     ui/OsdOverlay.cpp
     ui/PlaylistDock.h
     ui/PlaylistDock.cpp
+    ui/ScreenCaptureController.h
+    ui/ScreenCaptureController.cpp
     ui/TimeFormatter.h
     ui/TimelineSlider.h
     ui/TimelineSlider.cpp

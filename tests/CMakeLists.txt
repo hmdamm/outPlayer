@@ -283,5 +283,23 @@ target_link_libraries(test_bookmark_manager
 
 add_test(NAME test_bookmark_manager COMMAND test_bookmark_manager)
 
+# ==============================================================================
+# Phase 3C Task 3: test_screen_capture target
+# ==============================================================================
+qt_add_executable(test_screen_capture
+    test_screen_capture.cpp
+)
+
+target_link_libraries(test_screen_capture
+    PRIVATE
+        outplayer_ui
+        outplayer_core
+        Qt6::Test
+        Qt6::Widgets
+)
+
+add_test(NAME test_screen_capture COMMAND test_screen_capture)
+
+
 
 
