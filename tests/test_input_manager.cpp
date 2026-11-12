@@ -71,7 +71,8 @@ void TestInputManager::testRebindShortcut() {
 void TestInputManager::testShortcutExecution() {
     QWidget dummyWindow;
     dummyWindow.show();
-    QVERIFY(QTest::qWaitForWindowActive(&dummyWindow));
+    dummyWindow.activateWindow();
+    QVERIFY(QTest::qWaitForWindowExposed(&dummyWindow));
     outplayer::input::InputManager inputMgr(&dummyWindow);
 
     bool executed = false;
@@ -176,7 +177,8 @@ void TestInputManager::testRebindMouseMapping() {
 void TestInputManager::testAttachToWindowLater() {
     QWidget dummyWindow;
     dummyWindow.show();
-    QVERIFY(QTest::qWaitForWindowActive(&dummyWindow));
+    dummyWindow.activateWindow();
+    QVERIFY(QTest::qWaitForWindowExposed(&dummyWindow));
     outplayer::input::InputManager inputMgr;
     inputMgr.attachToWindow(&dummyWindow);
 
