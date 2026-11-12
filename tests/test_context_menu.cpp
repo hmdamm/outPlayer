@@ -57,6 +57,36 @@ public:
         return true;
     }
 
+    int brightness() const override { return 0; }
+    void setBrightness(int) override {}
+    int contrast() const override { return 0; }
+    void setContrast(int) override {}
+    int saturation() const override { return 0; }
+    void setSaturation(int) override {}
+    int hue() const override { return 0; }
+    void setHue(int) override {}
+    int rotation() const override { return 0; }
+    void setRotation(int) override {}
+    bool deinterlace() const override { return false; }
+    void setDeinterlace(bool) override {}
+    void resetVideoEqualizer() override {}
+
+    double audioDelay() const override { return 0.0; }
+    void setAudioDelay(double) override {}
+    double equalizerBand(int) const override { return 0.0; }
+    void setEqualizerBand(int, double) override {}
+    void resetAudioEqualizer() override {}
+    bool isNormalizerEnabled() const override { return false; }
+    void setNormalizerEnabled(bool) override {}
+
+    double subtitleDelay() const override { return 0.0; }
+    void setSubtitleDelay(double) override {}
+    double subtitleScale() const override { return 1.0; }
+    void setSubtitleScale(double) override {}
+    bool loadSubtitle(const QString&) override { return true; }
+
+    bool captureFrame(const QString&) override { return true; }
+
     QList<engine::MediaTrack> m_subTracks;
     QList<engine::MediaTrack> m_audioTracks;
     QList<engine::MediaTrack> m_videoTracks;

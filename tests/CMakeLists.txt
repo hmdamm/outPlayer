@@ -68,6 +68,21 @@ target_link_libraries(test_mpv_engine
 add_test(NAME test_mpv_engine COMMAND test_mpv_engine)
 
 # ==============================================================================
+# Phase 3C Task 1: test_mpv_engine_av target
+# ==============================================================================
+qt_add_executable(test_mpv_engine_av
+    test_mpv_engine_av.cpp
+)
+
+target_link_libraries(test_mpv_engine_av
+    PRIVATE
+        outplayer_core
+        Qt6::Test
+)
+
+add_test(NAME test_mpv_engine_av COMMAND test_mpv_engine_av)
+
+# ==============================================================================
 # Task 4: test_video_widget target
 # ==============================================================================
 qt_add_executable(test_video_widget
