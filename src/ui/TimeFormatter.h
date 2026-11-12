@@ -11,7 +11,7 @@ class TimeFormatter {
 public:
     static QString formatTime(double seconds, bool showHours = false)
     {
-        if (std::isnan(seconds) || seconds < 0.0) {
+        if (!std::isfinite(seconds) || seconds < 0.0) {
             seconds = 0.0;
         }
 
