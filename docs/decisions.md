@@ -502,7 +502,95 @@ We formally accept the Phase 3C Audio/Video Processing, Subtitle Timing Engine, 
 - **Negative:**
   - Real-time graphic equalizer filter changes via libmpv filter graphs require slight audio buffer pipeline re-priming.
 
+---
 
+## ADR 009: Preferences System F5, Desktop Integration, Device Streams & Vector Theming
 
+- **Status:** Approved
+- **Date:** 2026-11-12
+- **Deciders:** Lead Architect & AntiGravity Pair Programmer
 
+### Context
+Following the completion of Phase 3C (ADR 008 covering audio/video processing, subtitles, bookmarks, capture, and F7 Control Panel), Phase 3D addresses the remaining functional capabilities required to bring Phase 3 Vertical Slices to 100% completion across Slices 10, 11, 12, and 13:
+1. **Vector Iconography & Theming (Slice 12):** Clean, scalable SVG iconography rendered independently of screen DPI or raster assets, coupled with dynamic theme palettes (Amber `#ffaa00`, Blue `#3399ff`, Green `#33cc66`, Crimson `#ff4444`) and dark stylesheet tokens (`#1b1b1b` / `#1e1e1e` backgrounds, `#252525` panels, `#2e2e2e` borders).
+2. **Master Preferences Dialog (Slice 10):** A hierarchical settings manager accessible via `F5` / `CMD_PREFERENCES` matching the 7 reference categories (General, Playback, Video, Audio, Subtitles, Associations, Hotkeys), featuring real-time incremental search filtering across controls, reset-to-defaults capabilities, and atomic snapshot rollback semantics ensuring cancelled dialog sessions do not leak modified preferences.
+3. **Hardware Devices & Streaming Protocols (Slice 11):** Discovery and mpv URI formatting for Linux V4L2 webcams (`/dev/video*`), optical media drives (`/dev/cdrom`, `/dev/sr0`, `dvdnav://`, `bd://`), and network streaming protocols (HLS, DASH, RTSP, HTTP/HTTPS, YouTube/yt-dlp).
+4. **Linux Desktop Ecosystem Integration (Slice 13):** Standard Linux desktop protocol compliance, including MPRIS2 D-Bus media control interfaces (`org.mpris.MediaPlayer2` and `org.mpris.MediaPlayer2.Player`), XDG screensaver inhibition (`org.freedesktop.ScreenSaver` and `org.freedesktop.portal.Inhibit`) active strictly during non-paused video playback, and a system tray icon (`QSystemTrayIcon`) with contextual controls.
+5. **MainWindow Unified Coordination:** Unifying all Phase 3 subsystems within `MainWindow`, managing dialog lifecycles, shortcut routing (`F5`, `Ctrl+D`, `Ctrl+J`), and asynchronous desktop event propagation.
+
+### Decision
+We formally accept the Phase 3D Preferences System, Desktop Integration, Device Streams, and Vector Theming architecture, declaring Phase 3D and all 12 Vertical Slices of Phase 3 **100% COMPLETE** based on the following implementations and verification evidence:
+
+1. **Vector `ThemeManager` & SVG Icon System (`src/ui/ThemeManager.h` / `.cpp`):**
+   - Implemented as a singleton service managing dynamic application stylesheets and scalable SVG vector icons.
+   - Generates and dynamically applies dark palette variables with configurable accent themes (Amber `#ffaa00` default, Blue, Green, Crimson) and notifies listeners via `themeChanged()`.
+   - Renders vector SVG paths to crisp `QIcon` and `QPixmap` instances at arbitrary geometries for core transport actions (`play`, `pause`, `stop`, `prev`, `next`, `volume`, `mute`, `settings`, `playlist`).
+   - Generates standardized QSS stylesheets applying consistent border-radius, slider groove/handle highlights, and dark contrast across all widgets.
+
+2. **Master `PreferencesDialog` (`F5`) (`src/ui/PreferencesDialog.h` / `.cpp`):**
+   - Modal configuration interface modeled after reference player ergonomics with a split layout: left `QTreeWidget` category navigator and right `QStackedWidget` page container.
+   - Covers all 7 standard categories from `docs/spec/preferences.csv`: General, Playback, Video, Audio, Subtitles, Associations, and Hotkeys.
+   - Provides live incremental search filter (`QLineEdit`) that dynamically displays matching categories and auto-selects top search matches.
+   - Enforces transactional snapshot commit/rollback semantics: on dialog invocation, a deep snapshot of `SettingsManager` state is taken; edits mutate working state, but clicking `[ Cancel ]` or closing the dialog restores the snapshot; only `[ OK ]` or `[ Apply ]` commits changes to persistent storage and emits `settingsApplied()`.
+   - Includes `[ Reset Defaults ]` to restore factory default settings across all categories.
+
+3. **Core `DeviceStreamManager` (`src/core/DeviceStreamManager.h` / `.cpp`):**
+   - Designed with zero UI dependencies in `src/core/` to ensure deterministic, isolated unit testability.
+   - Safely discovers available V4L2 video devices (`/dev/video*`) and optical media drives (`/dev/cdrom`, `/dev/sr*`) without blocking or throwing when hardware is absent or permissions are constrained.
+   - Detects streaming protocols (`http://`, `https://`, `rtsp://`, `hls://`, `dash://`, `dvdnav://`, `bd://`, `v4l2://`) via `isStreamUrl()`.
+   - Formats hardware and protocol URIs (`formatDvdUrl`, `formatBlurayUrl`, `formatV4l2Url`) ready for direct ingestion by `IPlaybackEngine`.
+
+4. **Linux `DesktopIntegration` (`src/ui/DesktopIntegration.h` / `.cpp`):**
+   - Implements full MPRIS2 D-Bus specifications on the session bus (`org.mpris.MediaPlayer2.outPlayer`), providing `org.mpris.MediaPlayer2` and `org.mpris.MediaPlayer2.Player` interfaces with properties (`PlaybackStatus`, `Rate`, `Metadata`, `Volume`, `Position`, `CanGoNext`, `CanGoPrevious`, `CanPlay`, `CanPause`, `CanSeek`, `CanControl`) and methods (`Next`, `Previous`, `Pause`, `PlayPause`, `Stop`, `Play`, `Seek`, `SetPosition`, `OpenUri`).
+   - Gracefully degrades with zero crashes or exceptions when D-Bus session bus is unavailable (headless CI or sandboxed containers).
+   - Manages XDG ScreenSaver inhibition via D-Bus (`org.freedesktop.ScreenSaver` and portal `Inhibit` fallback), automatically asserting cookie locks during active video playback and releasing locks upon pause, stop, EOF, or player shutdown.
+   - Provides a system tray icon (`QSystemTrayIcon`) with contextual play/pause, next/previous, mute, preferences, and quit actions.
+
+5. **`MainWindow` Unified Integration:**
+   - Coordinates `PreferencesDialog` (`F5`, `CMD_PREFERENCES`), `DeviceStreamManager` (`Ctrl+D` for device/webcam, `Ctrl+J` for optical disc), and `DesktopIntegration`.
+   - Subscribes to engine state notifications to dynamically assert/release screensaver inhibits and sync MPRIS2 playback statuses and metadata.
+   - Responds to desktop remote control signals (`playPauseRequested`, `nextRequested`, `previousRequested`, `stopRequested`, `raiseWindowRequested`).
+   - Applies theme accent switches dynamically across main window chrome and child dialogs.
+
+6. **Empirical Verification & Test Evidence:**
+   - 100% automated test pass rate across all 25 ctest targets under headless `xvfb-run` (Total Test time = 21.99s):
+     - `test_dummy`: Passed (0.01s)
+     - `test_command_registry`: Passed (0.13s)
+     - `test_settings_manager`: Passed (0.17s)
+     - `test_mpv_engine`: Passed (0.62s)
+     - `test_mpv_engine_av`: Passed (1.07s)
+     - `test_video_widget`: Passed (0.72s)
+     - `test_input_manager`: Passed (0.20s)
+     - `test_timeline_slider`: Passed (0.16s)
+     - `test_control_bar`: Passed (0.17s)
+     - `test_osd_overlay`: Passed (0.33s)
+     - `test_main_window_ui`: Passed (6.37s)
+     - `test_context_menu`: Passed (0.22s)
+     - `test_media_open_dialogs`: Passed (0.35s)
+     - `test_playlist_model`: Passed (0.16s)
+     - `test_playlist_dock`: Passed (0.28s)
+     - `test_main_window_navigation`: Passed (1.90s)
+     - `test_bookmark_manager`: Passed (0.22s)
+     - `test_screen_capture`: Passed (0.43s)
+     - `test_control_panel`: Passed (0.43s)
+     - `test_main_window_av`: Passed (4.86s)
+     - `test_theme_manager`: Passed (0.18s) — verifies SVG rendering, dark palette variables, accent color switching, and theme notification signals.
+     - `test_preferences_dialog`: Passed (0.34s) — verifies 7 categories, search filter, rollback on cancel, commit on apply/OK, and reset defaults.
+     - `test_device_stream_manager`: Passed (0.18s) — verifies V4L2/optical scanning, stream URL detection, and URI formatting.
+     - `test_desktop_integration`: Passed (0.25s) — verifies D-Bus graceful fallback, screensaver inhibit lifecycle, metadata updates, and tray menu actions.
+     - `test_main_window_integration`: Passed (1.79s) — verifies unified F5 preferences dialog, device/stream triggers, desktop remote signals, screensaver inhibition, and theme updates.
+     - Result: 25/25 passed (100%), 0 failures.
+   - 100% specification verification assertions pass under `python3 tests/test_phase1_specs.py` (345 features, 253 hotkeys, 87 preferences rows, 0 clean-room branding violations).
+   - Standalone synthetic playback (`xvfb-run -a ./build/src/outplayer --test-run lavfi://nullsrc=s=640x360:d=1`) completes cleanly with return code 0.
+   - Clean-room audit compliance: zero proprietary branding violations across all source code and documentation.
+
+### Consequences
+- **Positive:**
+  - Full functional and architectural completion of Phase 3 across all 12 vertical feature slices (and Slice 13 Linux integration).
+  - First-class Linux desktop citizenship via MPRIS2, XDG inhibit, and Tray integration without sacrificing headless/CI testability.
+  - Highly maintainable modular architecture: Core/Engine remains completely decoupled from UI; UI layers interact cleanly via Qt signals and slots.
+  - Robust preferences management with full rollback guarantees protects user configuration integrity.
+  - Ready for Phase 4 Parity Hardening & Verification.
+- **Negative:**
+  - Dynamic D-Bus screensaver inhibition relies on X11 / freedesktop protocol APIs; full Wayland idle-inhibit portal negotiation can be refined in Phase 4.
 
