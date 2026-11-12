@@ -7,19 +7,32 @@
 class TestSettingsManager : public QObject {
     Q_OBJECT
 private slots:
+    void init();
+    void cleanup();
     void testGetAndSet();
     void testSignals();
     void testDefaults();
     void testTypedAccessors();
     void testContainsAndRemove();
     void testExportImport();
+
+private:
+    std::unique_ptr<QTemporaryDir> m_tempDir;
 };
 
+void TestSettingsManager::init() {
+    m_tempDir = std::make_unique<QTemporaryDir>();
+    QVERIFY(m_tempDir->isValid());
+    QString iniPath = m_tempDir->filePath("test_outplayer.ini");
+    outplayer::core::SettingsManager::instance().init(iniPath);
+}
+
+void TestSettingsManager::cleanup() {
+    m_tempDir.reset();
+}
+
 void TestSettingsManager::testGetAndSet() {
-    QTemporaryDir tempDir;
-    QString iniPath = tempDir.filePath("test_outplayer.ini");
     auto& settings = outplayer::core::SettingsManager::instance();
-    settings.init(iniPath);
     settings.set("Playback/Volume", 85.0);
     QCOMPARE(settings.get("Playback/Volume").toDouble(), 85.0);
 }
@@ -30,6 +43,10 @@ void TestSettingsManager::testSignals() {
     settings.set("Video/Deinterlace", QString("auto"));
     QCOMPARE(spy.count(), 1);
     QCOMPARE(spy.takeFirst().at(0).toString(), QString("Video/Deinterlace"));
+
+    // Setting identical value should not re-trigger signal
+    settings.set("Video/Deinterlace", QString("auto"));
+    QCOMPARE(spy.count(), 0);
 }
 
 void TestSettingsManager::testDefaults() {
@@ -39,10 +56,7 @@ void TestSettingsManager::testDefaults() {
 }
 
 void TestSettingsManager::testTypedAccessors() {
-    QTemporaryDir tempDir;
-    QString iniPath = tempDir.filePath("typed_accessors.ini");
     auto& settings = outplayer::core::SettingsManager::instance();
-    settings.init(iniPath);
 
     settings.setAllowMultipleInstances(true);
     QCOMPARE(settings.allowMultipleInstances(), true);
@@ -62,10 +76,7 @@ void TestSettingsManager::testTypedAccessors() {
 }
 
 void TestSettingsManager::testContainsAndRemove() {
-    QTemporaryDir tempDir;
-    QString iniPath = tempDir.filePath("test_contains.ini");
     auto& settings = outplayer::core::SettingsManager::instance();
-    settings.init(iniPath);
 
     QVERIFY(!settings.contains("Custom/Foo"));
     settings.set("Custom/Foo", "Bar");
@@ -75,8 +86,7 @@ void TestSettingsManager::testContainsAndRemove() {
 }
 
 void TestSettingsManager::testExportImport() {
-    QTemporaryDir tempDir;
-    QString exportPath = tempDir.filePath("exported.ini");
+    QString exportPath = m_tempDir->filePath("exported.ini");
     auto& settings = outplayer::core::SettingsManager::instance();
     settings.set("General/CustomSetting", 12345);
     QVERIFY(settings.exportToFile(exportPath));
