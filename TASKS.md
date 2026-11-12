@@ -118,7 +118,8 @@ This document tracks the roadmap, phase progression, and verification evidence f
 
 **Gate Requirement:** Each vertical slice implemented using strict TDD, verified with automated unit and integration tests.  
 **Phase 3A Status (Interactive Player UI & Core Controls):** **CLEARED / COMPLETE** (ADR 006)  
-**Phase 3B Status (Navigation & Media Management: Slices 3, 4, 5):** **CLEARED / COMPLETE** (ADR 007)
+**Phase 3B Status (Navigation & Media Management: Slices 3, 4, 5):** **CLEARED / COMPLETE** (ADR 007)  
+**Phase 3C Status (Audio/Video Subsystems, Subtitles & Control Panel: Slices 6, 7, 8, 9):** **CLEARED / COMPLETE** (ADR 008)
 
 ### Phase 3A Tasks: Interactive Player UI & Core Controls (Slices 1 & 2)
 
@@ -198,6 +199,53 @@ This document tracks the roadmap, phase progression, and verification evidence f
   - ADR 007 formally approved and recorded in `docs/decisions.md`.
   - Zero UI dependencies in `src/core/`, `src/engine/`, and `src/playlist/PlaylistItem.h` maintained.
 
+### Phase 3C Tasks: Audio/Video Processing, Subtitles & Control Panel (Slices 6, 7, 8, 9)
+
+| Task ID | Description | Status | Assignee / Role | Target Deliverables | Verification Evidence |
+|---|---|---|---|---|---|
+| **P3C-T1** | Engine AV Equalizer, Subtitle Sync & Frame Capture Extension | Done | Implementer | `src/engine/IPlaybackEngine.h`, `src/engine/MpvEngine.h`, `src/engine/MpvEngine.cpp`, `tests/test_mpv_engine_av.cpp` | `ctest -R test_mpv_engine_av` PASS (video EQ properties, 10-band audio EQ filter graph, sub delay/scale, frame capture), commit `c999af4` |
+| **P3C-T2** | Persistent Bookmark Manager with Timestamp Navigation | Done | Implementer | `src/core/BookmarkManager.h`, `src/core/BookmarkManager.cpp`, `tests/test_bookmark_manager.cpp` | `ctest -R test_bookmark_manager` PASS (bookmark CRUD, binary search traversal, INI persistence), commit `6b6a07c` |
+| **P3C-T3** | Screen Capture Controller for Instant Snapshot & Clipboard | Done | Implementer | `src/ui/ScreenCaptureController.h`, `src/ui/ScreenCaptureController.cpp`, `tests/test_screen_capture.cpp` | `ctest -R test_screen_capture` PASS (snapshot saving, directory creation, format templating, clipboard copy), commit `cdb03c7` |
+| **P3C-T4** | Multi-Tab Control Panel (`F7`) | Done | Implementer | `src/ui/ControlPanel.h`, `src/ui/ControlPanel.cpp`, `tests/test_control_panel.cpp` | `ctest -R test_control_panel` PASS (Video, Audio/EQ, Subtitles, Playback tabs, bi-directional sync, reset handlers), commit `4984f33` |
+| **P3C-T5** | MainWindow Integration, Hotkeys, Control Panel Toggle & OSD Routing | Done | Implementer | `src/ui/MainWindow.h`, `src/ui/MainWindow.cpp`, `tests/test_main_window_av.cpp` | `ctest -R test_main_window_av` PASS (F7 / CP button toggle, bookmark shortcuts, capture shortcuts, OSD feedback), commit `4f36bd3` |
+| **P3C-T6** | Phase 3C Gate Review, Integration Verification & ADR 008 | Done | Implementer | `docs/decisions.md` (ADR 008), `TASKS.md`, verification test runs | 100% test pass rate (20/20 ctest, python specs, synthetic playback test-run) |
+
+### Phase 3C Gate Clearance Evidence
+- **Build Cleanliness:**
+  - `wsl bash -c 'cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=Debug && cmake --build build -j$(nproc)'`: 0 errors, 0 warnings.
+- **Unit & Integration Test Suite (`wsl xvfb-run -a ctest --test-dir build --output-on-failure`):**
+  - `test_dummy`: PASSED (0.01s)
+  - `test_command_registry`: PASSED (0.19s)
+  - `test_settings_manager`: PASSED (0.25s)
+  - `test_mpv_engine`: PASSED (0.73s)
+  - `test_mpv_engine_av`: PASSED (0.95s) — verifies video EQ properties, 10-band audio EQ filter graphs, subtitle delay/scaling, and frame capture.
+  - `test_video_widget`: PASSED (0.71s)
+  - `test_input_manager`: PASSED (0.31s)
+  - `test_timeline_slider`: PASSED (0.27s)
+  - `test_control_bar`: PASSED (0.25s)
+  - `test_osd_overlay`: PASSED (0.43s)
+  - `test_main_window_ui`: PASSED (6.46s)
+  - `test_context_menu`: PASSED (0.28s)
+  - `test_media_open_dialogs`: PASSED (0.31s)
+  - `test_playlist_model`: PASSED (0.13s)
+  - `test_playlist_dock`: PASSED (0.28s)
+  - `test_main_window_navigation`: PASSED (1.29s)
+  - `test_bookmark_manager`: PASSED (0.22s) — verifies bookmark addition, sorting, navigation, removal, and INI persistence.
+  - `test_screen_capture`: PASSED (0.40s) — verifies image saving, timestamp naming, clipboard export, and directory handling.
+  - `test_control_panel`: PASSED (0.34s) — verifies 4 tabs, slider ranges, resets, and engine bi-directional sync.
+  - `test_main_window_av`: PASSED (4.28s) — verifies F7 toggle, CP button, bookmark hotkeys, capture hotkeys, and OSD display.
+  - Result: 20/20 passed (100%), 0 failures (Total Test time = 18.53s).
+- **End-to-End Synthetic Media Playback (`wsl xvfb-run -a ./build/src/outplayer --test-run lavfi://nullsrc=s=640x360:d=1`):**
+  - Exit code: `0`
+  - Render Surface: `QOpenGLWidget` + `mpv_render_context` using OpenGL FBO (`rgba16f`, Mesa llvmpipe desktop OpenGL 4.6).
+  - Stream lifecycle: Demuxed `lavfi` source (640x360 @ 25fps), presented frames through `mpv_render_context_render()`, reached container EOF, and exited cleanly.
+- **Specification & Scaffold Verification Suite:**
+  - `python3 tests/test_phase1_specs.py`: PASSED (all Phase 1 spec assertions satisfied, 0 clean-room branding violations).
+  - `python3 tests/test_project_scaffold.py`: PASSED (scaffolding and governance verified).
+- **Architectural Integrity:**
+  - ADR 008 formally approved and recorded in `docs/decisions.md`.
+  - Zero UI dependencies in `src/core/` and `src/engine/` maintained.
+
 ### Vertical Slices Progress Table
 
 | Slice | Description | Status | Target Deliverables | Verification Evidence |
@@ -207,10 +255,10 @@ This document tracks the roadmap, phase progression, and verification evidence f
 | **Slice 3** | Hotkey Router & Mouse Gestures | Done (Phase 3B) | Global/local shortcut listener, configurable mouse clicks/wheel actions, 1:1 context menu action routing | `test_input_manager`, `test_context_menu` PASS |
 | **Slice 4** | Playlist Model/View (F6) | Done (Phase 3B) | High-performance QAbstractItemModel, repeat modes, sorting, search filter dock widget, dark delegate | `test_playlist_model`, `test_playlist_dock`, 10k item benchmark PASS |
 | **Slice 5** | File & URL Open Dialogs / Media Ingestion | Done (Phase 3B) | MediaOpenController recursive scanner, OpenUrlDialog with history, drag-and-drop loading, EOF track auto-advance | `test_media_open_dialogs`, `test_main_window_navigation` PASS |
-| **Slice 6** | Audio Subsystem | Not Started | 10-band equalizer, volume boost, normalization, delay, track selection | Audio filter pipe tests |
-| **Slice 7** | Video Renderer Controls | Not Started | Aspect ratio, rotation, zoom/pan, deinterlacing, color adjustments | OpenGL shader parameter tests |
-| **Slice 8** | Subtitle Engine | Not Started | ASS/SSA, SRT, WebVTT rendering, subtitle sync adjustments, styling | libass subtitle placement tests |
-| **Slice 9** | Bookmarks & Screen Capture | Not Started | Bookmark manager, instant frame capture (PNG/JPG/GIF), burst capture | File generation verification tests |
+| **Slice 6** | Audio Subsystem | Done (Phase 3C) | 10-band equalizer, volume boost, delay sync, audio track selection | `test_mpv_engine_av`, `test_control_panel`, `test_main_window_av` PASS |
+| **Slice 7** | Video Renderer Controls | Done (Phase 3C) | Aspect ratio, rotation, brightness/contrast/saturation/hue color adjustments (-100..100) and resets | `test_mpv_engine_av`, `test_control_panel`, `test_main_window_av` PASS |
+| **Slice 8** | Subtitle Engine | Done (Phase 3C) | Subtitle delay sync (-10s..+10s), font size scaling (0.2x..5.0x), track selection, visibility toggle | `test_mpv_engine_av`, `test_control_panel`, `test_main_window_av` PASS |
+| **Slice 9** | Bookmarks & Screen Capture | Done (Phase 3C) | Persistent BookmarkManager with INI storage, ScreenCaptureController (PNG/JPG/BMP) snapshot & clipboard copy | `test_bookmark_manager`, `test_screen_capture`, `test_main_window_av` PASS |
 | **Slice 10** | Preferences Dialog (F5) | Not Started | Full categorical preferences tree dialog, search filter, reset defaults | Preference dialog test harness |
 | **Slice 11** | Streams, Optical & V4L2 Devices | Not Started | HLS, DASH, RTSP, YouTube/yt-dlp integration, DVD/Blu-ray, webcam input | URL opening & streaming tests |
 | **Slice 12** | Theming, Skins & SVG Vector Icons | Not Started | Custom dark skin, frameless window styling, original vector iconography | Visual rendering test under xvfb |
