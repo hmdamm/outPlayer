@@ -251,9 +251,117 @@ def test_task5():
 
     print("Task 5 spec verification passed.")
 
+def test_clean_room_guard():
+    import csv
+    import re
+
+    forbidden_brands = ["potplayer", "daum", "kakao"]
+
+    # 1. Scan src/ directory: Zero tolerance for forbidden proprietary branding in source code, headers, comments, or symbols
+    src_dir = "src"
+    assert os.path.exists(src_dir), "src directory missing"
+    src_violations = []
+    for root, _, files in os.walk(src_dir):
+        for f in files:
+            fpath = os.path.join(root, f)
+            with open(fpath, "r", encoding="utf-8", errors="ignore") as fp:
+                for line_no, line in enumerate(fp, 1):
+                    for brand in forbidden_brands:
+                        if brand in line.lower():
+                            src_violations.append((fpath, line_no, brand, line.strip()))
+    assert not src_violations, f"Clean-room violations in src/: {src_violations}"
+
+    # 2. Scan docs/spec/ for forbidden branding in target code symbols, binary paths, or package IDs
+    spec_dir = "docs/spec"
+    assert os.path.exists(spec_dir), "docs/spec directory missing"
+
+    # Verify features.csv IDs and total specification count
+    with open(os.path.join(spec_dir, "features.csv"), "r", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        feature_rows = list(reader)
+        for r in feature_rows:
+            for brand in forbidden_brands:
+                assert brand not in r["id"].lower(), f"Forbidden brand '{brand}' in feature id '{r['id']}'"
+
+    # Verify hotkeys.csv IDs, command_ids, and total specification count
+    with open(os.path.join(spec_dir, "hotkeys.csv"), "r", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        hotkey_rows = list(reader)
+        for r in hotkey_rows:
+            for brand in forbidden_brands:
+                assert brand not in r["id"].lower(), f"Forbidden brand '{brand}' in hotkey id '{r['id']}'"
+                assert brand not in r["command_id"].lower(), f"Forbidden brand '{brand}' in command_id '{r['command_id']}'"
+
+    assert len(feature_rows) == 345, f"Expected 345 rows in features.csv, found {len(feature_rows)}"
+    assert len(hotkey_rows) == 253, f"Expected 253 rows in hotkeys.csv, found {len(hotkey_rows)}"
+
+    # Verify package IDs, target binary paths, and class/struct/namespace symbols in docs/spec/
+    symbol_patterns = [
+        r'\bclass\s+(?:PotPlayer|Daum|Kakao)\w*',
+        r'\bstruct\s+(?:PotPlayer|Daum|Kakao)\w*',
+        r'\bnamespace\s+(?:PotPlayer|Daum|Kakao)\w*',
+        r'\b(?:PotPlayer|Daum|Kakao)\w*::',
+    ]
+    forbidden_pkg_patterns = [
+        r'org\.(?:potplayer|daum|kakao)',
+        r'com\.(?:potplayer|daum|kakao)',
+    ]
+    forbidden_bin_patterns = [
+        r'/usr/(?:local/)?bin/potplayer',
+        r'bin/potplayer\b',
+    ]
+
+    spec_violations = []
+    for root, _, files in os.walk(spec_dir):
+        for f in files:
+            fpath = os.path.join(root, f)
+            with open(fpath, "r", encoding="utf-8", errors="ignore") as fp:
+                content = fp.read()
+                for pat in symbol_patterns:
+                    m = re.search(pat, content, re.IGNORECASE)
+                    if m:
+                        spec_violations.append((fpath, f"symbol declaration: {m.group(0)}"))
+                for pat in forbidden_pkg_patterns:
+                    m = re.search(pat, content, re.IGNORECASE)
+                    if m:
+                        spec_violations.append((fpath, f"forbidden package id: {m.group(0)}"))
+                for pat in forbidden_bin_patterns:
+                    m = re.search(pat, content, re.IGNORECASE)
+                    if m:
+                        spec_violations.append((fpath, f"forbidden target binary path: {m.group(0)}"))
+
+    assert not spec_violations, f"Clean-room violations in docs/spec/: {spec_violations}"
+
+    # 3. Verify clean-room log citations: citations are permitted in docs/clean-room-log.md as external observation references
+    log_path = "docs/clean-room-log.md"
+    assert os.path.exists(log_path), "docs/clean-room-log.md missing"
+    with open(log_path, "r", encoding="utf-8") as f:
+        log_content = f.read()
+
+    for entry_id in ["CR-001", "CR-002", "CR-003", "CR-004", "CR-005", "CR-006", "CR-007", "CR-008"]:
+        assert f"### Entry {entry_id}:" in log_content, f"Audit log entry {entry_id} missing in clean-room-log.md"
+
+    # 4. Verify ADR 004 in docs/decisions.md
+    decisions_path = "docs/decisions.md"
+    assert os.path.exists(decisions_path), "docs/decisions.md missing"
+    with open(decisions_path, "r", encoding="utf-8") as f:
+        decisions_content = f.read()
+    assert "ADR 004: Phase 1 Specification Baseline & Clean-Room Feature Inventory" in decisions_content
+    assert "CLEARED" in decisions_content or "cleared" in decisions_content
+
+    # 5. Verify TASKS.md Phase 1 gate status
+    tasks_path = "TASKS.md"
+    assert os.path.exists(tasks_path), "TASKS.md missing"
+    with open(tasks_path, "r", encoding="utf-8") as f:
+        tasks_content = f.read()
+    assert "Phase Gate Status:** **CLEARED / COMPLETE** (ADR 004)" in tasks_content
+
+    print("Clean-room guard verification passed: 0 violations across src/ and docs/spec/, 345 features, 253 hotkeys, CR-001..CR-008 verified.")
+
 if __name__ == "__main__":
     test_task1()
     test_task2()
     test_task3()
     test_task4()
     test_task5()
+    test_clean_room_guard()
