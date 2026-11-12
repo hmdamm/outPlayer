@@ -51,6 +51,8 @@ target_link_libraries(outplayer_input
 qt_add_library(outplayer_ui STATIC
     ui/ControlBar.h
     ui/ControlBar.cpp
+    ui/CustomTitleBar.h
+    ui/CustomTitleBar.cpp
     ui/OsdOverlay.h
     ui/OsdOverlay.cpp
     ui/TimeFormatter.h
@@ -70,6 +72,7 @@ target_include_directories(outplayer_ui
 target_link_libraries(outplayer_ui
     PUBLIC
         outplayer_core
+        outplayer_input
         Qt6::Widgets
         Qt6::OpenGLWidgets
         PkgConfig::MPV
