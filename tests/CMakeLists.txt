@@ -202,3 +202,18 @@ target_link_libraries(test_media_open_dialogs
 
 add_test(NAME test_media_open_dialogs COMMAND test_media_open_dialogs)
 
+# ==============================================================================
+# Task 3 (Phase 3B): test_playlist_model target
+# ==============================================================================
+qt_add_executable(test_playlist_model
+    test_playlist_model.cpp
+)
+
+target_link_libraries(test_playlist_model
+    PRIVATE
+        outplayer_playlist
+        Qt6::Test
+)
+
+add_test(NAME test_playlist_model COMMAND test_playlist_model)
+
