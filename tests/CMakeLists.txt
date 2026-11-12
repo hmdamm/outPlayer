@@ -352,6 +352,24 @@ target_link_libraries(test_theme_manager
 
 add_test(NAME test_theme_manager COMMAND test_theme_manager)
 
+# ==============================================================================
+# Phase 3D Task 2: test_preferences_dialog target
+# ==============================================================================
+qt_add_executable(test_preferences_dialog
+    test_preferences_dialog.cpp
+)
+
+target_link_libraries(test_preferences_dialog
+    PRIVATE
+        outplayer_ui
+        outplayer_core
+        outplayer_input
+        Qt6::Test
+        Qt6::Widgets
+)
+
+add_test(NAME test_preferences_dialog COMMAND test_preferences_dialog)
+
 
 
 
