@@ -104,6 +104,10 @@ enum class CommandId : uint16_t {
     CMD_VIDEO_SATURATION_DOWN,
     CMD_VIDEO_SATURATION_UP,
     CMD_VIDEO_SATURATION_RESET,
+    CMD_VIDEO_HUE_DOWN,
+    CMD_VIDEO_HUE_UP,
+    CMD_VIDEO_HUE_RESET,
+    CMD_VIDEO_RESET,
     CMD_VIDEO_CYCLE,
     CMD_VIDEO_CYCLE_DEINTERLACE,
     CMD_VIDEO_CYCLE_TRANSFORM,
@@ -151,7 +155,9 @@ enum class CommandId : uint16_t {
     CMD_VIDEO_PAN_UP,
     CMD_VIDEO_PAN_DOWN,
     CMD_CAPTURE_COPY_FRAME,
+    CMD_CAPTURE_COPY = CMD_CAPTURE_COPY_FRAME,
     CMD_CAPTURE_SAVE_FRAME,
+    CMD_CAPTURE_SAVE = CMD_CAPTURE_SAVE_FRAME,
     CMD_CAPTURE_CONSECUTIVE,
     CMD_CAPTURE_AUDIO,
     CMD_CAPTURE_VIDEO,
@@ -171,6 +177,7 @@ enum class CommandId : uint16_t {
     CMD_PLAYLIST_TOGGLE = CMD_PLAYLIST,
     CMD_PLAYLIST_WINDOW = CMD_PLAYLIST,
     CMD_CONTROL_PANEL,
+    CMD_PANEL_CONTROL = CMD_CONTROL_PANEL,
     CMD_BROADCAST_WINDOW,
     CMD_CHAT_WINDOW,
     CMD_MANAGE_BROADCAST,
@@ -194,6 +201,8 @@ enum class CommandId : uint16_t {
     CMD_FAVORITES_ADD_ITEM,
     CMD_FAVORITES_ADD_FOLDER,
     CMD_BOOKMARK_ADD,
+    CMD_BOOKMARK_PREV,
+    CMD_BOOKMARK_NEXT,
     CMD_BOOKMARK_MANAGE,
     CMD_BOOKMARK_JUMP_1,
     CMD_BOOKMARK_JUMP_2,
@@ -385,6 +394,10 @@ inline constexpr RawCommandData kRawCommandData[] = {
     { CommandId::CMD_VIDEO_SATURATION_DOWN, "CMD_VIDEO_SATURATION_DOWN", "Decrease Saturation (-1%)", "U", "None", "Window", "Menu > Video > Video Effects > Decrease Saturation", "Decrease Saturation (-1%)" },
     { CommandId::CMD_VIDEO_SATURATION_UP, "CMD_VIDEO_SATURATION_UP", "Increase Saturation (+1%)", "I", "None", "Window", "Menu > Video > Video Effects > Increase Saturation", "Increase Saturation (+1%)" },
     { CommandId::CMD_VIDEO_SATURATION_RESET, "CMD_VIDEO_SATURATION_RESET", "Reset Saturation", "O", "None", "Window", "Menu > Video > Video Effects > Reset Saturation", "Reset Saturation" },
+    { CommandId::CMD_VIDEO_HUE_DOWN, "CMD_VIDEO_HUE_DOWN", "Decrease Hue (-1%)", "None", "None", "Window", "Menu > Video > Video Effects > Decrease Hue", "Decrease Hue (-1%)" },
+    { CommandId::CMD_VIDEO_HUE_UP, "CMD_VIDEO_HUE_UP", "Increase Hue (+1%)", "None", "None", "Window", "Menu > Video > Video Effects > Increase Hue", "Increase Hue (+1%)" },
+    { CommandId::CMD_VIDEO_HUE_RESET, "CMD_VIDEO_HUE_RESET", "Reset Hue", "None", "None", "Window", "Menu > Video > Video Effects > Reset Hue", "Reset Hue" },
+    { CommandId::CMD_VIDEO_RESET, "CMD_VIDEO_RESET", "Reset All Video Adjustments", "None", "None", "Window", "Menu > Video > Video Effects > Reset All", "Reset All Video Adjustments" },
     { CommandId::CMD_VIDEO_CYCLE, "CMD_VIDEO_CYCLE", "Cycle Video Track / Stream", "V", "None", "Window", "Menu > Video > Select Video Stream", "Cycle Video Track / Stream" },
     { CommandId::CMD_VIDEO_CYCLE_DEINTERLACE, "CMD_VIDEO_CYCLE_DEINTERLACE", "Cycle Deinterlacing Mode", "I", "Ctrl", "Window", "Menu > Video > Deinterlacing > Cycle Deinterlacing Mode", "Cycle Deinterlacing Mode" },
     { CommandId::CMD_VIDEO_CYCLE_TRANSFORM, "CMD_VIDEO_CYCLE_TRANSFORM", "Cycle Built-in Video Transform Filter", "X", "Ctrl", "Window", "Menu > Video > Video Processing > Cycle Video Transform Filter", "Cycle Built-in Video Transform Filter" },
@@ -472,7 +485,9 @@ inline constexpr RawCommandData kRawCommandData[] = {
     { CommandId::CMD_REOPEN_LAST, "CMD_REOPEN_LAST", "Reopen Current / Last Played Item", "Y", "Ctrl", "Window", "Menu > Open > Reopen Current/Last Item", "Reopen Current / Last Played Item" },
     { CommandId::CMD_FAVORITES_ADD_ITEM, "CMD_FAVORITES_ADD_ITEM", "Add Current Item to Favorites", "Insert", "Alt", "Window", "Menu > Favorites > Add Current Item to Favorites", "Add Current Item to Favorites" },
     { CommandId::CMD_FAVORITES_ADD_FOLDER, "CMD_FAVORITES_ADD_FOLDER", "Add Current Folder to Favorites", "Insert", "Ctrl", "Window", "Menu > Favorites > Add Current Folder to Favorites", "Add Current Folder to Favorites" },
-    { CommandId::CMD_BOOKMARK_ADD, "CMD_BOOKMARK_ADD", "Add Bookmark at Current Position", "P", "Ctrl", "Window", "Menu > Bookmarks > Add to Bookmarks", "Add Bookmark at Current Position" },
+    { CommandId::CMD_BOOKMARK_ADD, "CMD_BOOKMARK_ADD", "Add Bookmark at Current Position", "H", "None", "Window", "Menu > Bookmarks > Add to Bookmarks", "Add Bookmark at Current Position" },
+    { CommandId::CMD_BOOKMARK_PREV, "CMD_BOOKMARK_PREV", "Jump to Previous Bookmark", "H", "Shift", "Window", "Menu > Bookmarks > Previous Bookmark", "Jump to Previous Bookmark" },
+    { CommandId::CMD_BOOKMARK_NEXT, "CMD_BOOKMARK_NEXT", "Jump to Next Bookmark", "H", "Ctrl", "Window", "Menu > Bookmarks > Next Bookmark", "Jump to Next Bookmark" },
     { CommandId::CMD_BOOKMARK_MANAGE, "CMD_BOOKMARK_MANAGE", "Manage Bookmarks Window", "P", "None", "Window", "Menu > Bookmarks > Bookmark Manager...", "Manage Bookmarks Window" },
     { CommandId::CMD_BOOKMARK_JUMP_1, "CMD_BOOKMARK_JUMP_1", "Jump to Bookmark 1", "F1", "Shift", "Window", "Menu > Bookmarks > Jump to Bookmark 1", "Jump to Bookmark 1" },
     { CommandId::CMD_BOOKMARK_JUMP_2, "CMD_BOOKMARK_JUMP_2", "Jump to Bookmark 2", "F2", "Shift", "Window", "Menu > Bookmarks > Jump to Bookmark 2", "Jump to Bookmark 2" },
@@ -644,6 +659,10 @@ inline constexpr size_t TotalCommands = sizeof(kRawCommandData) / sizeof(kRawCom
     case CommandId::CMD_VIDEO_SATURATION_DOWN: return QStringLiteral("CMD_VIDEO_SATURATION_DOWN");
     case CommandId::CMD_VIDEO_SATURATION_UP: return QStringLiteral("CMD_VIDEO_SATURATION_UP");
     case CommandId::CMD_VIDEO_SATURATION_RESET: return QStringLiteral("CMD_VIDEO_SATURATION_RESET");
+    case CommandId::CMD_VIDEO_HUE_DOWN: return QStringLiteral("CMD_VIDEO_HUE_DOWN");
+    case CommandId::CMD_VIDEO_HUE_UP: return QStringLiteral("CMD_VIDEO_HUE_UP");
+    case CommandId::CMD_VIDEO_HUE_RESET: return QStringLiteral("CMD_VIDEO_HUE_RESET");
+    case CommandId::CMD_VIDEO_RESET: return QStringLiteral("CMD_VIDEO_RESET");
     case CommandId::CMD_VIDEO_CYCLE: return QStringLiteral("CMD_VIDEO_CYCLE");
     case CommandId::CMD_VIDEO_CYCLE_DEINTERLACE: return QStringLiteral("CMD_VIDEO_CYCLE_DEINTERLACE");
     case CommandId::CMD_VIDEO_CYCLE_TRANSFORM: return QStringLiteral("CMD_VIDEO_CYCLE_TRANSFORM");
@@ -732,6 +751,8 @@ inline constexpr size_t TotalCommands = sizeof(kRawCommandData) / sizeof(kRawCom
     case CommandId::CMD_FAVORITES_ADD_ITEM: return QStringLiteral("CMD_FAVORITES_ADD_ITEM");
     case CommandId::CMD_FAVORITES_ADD_FOLDER: return QStringLiteral("CMD_FAVORITES_ADD_FOLDER");
     case CommandId::CMD_BOOKMARK_ADD: return QStringLiteral("CMD_BOOKMARK_ADD");
+    case CommandId::CMD_BOOKMARK_PREV: return QStringLiteral("CMD_BOOKMARK_PREV");
+    case CommandId::CMD_BOOKMARK_NEXT: return QStringLiteral("CMD_BOOKMARK_NEXT");
     case CommandId::CMD_BOOKMARK_MANAGE: return QStringLiteral("CMD_BOOKMARK_MANAGE");
     case CommandId::CMD_BOOKMARK_JUMP_1: return QStringLiteral("CMD_BOOKMARK_JUMP_1");
     case CommandId::CMD_BOOKMARK_JUMP_2: return QStringLiteral("CMD_BOOKMARK_JUMP_2");
@@ -905,6 +926,10 @@ inline constexpr size_t TotalCommands = sizeof(kRawCommandData) / sizeof(kRawCom
         { "CMD_VIDEO_SATURATION_DOWN", CommandId::CMD_VIDEO_SATURATION_DOWN },
         { "CMD_VIDEO_SATURATION_UP", CommandId::CMD_VIDEO_SATURATION_UP },
         { "CMD_VIDEO_SATURATION_RESET", CommandId::CMD_VIDEO_SATURATION_RESET },
+        { "CMD_VIDEO_HUE_DOWN", CommandId::CMD_VIDEO_HUE_DOWN },
+        { "CMD_VIDEO_HUE_UP", CommandId::CMD_VIDEO_HUE_UP },
+        { "CMD_VIDEO_HUE_RESET", CommandId::CMD_VIDEO_HUE_RESET },
+        { "CMD_VIDEO_RESET", CommandId::CMD_VIDEO_RESET },
         { "CMD_VIDEO_CYCLE", CommandId::CMD_VIDEO_CYCLE },
         { "CMD_VIDEO_CYCLE_DEINTERLACE", CommandId::CMD_VIDEO_CYCLE_DEINTERLACE },
         { "CMD_VIDEO_CYCLE_TRANSFORM", CommandId::CMD_VIDEO_CYCLE_TRANSFORM },
@@ -952,7 +977,9 @@ inline constexpr size_t TotalCommands = sizeof(kRawCommandData) / sizeof(kRawCom
         { "CMD_VIDEO_PAN_UP", CommandId::CMD_VIDEO_PAN_UP },
         { "CMD_VIDEO_PAN_DOWN", CommandId::CMD_VIDEO_PAN_DOWN },
         { "CMD_CAPTURE_COPY_FRAME", CommandId::CMD_CAPTURE_COPY_FRAME },
+        { "CMD_CAPTURE_COPY", CommandId::CMD_CAPTURE_COPY },
         { "CMD_CAPTURE_SAVE_FRAME", CommandId::CMD_CAPTURE_SAVE_FRAME },
+        { "CMD_CAPTURE_SAVE", CommandId::CMD_CAPTURE_SAVE },
         { "CMD_CAPTURE_CONSECUTIVE", CommandId::CMD_CAPTURE_CONSECUTIVE },
         { "CMD_CAPTURE_AUDIO", CommandId::CMD_CAPTURE_AUDIO },
         { "CMD_CAPTURE_VIDEO", CommandId::CMD_CAPTURE_VIDEO },
@@ -971,6 +998,7 @@ inline constexpr size_t TotalCommands = sizeof(kRawCommandData) / sizeof(kRawCom
         { "CMD_PLAYLIST", CommandId::CMD_PLAYLIST },
         { "CMD_PLAYLIST_TOGGLE", CommandId::CMD_PLAYLIST_TOGGLE },
         { "CMD_CONTROL_PANEL", CommandId::CMD_CONTROL_PANEL },
+        { "CMD_PANEL_CONTROL", CommandId::CMD_PANEL_CONTROL },
         { "CMD_BROADCAST_WINDOW", CommandId::CMD_BROADCAST_WINDOW },
         { "CMD_CHAT_WINDOW", CommandId::CMD_CHAT_WINDOW },
         { "CMD_MANAGE_BROADCAST", CommandId::CMD_MANAGE_BROADCAST },
@@ -994,6 +1022,8 @@ inline constexpr size_t TotalCommands = sizeof(kRawCommandData) / sizeof(kRawCom
         { "CMD_FAVORITES_ADD_ITEM", CommandId::CMD_FAVORITES_ADD_ITEM },
         { "CMD_FAVORITES_ADD_FOLDER", CommandId::CMD_FAVORITES_ADD_FOLDER },
         { "CMD_BOOKMARK_ADD", CommandId::CMD_BOOKMARK_ADD },
+        { "CMD_BOOKMARK_PREV", CommandId::CMD_BOOKMARK_PREV },
+        { "CMD_BOOKMARK_NEXT", CommandId::CMD_BOOKMARK_NEXT },
         { "CMD_BOOKMARK_MANAGE", CommandId::CMD_BOOKMARK_MANAGE },
         { "CMD_BOOKMARK_JUMP_1", CommandId::CMD_BOOKMARK_JUMP_1 },
         { "CMD_BOOKMARK_JUMP_2", CommandId::CMD_BOOKMARK_JUMP_2 },

@@ -317,6 +317,26 @@ target_link_libraries(test_control_panel
 
 add_test(NAME test_control_panel COMMAND test_control_panel)
 
+# ==============================================================================
+# Phase 3C Task 5: test_main_window_av target
+# ==============================================================================
+qt_add_executable(test_main_window_av
+    test_main_window_av.cpp
+)
+
+target_link_libraries(test_main_window_av
+    PRIVATE
+        outplayer_ui
+        outplayer_playlist
+        outplayer_input
+        outplayer_core
+        Qt6::Test
+        Qt6::Widgets
+)
+
+add_test(NAME test_main_window_av COMMAND test_main_window_av)
+
+
 
 
 

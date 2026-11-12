@@ -14,6 +14,10 @@ class QDragEnterEvent;
 class QDropEvent;
 class QContextMenuEvent;
 
+namespace outplayer::core {
+class BookmarkManager;
+}
+
 namespace outplayer::engine {
 class MpvEngine;
 }
@@ -35,6 +39,8 @@ class VideoWidget;
 class PlaylistDock;
 class ContextMenuManager;
 class MediaOpenController;
+class ControlPanel;
+class ScreenCaptureController;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -59,6 +65,9 @@ public:
     [[nodiscard]] playlist::PlaylistModel* playlistModel() const noexcept;
     [[nodiscard]] ContextMenuManager* contextMenuManager() const noexcept;
     [[nodiscard]] MediaOpenController* mediaOpenController() const noexcept;
+    [[nodiscard]] ControlPanel* controlPanel() const noexcept;
+    [[nodiscard]] core::BookmarkManager* bookmarkManager() const noexcept;
+    [[nodiscard]] ScreenCaptureController* screenCaptureController() const noexcept;
 
     [[nodiscard]] bool isChromeVisible() const noexcept;
     void setChromeVisible(bool visible);
@@ -66,6 +75,9 @@ public:
 
     void setPlaylistVisible(bool visible);
     void togglePlaylist();
+
+    void setControlPanelVisible(bool visible);
+    void toggleControlPanel();
 
     bool openMedia(const QString& pathOrUrl);
     void openFiles(const QStringList& files, bool playFirst = true);
@@ -104,8 +116,13 @@ private:
     VideoWidget* m_videoWidget{nullptr};
     PlaylistDock* m_playlistDock{nullptr};
     playlist::PlaylistModel* m_playlistModel{nullptr};
+    ControlPanel* m_controlPanel{nullptr};
+    std::unique_ptr<core::BookmarkManager> m_bookmarkManager;
+    std::unique_ptr<ScreenCaptureController> m_captureController;
     std::unique_ptr<ContextMenuManager> m_contextMenuManager;
     std::unique_ptr<MediaOpenController> m_mediaOpenController;
+
+    QString m_currentFile;
 
     CustomTitleBar* m_titleBar{nullptr};
     ControlBar* m_controlBar{nullptr};
