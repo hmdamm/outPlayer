@@ -96,6 +96,8 @@ qt_add_library(outplayer_ui STATIC
     ui/VideoWidget.cpp
     ui/MainWindow.h
     ui/MainWindow.cpp
+    ui/ThemeManager.h
+    ui/ThemeManager.cpp
 )
 
 target_include_directories(outplayer_ui
@@ -110,6 +112,7 @@ target_link_libraries(outplayer_ui
         outplayer_playlist
         Qt6::Widgets
         Qt6::OpenGLWidgets
+        Qt6::Svg
         PkgConfig::MPV
 )
 

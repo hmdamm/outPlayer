@@ -13,6 +13,7 @@ find_package(Qt6 6.5 REQUIRED COMPONENTS
     Core
     Widgets
     OpenGLWidgets
+    Svg
 )
 
 qt_standard_project_setup(REQUIRES 6.5)
