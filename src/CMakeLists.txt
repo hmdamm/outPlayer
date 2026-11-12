@@ -75,6 +75,8 @@ qt_add_library(outplayer_ui STATIC
     ui/ContextMenuManager.cpp
     ui/ControlBar.h
     ui/ControlBar.cpp
+    ui/ControlPanel.h
+    ui/ControlPanel.cpp
     ui/CustomTitleBar.h
     ui/CustomTitleBar.cpp
     ui/MediaOpenController.h

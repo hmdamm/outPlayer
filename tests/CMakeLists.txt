@@ -300,6 +300,23 @@ target_link_libraries(test_screen_capture
 
 add_test(NAME test_screen_capture COMMAND test_screen_capture)
 
+# ==============================================================================
+# Phase 3C Task 4: test_control_panel target
+# ==============================================================================
+qt_add_executable(test_control_panel
+    test_control_panel.cpp
+)
+
+target_link_libraries(test_control_panel
+    PRIVATE
+        outplayer_ui
+        outplayer_core
+        Qt6::Test
+        Qt6::Widgets
+)
+
+add_test(NAME test_control_panel COMMAND test_control_panel)
+
 
 
 
