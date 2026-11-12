@@ -268,4 +268,20 @@ target_link_libraries(test_main_window_navigation
 
 add_test(NAME test_main_window_navigation COMMAND test_main_window_navigation)
 
+# ==============================================================================
+# Phase 3C Task 2: test_bookmark_manager target
+# ==============================================================================
+qt_add_executable(test_bookmark_manager
+    test_bookmark_manager.cpp
+)
+
+target_link_libraries(test_bookmark_manager
+    PRIVATE
+        outplayer_core
+        Qt6::Test
+)
+
+add_test(NAME test_bookmark_manager COMMAND test_bookmark_manager)
+
+
 
