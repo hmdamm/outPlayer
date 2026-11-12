@@ -457,7 +457,7 @@ void MainWindow::handleMouseMove(QMouseEvent* event, QObject* /*watched*/)
             if (m_resizeEdges.testFlag(Qt::RightEdge)) {
                 const int newW = geo.width() + delta.x();
                 if (newW >= minimumWidth()) {
-                    geo.setRight(geo.left() + newW);
+                    geo.setWidth(newW);
                 }
             }
             if (m_resizeEdges.testFlag(Qt::TopEdge)) {
@@ -469,7 +469,7 @@ void MainWindow::handleMouseMove(QMouseEvent* event, QObject* /*watched*/)
             if (m_resizeEdges.testFlag(Qt::BottomEdge)) {
                 const int newH = geo.height() + delta.y();
                 if (newH >= minimumHeight()) {
-                    geo.setBottom(geo.top() + newH);
+                    geo.setHeight(newH);
                 }
             }
             setGeometry(geo);
