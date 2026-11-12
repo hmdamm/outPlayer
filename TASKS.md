@@ -117,7 +117,8 @@ This document tracks the roadmap, phase progression, and verification evidence f
 ## Phase 3: Vertical Slices Implementation
 
 **Gate Requirement:** Each vertical slice implemented using strict TDD, verified with automated unit and integration tests.  
-**Phase 3A Status (Interactive Player UI & Core Controls):** **CLEARED / COMPLETE** (ADR 006)
+**Phase 3A Status (Interactive Player UI & Core Controls):** **CLEARED / COMPLETE** (ADR 006)  
+**Phase 3B Status (Navigation & Media Management: Slices 3, 4, 5):** **CLEARED / COMPLETE** (ADR 007)
 
 ### Phase 3A Tasks: Interactive Player UI & Core Controls (Slices 1 & 2)
 
@@ -155,22 +156,65 @@ This document tracks the roadmap, phase progression, and verification evidence f
   - ADR 006 formally approved and recorded in `docs/decisions.md`.
   - Zero UI dependencies in `src/core/` and `src/engine/` maintained.
 
+### Phase 3B Tasks: Navigation & Media Management (Slices 3, 4, 5)
+
+| Task ID | Description | Status | Assignee / Role | Target Deliverables | Verification Evidence |
+|---|---|---|---|---|---|
+| **P3B-T1** | Context Menu Architecture & Action Builder (`ContextMenuManager`) | Done | Implementer | `src/ui/ContextMenuManager.h`, `src/ui/ContextMenuManager.cpp`, `tests/test_context_menu.cpp` | `ctest -R test_context_menu` PASS (1:1 menu structure, action counts, shortcuts, commands), commit `4b33e5f` |
+| **P3B-T2** | Media Open Dialogs & Streaming URL Controller | Done | Implementer | `src/ui/OpenUrlDialog.h`, `src/ui/OpenUrlDialog.cpp`, `src/ui/MediaOpenController.h`, `src/ui/MediaOpenController.cpp`, `tests/test_media_open_dialogs.cpp` | `ctest -R test_media_open_dialogs` PASS (format checks, recursive scanner, URL history), commit `a383270` |
+| **P3B-T3** | Playlist Model & Queue Management (`PlaylistModel`) | Done | Implementer | `src/playlist/PlaylistItem.h`, `src/playlist/PlaylistModel.h`, `src/playlist/PlaylistModel.cpp`, `tests/test_playlist_model.cpp` | `ctest -R test_playlist_model` PASS (queue navigation, repeat/shuffle, 10k items benchmark), commit `cddc446` |
+| **P3B-T4** | Playlist Dock Widget & View (`PlaylistDock`) | Done | Implementer | `src/ui/PlaylistDock.h`, `src/ui/PlaylistDock.cpp`, `tests/test_playlist_dock.cpp` | `ctest -R test_playlist_dock` PASS (dark view, real-time search filter proxy, dark delegate, action toolbar), commit `e47aede` |
+| **P3B-T5** | MainWindow Navigation Integration (ContextMenu, Playlist Dock, Drag-and-Drop, Auto-Advance) | Done | Implementer | `src/ui/MainWindow.h`, `src/ui/MainWindow.cpp`, `tests/test_main_window_navigation.cpp` | `ctest -R test_main_window_navigation` PASS (F6/PL dock toggle, right-click menu, drag & drop ingestion, EOF track auto-advance), commit `d75dd4f` |
+| **P3B-T6** | Phase 3B Gate Review, Integration Verification & ADR 007 | Done | Implementer | `docs/decisions.md` (ADR 007), `TASKS.md`, verification test runs | 100% test pass rate (15/15 ctest, python specs, synthetic playback test-run) |
+
+### Phase 3B Gate Clearance Evidence
+- **Build Cleanliness:**
+  - `wsl bash -c 'cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=Debug && cmake --build build -j$(nproc)'`: 0 errors, 0 warnings.
+- **Unit & Integration Test Suite (`wsl xvfb-run -a ctest --test-dir build --output-on-failure`):**
+  - `test_dummy`: PASSED (0.01s)
+  - `test_command_registry`: PASSED (0.20s)
+  - `test_settings_manager`: PASSED (0.23s)
+  - `test_mpv_engine`: PASSED (0.53s)
+  - `test_video_widget`: PASSED (0.49s)
+  - `test_input_manager`: PASSED (0.27s)
+  - `test_timeline_slider`: PASSED (0.25s)
+  - `test_control_bar`: PASSED (0.26s)
+  - `test_osd_overlay`: PASSED (0.42s)
+  - `test_main_window_ui`: PASSED (7.16s)
+  - `test_context_menu`: PASSED (0.20s) — verifies 1:1 menu structure, action counts, shortcut bindings, and command dispatch.
+  - `test_media_open_dialogs`: PASSED (0.24s) — verifies format filters, recursive directory scanner, URL validation, and history persistence.
+  - `test_playlist_model`: PASSED (0.12s) — verifies queue operations, repeat modes, sorting, shuffle, and 10k item load performance.
+  - `test_playlist_dock`: PASSED (0.23s) — verifies dark dock view, proxy search filter, delegate rendering, and toolbar actions.
+  - `test_main_window_navigation`: PASSED (0.96s) — verifies F6 dock toggle, right-click menu, drag & drop ingestion, and EOF auto-advance.
+  - Result: 15/15 passed (100%), 0 failures (Total Test time = 11.88s).
+- **End-to-End Synthetic Media Playback (`wsl xvfb-run -a ./build/src/outplayer --test-run lavfi://nullsrc=s=640x360:d=1`):**
+  - Exit code: `0`
+  - Render Surface: `QOpenGLWidget` + `mpv_render_context` using OpenGL FBO (`rgba16f`, Mesa llvmpipe desktop OpenGL 4.6).
+  - Stream lifecycle: Demuxed `lavfi` source (640x360 @ 25fps), presented frames through `mpv_render_context_render()`, reached container EOF, and exited cleanly.
+- **Specification & Scaffold Verification Suite:**
+  - `python3 tests/test_phase1_specs.py`: PASSED (all Phase 1 spec assertions satisfied, 0 clean-room branding violations).
+  - `python3 tests/test_project_scaffold.py`: PASSED (scaffolding and governance verified).
+- **Architectural Integrity:**
+  - ADR 007 formally approved and recorded in `docs/decisions.md`.
+  - Zero UI dependencies in `src/core/`, `src/engine/`, and `src/playlist/PlaylistItem.h` maintained.
+
 ### Vertical Slices Progress Table
 
 | Slice | Description | Status | Target Deliverables | Verification Evidence |
 |---|---|---|---|---|
 | **Slice 1** | Playback Core & Precise Seeking | Done (Phase 3A) | Exact frame step, relative/absolute seek, speed controls (0.2x - 12x), timeline slider with chapter markers | `test_mpv_engine`, `test_timeline_slider`, `test_main_window_ui` PASS |
 | **Slice 2** | Control Bar & OSD Engine | Done (Phase 3A) | Autohiding bottom control bar, timeline slider, high-res OSD overlay, 2.5s blank cursor | `test_control_bar`, `test_osd_overlay`, `test_main_window_ui` PASS |
-| **Slice 3** | Hotkey Router & Mouse Gestures | In Progress | Global/local shortcut listener, configurable mouse clicks/wheel actions | Hotkey mapping test suite (`test_input_manager`) |
-| **Slice 4** | Playlist Model/View (F6) | Not Started | High-performance QAbstractItemModel, sorting, search, drag & drop | 10k item load & search benchmarks |
-| **Slice 5** | Audio Subsystem | Not Started | 10-band equalizer, volume boost, normalization, delay, track selection | Audio filter pipe tests |
-| **Slice 6** | Video Renderer Controls | Not Started | Aspect ratio, rotation, zoom/pan, deinterlacing, color adjustments | OpenGL shader parameter tests |
-| **Slice 7** | Subtitle Engine | Not Started | ASS/SSA, SRT, WebVTT rendering, subtitle sync adjustments, styling | libass subtitle placement tests |
-| **Slice 8** | Bookmarks & Screen Capture | Not Started | Bookmark manager, instant frame capture (PNG/JPG/GIF), burst capture | File generation verification tests |
-| **Slice 9** | Preferences Dialog (F5) | Not Started | Full categorical preferences tree dialog, search filter, reset defaults | Preference dialog test harness |
-| **Slice 10** | Streams, Optical & V4L2 Devices | Not Started | HLS, DASH, RTSP, YouTube/yt-dlp integration, DVD/Blu-ray, webcam input | URL opening & streaming tests |
-| **Slice 11** | Theming, Skins & SVG Vector Icons | Not Started | Custom dark skin, frameless window styling, original vector iconography | Visual rendering test under xvfb |
-| **Slice 12** | Linux Desktop Integration | Not Started | MPRIS2 D-Bus interface, XDG inhibit portal, StatusNotifierItem tray | D-Bus compliance test suite |
+| **Slice 3** | Hotkey Router & Mouse Gestures | Done (Phase 3B) | Global/local shortcut listener, configurable mouse clicks/wheel actions, 1:1 context menu action routing | `test_input_manager`, `test_context_menu` PASS |
+| **Slice 4** | Playlist Model/View (F6) | Done (Phase 3B) | High-performance QAbstractItemModel, repeat modes, sorting, search filter dock widget, dark delegate | `test_playlist_model`, `test_playlist_dock`, 10k item benchmark PASS |
+| **Slice 5** | File & URL Open Dialogs / Media Ingestion | Done (Phase 3B) | MediaOpenController recursive scanner, OpenUrlDialog with history, drag-and-drop loading, EOF track auto-advance | `test_media_open_dialogs`, `test_main_window_navigation` PASS |
+| **Slice 6** | Audio Subsystem | Not Started | 10-band equalizer, volume boost, normalization, delay, track selection | Audio filter pipe tests |
+| **Slice 7** | Video Renderer Controls | Not Started | Aspect ratio, rotation, zoom/pan, deinterlacing, color adjustments | OpenGL shader parameter tests |
+| **Slice 8** | Subtitle Engine | Not Started | ASS/SSA, SRT, WebVTT rendering, subtitle sync adjustments, styling | libass subtitle placement tests |
+| **Slice 9** | Bookmarks & Screen Capture | Not Started | Bookmark manager, instant frame capture (PNG/JPG/GIF), burst capture | File generation verification tests |
+| **Slice 10** | Preferences Dialog (F5) | Not Started | Full categorical preferences tree dialog, search filter, reset defaults | Preference dialog test harness |
+| **Slice 11** | Streams, Optical & V4L2 Devices | Not Started | HLS, DASH, RTSP, YouTube/yt-dlp integration, DVD/Blu-ray, webcam input | URL opening & streaming tests |
+| **Slice 12** | Theming, Skins & SVG Vector Icons | Not Started | Custom dark skin, frameless window styling, original vector iconography | Visual rendering test under xvfb |
+| **Slice 13** | Linux Desktop Integration | Not Started | MPRIS2 D-Bus interface, XDG inhibit portal, StatusNotifierItem tray | D-Bus compliance test suite |
 
 ---
 
