@@ -466,6 +466,24 @@ target_link_libraries(test_ui_layout_validation
 
 add_test(NAME test_ui_layout_validation COMMAND test_ui_layout_validation)
 
+# ==============================================================================
+# Phase 4 Task 3: test_format_matrix target
+# ==============================================================================
+qt_add_executable(test_format_matrix
+    test_format_matrix.cpp
+)
+
+target_link_libraries(test_format_matrix
+    PRIVATE
+        outplayer_ui
+        outplayer_core
+        Qt6::Test
+        Qt6::Widgets
+)
+
+add_test(NAME test_format_matrix COMMAND test_format_matrix)
+
+
 
 
 

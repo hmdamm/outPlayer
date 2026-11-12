@@ -352,7 +352,10 @@ bool MpvEngine::loadFile(const QString& url)
 
     QString targetUrl = url;
     if (targetUrl.startsWith(QStringLiteral("lavfi://"))) {
-        targetUrl = QStringLiteral("av://lavfi:") + targetUrl.mid(8);
+        QString graph = targetUrl.mid(8);
+        graph.replace(QStringLiteral("[v]"), QStringLiteral("[out0]"));
+        graph.replace(QStringLiteral("[a]"), QStringLiteral("[out1]"));
+        targetUrl = QStringLiteral("av://lavfi:") + graph;
     }
 
     const QByteArray utf8 = targetUrl.toUtf8();
