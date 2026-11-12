@@ -187,3 +187,72 @@ We formally accept the Phase 1 Specification Baseline and declare the Phase 1 Ga
 - **Negative:**
   - Large specification volume (345 features, 253 hotkeys) requires disciplined prioritization during vertical slice execution in Phase 3.
 
+---
+
+## ADR 005: Core Architecture, Command Engine Foundation & Input Routing
+
+- **Status:** Accepted
+- **Date:** 2026-11-12
+- **Deciders:** Lead Architect & AntiGravity Pair Programmer
+
+### Context
+Following the completion of the Phase 1 Specification Baseline (ADR 004), Phase 2 transitions **outPlayer** from a minimal video-rendering prototype into a modular, production-ready multimedia architecture.
+
+To support the 253 cataloged hotkeys, 87 preferences, diverse media formats, and complex multi-window interfaces planned in Phase 3, the architecture must solve five core design challenges:
+1. **Central Command Bus vs. Direct UI Couplings:** Direct connections between Qt widget signals and media player slots create high coupling, preventing alternate input sources (CLI, global shortcuts, D-Bus/MPRIS2) from executing actions identically.
+2. **Rebindable Input Routing & Mouse Gestures:** Keybindings and mouse gestures (e.g. wheel volume/seeking, left-click pause, double-click fullscreen) require centralized routing, conflict prevention, and runtime rebinding.
+3. **Configuration Persistence & Linux Standards:** The application requires a fast, reliable configuration engine adhering to the FreeDesktop XDG Base Directory specification without Windows Registry paradigms.
+4. **Non-Blocking Playback Engine Expansion:** The playback engine must expose track enumeration, chapter navigation, aspect ratio, volume/speed controls, and asynchronous command dispatch without locking the main Qt GUI thread.
+5. **Strict Component Isolation & Headless Testability:** Core business logic and the playback engine must remain 100% free of UI/Widget dependencies (`QtWidgets`, `QtGui`, `QPainter`) to ensure automated headless testing.
+
+### Decision
+We formally accept the Phase 2 Core Architecture and declare the Phase 2 Gate cleared based on the following architectural implementations and empirical verification evidence:
+
+1. **Decoupled Architecture & CMake Target Partitioning:**
+   - **`outplayer_core`:** Static library containing `CommandRegistry`, `CommandId`, `SettingsManager`, `IPlaybackEngine`, and `MpvEngine`. Depends solely on `Qt6::Core` and `PkgConfig::MPV`. Zero GUI/Widget headers are permitted, ensuring headless execution without an X11/Wayland display server.
+   - **`outplayer_input`:** Static library containing `InputManager`. Links `outplayer_core` and `Qt6::Widgets` to map keyboard shortcuts (`QShortcut`) and mouse event filters to canonical `CommandId` actions.
+   - **`outplayer_ui`:** Static library containing `VideoWidget` (OpenGL rendering via `mpv_render_context`) and `MainWindow`.
+   - **`outplayer`:** Application executable linking the static libraries.
+
+2. **Automated Command Engine (`CommandRegistry` & Codegen):**
+   - Implemented `tools/generate_commands.py` to ingest `docs/spec/hotkeys.csv` and generate `src/core/CommandId.h`, defining 253 canonical `enum class CommandId` values and metadata lookup tables.
+   - Implemented singleton `CommandRegistry` in `src/core/CommandRegistry.h`/`.cpp` supporting handler registration (`std::function<void(const QVariantMap&)>`), string-to-enum resolution, and parameterized action dispatch (`execute()`).
+
+3. **XDG-Compliant Configuration Subsystem (`SettingsManager`):**
+   - Implemented `SettingsManager` in `src/core/SettingsManager.h`/`.cpp` using `QSettings::IniFormat`.
+   - Resolves configuration storage according to XDG specifications: `$XDG_CONFIG_HOME/outplayer/outplayer.ini` (defaulting to `~/.config/outplayer/outplayer.ini`), with runtime override support via `init(path)`.
+   - Enforces default preference values matching `docs/spec/features.csv`, provides strongly-typed getters/setters, emits reactive `settingChanged` signals, and supports atomic configuration import/export.
+
+4. **Input Routing & Gesture Interception (`InputManager`):**
+   - Implemented `InputManager` in `src/input/InputManager.h`/`.cpp`.
+   - Manages window-scoped `QShortcut` instances initialized from default hotkey specifications, supporting dynamic runtime rebinding with conflict safety.
+   - Implements an event filter (`QObject::eventFilter`) attachable to `VideoWidget` to translate mouse click actions (`LeftClick`, `LeftDblClick`, `MiddleClick`, `RightClick`) and scroll gestures (`WheelUp`, `WheelDown`) directly into `CommandRegistry` actions.
+
+5. **Hardened Playback Engine (`IPlaybackEngine` & `MpvEngine`):**
+   - Expanded `IPlaybackEngine` and `MpvEngine` to support audio/video/subtitle track selection (`MediaTrack`), chapter navigation (`ChapterInfo`), volume, mute, speed adjustments, and aspect ratio controls.
+   - Implemented local property caching for playback state, eliminating synchronous blocking calls to `libmpv` from the Qt GUI thread.
+   - Implemented asynchronous command dispatch via `mpv_command_async()`.
+
+6. **Automated Test Pass Rate & Verification Evidence:**
+   - 100% of unit and integration tests pass cleanly under `xvfb-run -a ctest`:
+     - `test_dummy`: Passed
+     - `test_command_registry`: Passed (verifies 253 commands, enum resolution, signal dispatch)
+     - `test_settings_manager`: Passed (verifies INI persistence, XDG pathing, typed defaults, export/import)
+     - `test_mpv_engine`: Passed (verifies track enumeration, volume/speed/aspect ratio, async commands)
+     - `test_video_widget`: Passed (verifies OpenGL surface initialization, FBO presentation)
+     - `test_input_manager`: Passed (verifies default shortcuts, runtime rebinding, mouse filter)
+   - 100% of specification verification assertions pass under `python3 tests/test_phase1_specs.py`.
+   - Scaffold assertions pass under `python3 tests/test_project_scaffold.py`.
+   - Clean-room audit compliance: zero proprietary branding violations across all source code and documentation.
+
+### Consequences
+- **Positive:**
+  - High degree of modularity and maintainability; individual subsystems can be developed and tested in complete isolation.
+  - Headless test execution remains fast (< 4 seconds for full test suite) and reliable without physical display hardware.
+  - Phase 3 vertical feature slices can connect to the unified `CommandRegistry` and `SettingsManager` immediately without refactoring.
+  - Input configuration is fully customizable by end-users.
+- **Negative:**
+  - Additional indirection through `CommandRegistry` requires registering handlers for all commands.
+  - Modifying default keybindings requires re-running `tools/generate_commands.py` to regenerate `CommandId.h`.
+
+
