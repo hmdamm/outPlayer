@@ -102,6 +102,8 @@ qt_add_library(outplayer_ui STATIC
     ui/PreferencesDialog.cpp
     ui/ThemeManager.h
     ui/ThemeManager.cpp
+    ui/DesktopIntegration.h
+    ui/DesktopIntegration.cpp
 )
 
 target_include_directories(outplayer_ui
@@ -117,6 +119,7 @@ target_link_libraries(outplayer_ui
         Qt6::Widgets
         Qt6::OpenGLWidgets
         Qt6::Svg
+        Qt6::DBus
         PkgConfig::MPV
 )
 

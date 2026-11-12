@@ -14,6 +14,7 @@ find_package(Qt6 6.5 REQUIRED COMPONENTS
     Widgets
     OpenGLWidgets
     Svg
+    DBus
 )
 
 qt_standard_project_setup(REQUIRES 6.5)
