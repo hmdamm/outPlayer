@@ -83,7 +83,7 @@ target_link_libraries(test_video_widget
 add_test(NAME test_video_widget COMMAND test_video_widget)
 
 # ==============================================================================
-# Task 5: test_input_manager target
+# Task 3: test_input_manager target
 # ==============================================================================
 qt_add_executable(test_input_manager
     test_input_manager.cpp
