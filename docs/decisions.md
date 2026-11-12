@@ -255,4 +255,79 @@ We formally accept the Phase 2 Core Architecture and declare the Phase 2 Gate cl
   - Additional indirection through `CommandRegistry` requires registering handlers for all commands.
   - Modifying default keybindings requires re-running `tools/generate_commands.py` to regenerate `CommandId.h`.
 
+---
+
+## ADR 006: Interactive Player UI Layer, Timeline Scrubber & Chrome Autohide
+
+- **Status:** Accepted
+- **Date:** 2026-11-12
+- **Deciders:** Lead Architect & AntiGravity Pair Programmer
+
+### Context
+Following the completion of the Phase 2 Core Architecture (ADR 005), Phase 3 transitions **outPlayer** into vertical feature slices, beginning with Phase 3A: the interactive player user interface and core playback controls (Slice 1 & Slice 2).
+
+Prior to this phase, the application possessed a headless command engine, configuration subsystem, and raw `VideoWidget` rendering surface, but lacked:
+1. **Interactive Control Bar & Navigation:** Visual buttons for play, pause, stop, frame stepping, volume control, track navigation, and auxiliary panel toggles (F5/F6/F7).
+2. **High-Precision Timeline Scrubber:** A dedicated timeline slider supporting smooth scrub interaction, sub-second seeking precision, hover timestamp preview, and visual chapter marker ticks according to `docs/spec/ui-layout.md`.
+3. **On-Screen Display (OSD) Overlay:** A non-intrusive, transparent HUD layer to display transient playback state notifications (volume, speed, seek offset, aspect ratio) with smooth fadeout animations.
+4. **Cinematic Chrome Autohide:** Automatic concealment of the titlebar and control bar during active video playback after user inactivity, including suppressing the mouse cursor to `Qt::BlankCursor` for an unobstructed viewing experience.
+5. **Architectural Decoupling:** Ensuring all UI components interact with the underlying media engine strictly through abstract interfaces (`IPlaybackEngine`) and canonical command dispatches (`CommandRegistry`), preserving zero-UI testability for core playback logic.
+
+### Decision
+We formally accept the Phase 3A Interactive Player UI Layer architecture and declare the Phase 3A Gate cleared based on the following architectural implementations and empirical verification evidence:
+
+1. **Composite MainWindow Layout & Layering:**
+   - Assembled a frameless desktop window (`Qt::FramelessWindowHint`) adhering to the dark palette tokens (`#1b1b1b` / `#1e1e1e` / `#252525`) defined in `docs/spec/ui-layout.md`.
+   - Designed custom titlebar (`CustomTitleBar`, 30px height) providing window dragging, title synchronization, and window control buttons (minimize, maximize/restore, close).
+   - Designed bottom control bar (`ControlBar`, 40px fixed height) hosting playback buttons, duration labels (`00:00:00 / 00:00:00`), volume slider, mute toggle, and panel shortcuts.
+   - Designed transparent, click-through overlay (`OsdOverlay`) layered directly atop `VideoWidget` with `Qt::WA_TransparentForMouseEvents`, `Qt::WA_TranslucentBackground`, and `Qt::WA_NoSystemBackground`. The overlay renders high-contrast outlined typography and auto-dismisses notifications via fadeout animations.
+   - Integrated custom edge resize logic and system move support across Linux Wayland and X11 environments.
+
+2. **2.5s Mouse Inactivity Chrome Autohide & Blank Cursor:**
+   - Implemented an inactivity timer (`QTimer`) with a 2,500ms timeout active exclusively during playback (`PlaybackState::Playing`).
+   - Attached window-level event filtering across all child surfaces to detect `QEvent::MouseMove`, mouse button presses, and key events. Any detected activity resets the timer and immediately restores chrome visibility and normal cursor (`Qt::ArrowCursor`).
+   - Upon timer expiration during active playback, `CustomTitleBar` and `ControlBar` hide and `VideoWidget` sets its viewport cursor to `Qt::BlankCursor`.
+   - Pausing, stopping, or loading media immediately disarms the autohide timer, ensuring controls and mouse cursor remain persistently visible when user interaction is required.
+
+3. **High-Precision TimelineSlider & Custom QStyle Painting:**
+   - Implemented `TimelineSlider` inheriting `QSlider` with custom painting: 14px total height, 4px track groove (`#383838`), orange progress fill (`#e09b1f`), and a 10px circular thumb handle rendered on hover or active scrubbing.
+   - High sub-second precision is achieved by mapping continuous media seconds to a 10,000-step discrete integer range, eliminating coarse 1-second truncation during short video seeks.
+   - Implemented mouse hover tracking with a floating time tooltip formatted as `hh:mm:ss`.
+   - Implemented chapter marker tick visualization rendered directly from chapter positions provided by `IPlaybackEngine::chapters()`.
+   - Implemented direct click-to-seek and drag-to-seek with instant non-blocking asynchronous seek dispatch, suppressing position-update feedback loops during active scrubbing.
+
+4. **Strict Separation of UI Controls from Playback Core via `IPlaybackEngine`:**
+   - All interactive UI controls (`ControlBar`, `TimelineSlider`, `OsdOverlay`, `CustomTitleBar`) interact with the playback core exclusively through `IPlaybackEngine` signals and slots or canonical `CommandRegistry` actions.
+   - Zero `libmpv` headers or symbols exist within UI widget implementations. `VideoWidget` remains the sole component interfacing with the OpenGL rendering context (`mpv_render_context`).
+   - Playback state, track changes, duration, position, volume, and mute states propagate asynchronously via Qt signals, ensuring zero UI thread stalls.
+
+5. **Automated Test Pass Rate & Verification Evidence:**
+   - 100% of unit and integration tests pass cleanly under `xvfb-run -a ctest`:
+     - `test_dummy`: Passed (0.01s)
+     - `test_command_registry`: Passed (0.21s)
+     - `test_settings_manager`: Passed (0.25s)
+     - `test_mpv_engine`: Passed (0.56s)
+     - `test_video_widget`: Passed (0.61s)
+     - `test_input_manager`: Passed (0.40s)
+     - `test_timeline_slider`: Passed (0.33s) — verifies sub-second precision, hover tooltips, chapter marker ticks, and seek dispatch.
+     - `test_control_bar`: Passed (0.30s) — verifies playback button toggles, volume slider/mute sync, time formatting, and panel triggers.
+     - `test_osd_overlay`: Passed (0.48s) — verifies transparent overlay geometry, message display, styling, and timer fadeout.
+     - `test_main_window_ui`: Passed (13.86s) — comprehensive integration test verifying composite layout, play/pause synchronization, volume scrubbing, timeline seeking, 2.5s chrome autohide, blank cursor activation, and mouse motion chrome restoration.
+     - Result: 10/10 passed (100%), 0 failures (Total Test time = 17.27s).
+   - 100% specification verification assertions pass under `python3 tests/test_phase1_specs.py`.
+   - Project scaffold assertions pass under `python3 tests/test_project_scaffold.py`.
+   - End-to-end synthetic video playback (`xvfb-run -a ./build/src/outplayer --test-run lavfi://nullsrc=s=640x360:d=1`) executes to completion with exit code 0.
+   - Clean-room audit compliance: zero proprietary branding violations across all source code and documentation.
+
+### Consequences
+- **Positive:**
+  - Complete, functional, dark-themed player UI providing parity with desktop media player conventions.
+  - Smooth, accurate timeline seeking with chapter navigation and hover previews.
+  - Immersive full-window and fullscreen viewing experience via automated chrome autohide and blank cursor suppression.
+  - Deterministic headless UI verification suite under `xvfb-run` guaranteeing regression prevention without physical displays.
+  - Clean foundation for implementing auxiliary dialogs (F6 playlist, F7 control panel, F5 preferences) in subsequent Phase 3 slices.
+- **Negative:**
+  - Frameless window management requires platform-specific window move/resize event handling for edge cases on diverse Linux Wayland compositors and X11 window managers.
+
+
 

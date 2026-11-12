@@ -11,7 +11,7 @@ This document tracks the roadmap, phase progression, and verification evidence f
 | **Phase 0** | Development Environment & "Hello Player" | Complete | Working `outplayer` binary rendering video via `mpv_render_context` and unit test suite passing. |
 | **Phase 1** | Black-Box Feature Inventory (Observer Role) | Complete | Complete UI/hotkey/format spec inventory in `docs/spec/` with evidence logged in `docs/clean-room-log.md`. |
 | **Phase 2** | Core Architecture & Command Engine | Complete | Decoupled architecture (`IPlaybackEngine`, `CommandRegistry`, `SettingsManager`, `InputManager`) with passing unit tests. |
-| **Phase 3** | Vertical Slices Implementation | Not Started | 12 vertical feature slices implemented via TDD with 100% test coverage for implemented features. |
+| **Phase 3** | Vertical Slices Implementation | In Progress | 12 vertical feature slices implemented via TDD with 100% test coverage for implemented features. |
 | **Phase 4** | Parity Hardening & Verification | Not Started | Automated hotkey parity suite passing, offscreen xvfb visual match, and zero ASan/UBSan issues. |
 | **Phase 5** | Packaging & Distribution | Not Started | Flatpak, RPM, DEB, Arch PKGBUILD, and AppImage packages verified in container builds. |
 
@@ -116,13 +116,52 @@ This document tracks the roadmap, phase progression, and verification evidence f
 
 ## Phase 3: Vertical Slices Implementation
 
-**Gate Requirement:** Each vertical slice implemented using strict TDD, verified with automated unit and integration tests.
+**Gate Requirement:** Each vertical slice implemented using strict TDD, verified with automated unit and integration tests.  
+**Phase 3A Status (Interactive Player UI & Core Controls):** **CLEARED / COMPLETE** (ADR 006)
+
+### Phase 3A Tasks: Interactive Player UI & Core Controls (Slices 1 & 2)
+
+| Task ID | Description | Status | Assignee / Role | Target Deliverables | Verification Evidence |
+|---|---|---|---|---|---|
+| **P3A-T1** | TimelineSlider with Scrubbing & Chapter Markers | Done | Implementer | `src/ui/TimelineSlider.h`, `src/ui/TimelineSlider.cpp`, `tests/test_timeline_slider.cpp` | `ctest -R test_timeline_slider` PASS (10k scale, hover preview, chapter ticks), commits `b69621b`, `451b274` |
+| **P3A-T2** | ControlBar with Navigation & Volume Controls | Done | Implementer | `src/ui/ControlBar.h`, `src/ui/ControlBar.cpp`, `tests/test_control_bar.cpp` | `ctest -R test_control_bar` PASS (button states, volume slider, time labels), commits `2d7c6a3`, `9f29b24` |
+| **P3A-T3** | OsdOverlay with High-Contrast Typography | Done | Implementer | `src/ui/OsdOverlay.h`, `src/ui/OsdOverlay.cpp`, `tests/test_osd_overlay.cpp` | `ctest -R test_osd_overlay` PASS (click-through overlay, text outline, fadeout), commits `7b2157b`, `fecf0e6` |
+| **P3A-T4** | MainWindow Assembly & 2.5s Chrome Autohide | Done | Implementer | `src/ui/MainWindow.h`, `src/ui/MainWindow.cpp`, `tests/test_main_window_ui.cpp` | `xvfb-run -a ctest -R test_main_window_ui` PASS (autohide timer, blank cursor, motion restore), commits `d32cbdc`, `ef31ce1` |
+| **P3A-T5** | Phase 3A Gate Review & Integration Verification | Done | Implementer | `docs/decisions.md` (ADR 006), `TASKS.md`, verification test runs | 100% test pass rate (10/10 ctest, specs, synthetic playback test-run) |
+
+### Phase 3A Gate Clearance Evidence
+- **Build Cleanliness:**
+  - `wsl bash -c 'cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=Debug && cmake --build build -j$(nproc)'`: 0 errors, 0 warnings.
+- **Unit & Integration Test Suite (`wsl xvfb-run -a ctest --test-dir build --output-on-failure`):**
+  - `test_dummy`: PASSED (0.01s)
+  - `test_command_registry`: PASSED (0.21s)
+  - `test_settings_manager`: PASSED (0.25s)
+  - `test_mpv_engine`: PASSED (0.56s)
+  - `test_video_widget`: PASSED (0.61s)
+  - `test_input_manager`: PASSED (0.40s)
+  - `test_timeline_slider`: PASSED (0.33s)
+  - `test_control_bar`: PASSED (0.30s)
+  - `test_osd_overlay`: PASSED (0.48s)
+  - `test_main_window_ui`: PASSED (13.86s) — verifies composite layout, play/pause synchronization, volume slider/mute sync, timeline seeking, 2.5s chrome autohide, blank cursor suppression, and mouse motion chrome restoration.
+  - Result: 10/10 passed (100%), 0 failures (Total Test time = 17.27s).
+- **End-to-End Synthetic Media Playback (`wsl xvfb-run -a ./build/src/outplayer --test-run lavfi://nullsrc=s=640x360:d=1`):**
+  - Exit code: `0`
+  - Render Surface: `QOpenGLWidget` + `mpv_render_context` using OpenGL FBO (`rgba16f`, Mesa llvmpipe desktop OpenGL 4.6).
+  - Stream lifecycle: Demuxed `lavfi` source (640x360 @ 25fps), presented frames through `mpv_render_context_render()`, reached container EOF, and exited cleanly.
+- **Specification & Scaffold Verification Suite:**
+  - `python3 tests/test_phase1_specs.py`: PASSED (all Phase 1 spec assertions satisfied, 0 clean-room branding violations).
+  - `python3 tests/test_project_scaffold.py`: PASSED (scaffolding and governance verified).
+- **Architectural Integrity:**
+  - ADR 006 formally approved and recorded in `docs/decisions.md`.
+  - Zero UI dependencies in `src/core/` and `src/engine/` maintained.
+
+### Vertical Slices Progress Table
 
 | Slice | Description | Status | Target Deliverables | Verification Evidence |
 |---|---|---|---|---|
-| **Slice 1** | Playback Core & Precise Seeking | Not Started | Exact frame step, relative/absolute seek, speed controls (0.2x - 12x) | Automated seek and speed tests |
-| **Slice 2** | Control Bar & OSD Engine | Not Started | Autohiding bottom control bar, timeline slider, high-res OSD overlay | UI interaction tests under xvfb |
-| **Slice 3** | Hotkey Router & Mouse Gestures | Not Started | Global/local shortcut listener, configurable mouse clicks/wheel actions | Hotkey mapping test suite |
+| **Slice 1** | Playback Core & Precise Seeking | Done (Phase 3A) | Exact frame step, relative/absolute seek, speed controls (0.2x - 12x), timeline slider with chapter markers | `test_mpv_engine`, `test_timeline_slider`, `test_main_window_ui` PASS |
+| **Slice 2** | Control Bar & OSD Engine | Done (Phase 3A) | Autohiding bottom control bar, timeline slider, high-res OSD overlay, 2.5s blank cursor | `test_control_bar`, `test_osd_overlay`, `test_main_window_ui` PASS |
+| **Slice 3** | Hotkey Router & Mouse Gestures | In Progress | Global/local shortcut listener, configurable mouse clicks/wheel actions | Hotkey mapping test suite (`test_input_manager`) |
 | **Slice 4** | Playlist Model/View (F6) | Not Started | High-performance QAbstractItemModel, sorting, search, drag & drop | 10k item load & search benchmarks |
 | **Slice 5** | Audio Subsystem | Not Started | 10-band equalizer, volume boost, normalization, delay, track selection | Audio filter pipe tests |
 | **Slice 6** | Video Renderer Controls | Not Started | Aspect ratio, rotation, zoom/pan, deinterlacing, color adjustments | OpenGL shader parameter tests |
