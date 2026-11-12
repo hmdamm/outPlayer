@@ -30,6 +30,19 @@ public:
     [[nodiscard]] double duration() const override;
     [[nodiscard]] bool isPaused() const override;
 
+    [[nodiscard]] QList<MediaTrack> tracks(const QString& type = {}) const override;
+    bool setTrack(const QString& type, int trackId) override;
+    [[nodiscard]] double volume() const override;
+    void setVolume(double vol) override;
+    [[nodiscard]] bool isMuted() const override;
+    void setMuted(bool mute) override;
+    [[nodiscard]] double speed() const override;
+    void setSpeed(double spd) override;
+    [[nodiscard]] QString aspectRatio() const override;
+    void setAspectRatio(const QString& ar) override;
+    [[nodiscard]] QList<ChapterInfo> chapters() const override;
+    bool setChapter(int chapterIndex) override;
+
     [[nodiscard]] mpv_handle* mpvHandle() const noexcept { return m_mpv; }
 
     bool setProperty(const QString& name, const QString& value);
@@ -47,6 +60,12 @@ private:
     double m_position{0.0};
     double m_duration{0.0};
     bool m_paused{false};
+    double m_volume{100.0};
+    bool m_muted{false};
+    double m_speed{1.0};
+    QString m_aspectRatio;
+    QList<MediaTrack> m_tracks;
+    QList<ChapterInfo> m_chapters;
 };
 
 } // namespace outplayer::engine
