@@ -23,6 +23,21 @@ target_link_libraries(test_dummy
 add_test(NAME test_dummy COMMAND test_dummy)
 
 # ==============================================================================
+# Task 1: test_command_registry target
+# ==============================================================================
+qt_add_executable(test_command_registry
+    test_command_registry.cpp
+)
+
+target_link_libraries(test_command_registry
+    PRIVATE
+        outplayer_core
+        Qt6::Test
+)
+
+add_test(NAME test_command_registry COMMAND test_command_registry)
+
+# ==============================================================================
 # Task 3: test_mpv_engine target
 # ==============================================================================
 qt_add_executable(test_mpv_engine

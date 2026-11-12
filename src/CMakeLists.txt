@@ -3,6 +3,9 @@
 # ==============================================================================
 
 qt_add_library(outplayer_core STATIC
+    core/CommandId.h
+    core/CommandRegistry.h
+    core/CommandRegistry.cpp
     engine/IPlaybackEngine.h
     engine/MpvEngine.h
     engine/MpvEngine.cpp
