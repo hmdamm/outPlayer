@@ -370,6 +370,22 @@ target_link_libraries(test_preferences_dialog
 
 add_test(NAME test_preferences_dialog COMMAND test_preferences_dialog)
 
+# ==============================================================================
+# Phase 3D Task 3: test_device_stream_manager target
+# ==============================================================================
+qt_add_executable(test_device_stream_manager
+    test_device_stream_manager.cpp
+)
+
+target_link_libraries(test_device_stream_manager
+    PRIVATE
+        outplayer_core
+        Qt6::Test
+)
+
+add_test(NAME test_device_stream_manager COMMAND test_device_stream_manager)
+
+
 
 
 

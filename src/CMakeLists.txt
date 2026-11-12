@@ -10,6 +10,8 @@ qt_add_library(outplayer_core STATIC
     core/SettingsManager.cpp
     core/BookmarkManager.h
     core/BookmarkManager.cpp
+    core/DeviceStreamManager.h
+    core/DeviceStreamManager.cpp
     engine/IPlaybackEngine.h
     engine/MpvEngine.h
     engine/MpvEngine.cpp
