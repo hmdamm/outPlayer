@@ -17,6 +17,7 @@
 
 #include <algorithm>
 
+#include "core/BookmarkManager.h"
 #include "core/CommandRegistry.h"
 #include "core/SettingsManager.h"
 #include "engine/MpvEngine.h"
@@ -25,10 +26,12 @@
 #include "playlist/PlaylistModel.h"
 #include "ui/ContextMenuManager.h"
 #include "ui/ControlBar.h"
+#include "ui/ControlPanel.h"
 #include "ui/CustomTitleBar.h"
 #include "ui/MediaOpenController.h"
 #include "ui/OsdOverlay.h"
 #include "ui/PlaylistDock.h"
+#include "ui/ScreenCaptureController.h"
 #include "ui/TimeFormatter.h"
 #include "ui/VideoWidget.h"
 
@@ -37,6 +40,8 @@ namespace outplayer::ui {
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , m_engine(std::make_unique<engine::MpvEngine>())
+    , m_bookmarkManager(std::make_unique<core::BookmarkManager>(&core::SettingsManager::instance(), this))
+    , m_captureController(std::make_unique<ScreenCaptureController>(m_engine.get(), &core::SettingsManager::instance(), this))
     , m_contextMenuManager(std::make_unique<ContextMenuManager>(this))
     , m_mediaOpenController(std::make_unique<MediaOpenController>(m_engine.get(), this))
 {
@@ -101,6 +106,13 @@ MainWindow::MainWindow(QWidget* parent)
     m_controlBar->setPlaybackEngine(m_engine.get());
     m_controlBar->show();
 
+    // Control panel (F7)
+    m_controlPanel = new ControlPanel(m_engine.get(), this);
+    m_controlPanel->hide();
+    connect(m_controlPanel, &ControlPanel::closeRequested, this, [this]() {
+        setControlPanelVisible(false);
+    });
+
     // Input manager for keyboard shortcuts and mouse mapping
     m_inputManager = std::make_unique<input::InputManager>(this);
     m_inputManager->attachToWindow(this);
@@ -133,7 +145,14 @@ MainWindow::~MainWindow()
     }
     m_registeredCommands.clear();
 
+    if (m_controlPanel) {
+        delete m_controlPanel;
+        m_controlPanel = nullptr;
+    }
+
     m_inputManager.reset();
+    m_captureController.reset();
+    m_bookmarkManager.reset();
 
     // Explicitly delete video widget and osd overlay before engine is destroyed
     // to guarantee mpv_render_context_free() happens before mpv_terminate_destroy().
@@ -200,6 +219,21 @@ MediaOpenController* MainWindow::mediaOpenController() const noexcept
     return m_mediaOpenController.get();
 }
 
+ControlPanel* MainWindow::controlPanel() const noexcept
+{
+    return m_controlPanel;
+}
+
+core::BookmarkManager* MainWindow::bookmarkManager() const noexcept
+{
+    return m_bookmarkManager.get();
+}
+
+ScreenCaptureController* MainWindow::screenCaptureController() const noexcept
+{
+    return m_captureController.get();
+}
+
 bool MainWindow::isChromeVisible() const noexcept
 {
     return m_chromeVisible;
@@ -263,6 +297,25 @@ void MainWindow::togglePlaylist()
     }
 }
 
+void MainWindow::setControlPanelVisible(bool visible)
+{
+    if (!m_controlPanel) {
+        return;
+    }
+    m_controlPanel->setVisible(visible);
+    if (visible) {
+        m_controlPanel->raise();
+        m_controlPanel->activateWindow();
+    }
+}
+
+void MainWindow::toggleControlPanel()
+{
+    if (m_controlPanel) {
+        setControlPanelVisible(!m_controlPanel->isVisible());
+    }
+}
+
 void MainWindow::toggleFullScreen()
 {
     if (isFullScreen()) {
@@ -284,6 +337,7 @@ bool MainWindow::openMedia(const QString& pathOrUrl)
     }
     const bool loaded = m_engine->loadFile(pathOrUrl);
     if (loaded) {
+        m_currentFile = pathOrUrl;
         QString fileName = QFileInfo(pathOrUrl).fileName();
         if (fileName.isEmpty()) {
             fileName = pathOrUrl;
@@ -372,6 +426,7 @@ void MainWindow::playPlaylistItem(int row)
     }
 
     if (m_engine) {
+        m_currentFile = optItem->filePath;
         m_engine->loadFile(optItem->filePath);
         QString fileName = QFileInfo(optItem->filePath).fileName();
         if (fileName.isEmpty()) {
@@ -685,6 +740,294 @@ void MainWindow::setupCommandHandlers()
     registerCommand(core::CommandId::CMD_MOUSE_RIGHT_CLICK, [this](const QVariantMap&) {
         m_contextMenuManager->showContextMenu(QCursor::pos(), this, m_engine.get());
     });
+
+    // Control panel toggle
+    auto toggleCP = [this](const QVariantMap&) {
+        toggleControlPanel();
+    };
+    registerCommand(core::CommandId::CMD_CONTROL_PANEL, toggleCP);
+    registerCommand(core::CommandId::CMD_PANEL_CONTROL, toggleCP);
+
+    // Bookmarks
+    auto getCurrentFilePath = [this]() -> QString {
+        if (!m_currentFile.isEmpty()) {
+            return m_currentFile;
+        }
+        if (m_playlistModel) {
+            auto opt = m_playlistModel->currentItem();
+            if (opt.has_value()) {
+                return opt->filePath;
+            }
+        }
+        return QString();
+    };
+
+    registerCommand(core::CommandId::CMD_BOOKMARK_ADD, [this, getCurrentFilePath](const QVariantMap&) {
+        const QString path = getCurrentFilePath();
+        if (!path.isEmpty() && m_engine && m_bookmarkManager) {
+            const double pos = m_engine->position();
+            m_bookmarkManager->addBookmark(path, pos);
+            if (m_osdOverlay) {
+                m_osdOverlay->showMessage(
+                    QStringLiteral("Bookmark added: %1").arg(TimeFormatter::formatTime(pos)),
+                    1500, OsdPosition::TopLeft);
+            }
+        }
+    });
+
+    registerCommand(core::CommandId::CMD_BOOKMARK_PREV, [this, getCurrentFilePath](const QVariantMap&) {
+        const QString path = getCurrentFilePath();
+        if (!path.isEmpty() && m_engine && m_bookmarkManager) {
+            const double pos = m_engine->position();
+            auto optBm = m_bookmarkManager->previousBookmark(path, pos);
+            if (optBm.has_value()) {
+                m_engine->seek(optBm->timestamp);
+                if (m_osdOverlay) {
+                    m_osdOverlay->showMessage(
+                        QStringLiteral("Bookmark: %1").arg(TimeFormatter::formatTime(optBm->timestamp)),
+                        1500, OsdPosition::TopLeft);
+                }
+            }
+        }
+    });
+
+    registerCommand(core::CommandId::CMD_BOOKMARK_NEXT, [this, getCurrentFilePath](const QVariantMap&) {
+        const QString path = getCurrentFilePath();
+        if (!path.isEmpty() && m_engine && m_bookmarkManager) {
+            const double pos = m_engine->position();
+            auto optBm = m_bookmarkManager->nextBookmark(path, pos);
+            if (optBm.has_value()) {
+                m_engine->seek(optBm->timestamp);
+                if (m_osdOverlay) {
+                    m_osdOverlay->showMessage(
+                        QStringLiteral("Bookmark: %1").arg(TimeFormatter::formatTime(optBm->timestamp)),
+                        1500, OsdPosition::TopLeft);
+                }
+            }
+        }
+    });
+
+    // Frame capture
+    auto captureSave = [this](const QVariantMap&) {
+        if (m_captureController) {
+            const QString path = m_captureController->captureInstantFrame();
+            if (!path.isEmpty() && m_osdOverlay) {
+                m_osdOverlay->showMessage(
+                    QStringLiteral("Captured: %1").arg(QFileInfo(path).fileName()),
+                    1500, OsdPosition::TopLeft);
+            }
+        }
+    };
+    registerCommand(core::CommandId::CMD_CAPTURE_SAVE_FRAME, captureSave);
+    registerCommand(core::CommandId::CMD_CAPTURE_SAVE, captureSave);
+
+    auto captureCopy = [this](const QVariantMap&) {
+        if (m_captureController && m_captureController->copyFrameToClipboard()) {
+            if (m_osdOverlay) {
+                m_osdOverlay->showMessage(
+                    QStringLiteral("Frame copied to clipboard"),
+                    1500, OsdPosition::TopLeft);
+            }
+        }
+    };
+    registerCommand(core::CommandId::CMD_CAPTURE_COPY_FRAME, captureCopy);
+    registerCommand(core::CommandId::CMD_CAPTURE_COPY, captureCopy);
+
+    // Video Equalizer
+    registerCommand(core::CommandId::CMD_VIDEO_BRIGHTNESS_UP, [this](const QVariantMap&) {
+        if (m_engine) {
+            m_engine->setBrightness(m_engine->brightness() + 1);
+            if (m_osdOverlay) {
+                m_osdOverlay->showMessage(
+                    QStringLiteral("Brightness: %1%").arg(m_engine->brightness()),
+                    1500, OsdPosition::TopLeft);
+            }
+        }
+    });
+    registerCommand(core::CommandId::CMD_VIDEO_BRIGHTNESS_DOWN, [this](const QVariantMap&) {
+        if (m_engine) {
+            m_engine->setBrightness(m_engine->brightness() - 1);
+            if (m_osdOverlay) {
+                m_osdOverlay->showMessage(
+                    QStringLiteral("Brightness: %1%").arg(m_engine->brightness()),
+                    1500, OsdPosition::TopLeft);
+            }
+        }
+    });
+    registerCommand(core::CommandId::CMD_VIDEO_BRIGHTNESS_RESET, [this](const QVariantMap&) {
+        if (m_engine) {
+            m_engine->setBrightness(0);
+            if (m_osdOverlay) {
+                m_osdOverlay->showMessage(
+                    QStringLiteral("Brightness: 0%"),
+                    1500, OsdPosition::TopLeft);
+            }
+        }
+    });
+
+    registerCommand(core::CommandId::CMD_VIDEO_CONTRAST_UP, [this](const QVariantMap&) {
+        if (m_engine) {
+            m_engine->setContrast(m_engine->contrast() + 1);
+            if (m_osdOverlay) {
+                m_osdOverlay->showMessage(
+                    QStringLiteral("Contrast: %1%").arg(m_engine->contrast()),
+                    1500, OsdPosition::TopLeft);
+            }
+        }
+    });
+    registerCommand(core::CommandId::CMD_VIDEO_CONTRAST_DOWN, [this](const QVariantMap&) {
+        if (m_engine) {
+            m_engine->setContrast(m_engine->contrast() - 1);
+            if (m_osdOverlay) {
+                m_osdOverlay->showMessage(
+                    QStringLiteral("Contrast: %1%").arg(m_engine->contrast()),
+                    1500, OsdPosition::TopLeft);
+            }
+        }
+    });
+    registerCommand(core::CommandId::CMD_VIDEO_CONTRAST_RESET, [this](const QVariantMap&) {
+        if (m_engine) {
+            m_engine->setContrast(0);
+            if (m_osdOverlay) {
+                m_osdOverlay->showMessage(
+                    QStringLiteral("Contrast: 0%"),
+                    1500, OsdPosition::TopLeft);
+            }
+        }
+    });
+
+    registerCommand(core::CommandId::CMD_VIDEO_SATURATION_UP, [this](const QVariantMap&) {
+        if (m_engine) {
+            m_engine->setSaturation(m_engine->saturation() + 1);
+            if (m_osdOverlay) {
+                m_osdOverlay->showMessage(
+                    QStringLiteral("Saturation: %1%").arg(m_engine->saturation()),
+                    1500, OsdPosition::TopLeft);
+            }
+        }
+    });
+    registerCommand(core::CommandId::CMD_VIDEO_SATURATION_DOWN, [this](const QVariantMap&) {
+        if (m_engine) {
+            m_engine->setSaturation(m_engine->saturation() - 1);
+            if (m_osdOverlay) {
+                m_osdOverlay->showMessage(
+                    QStringLiteral("Saturation: %1%").arg(m_engine->saturation()),
+                    1500, OsdPosition::TopLeft);
+            }
+        }
+    });
+    registerCommand(core::CommandId::CMD_VIDEO_SATURATION_RESET, [this](const QVariantMap&) {
+        if (m_engine) {
+            m_engine->setSaturation(0);
+            if (m_osdOverlay) {
+                m_osdOverlay->showMessage(
+                    QStringLiteral("Saturation: 0%"),
+                    1500, OsdPosition::TopLeft);
+            }
+        }
+    });
+
+    registerCommand(core::CommandId::CMD_VIDEO_HUE_UP, [this](const QVariantMap&) {
+        if (m_engine) {
+            m_engine->setHue(m_engine->hue() + 1);
+            if (m_osdOverlay) {
+                m_osdOverlay->showMessage(
+                    QStringLiteral("Hue: %1%").arg(m_engine->hue()),
+                    1500, OsdPosition::TopLeft);
+            }
+        }
+    });
+    registerCommand(core::CommandId::CMD_VIDEO_HUE_DOWN, [this](const QVariantMap&) {
+        if (m_engine) {
+            m_engine->setHue(m_engine->hue() - 1);
+            if (m_osdOverlay) {
+                m_osdOverlay->showMessage(
+                    QStringLiteral("Hue: %1%").arg(m_engine->hue()),
+                    1500, OsdPosition::TopLeft);
+            }
+        }
+    });
+    registerCommand(core::CommandId::CMD_VIDEO_HUE_RESET, [this](const QVariantMap&) {
+        if (m_engine) {
+            m_engine->setHue(0);
+            if (m_osdOverlay) {
+                m_osdOverlay->showMessage(
+                    QStringLiteral("Hue: 0%"),
+                    1500, OsdPosition::TopLeft);
+            }
+        }
+    });
+
+    registerCommand(core::CommandId::CMD_VIDEO_RESET, [this](const QVariantMap&) {
+        if (m_engine) {
+            m_engine->resetVideoEqualizer();
+            if (m_osdOverlay) {
+                m_osdOverlay->showMessage(
+                    QStringLiteral("Video adjustments reset"),
+                    1500, OsdPosition::TopLeft);
+            }
+        }
+    });
+
+    // Audio Sync
+    auto showAudioSyncOsd = [this]() {
+        if (m_engine && m_osdOverlay) {
+            const int ms = static_cast<int>(std::round(m_engine->audioDelay() * 1000.0));
+            QString sign = (ms > 0) ? QStringLiteral("+") : QString();
+            m_osdOverlay->showMessage(
+                QStringLiteral("Audio Sync: %1%2 ms").arg(sign).arg(ms),
+                1500, OsdPosition::TopLeft);
+        }
+    };
+
+    registerCommand(core::CommandId::CMD_AUDIO_SYNC_FASTER, [this, showAudioSyncOsd](const QVariantMap&) {
+        if (m_engine) {
+            m_engine->setAudioDelay(m_engine->audioDelay() + 0.05);
+            showAudioSyncOsd();
+        }
+    });
+    registerCommand(core::CommandId::CMD_AUDIO_SYNC_SLOWER, [this, showAudioSyncOsd](const QVariantMap&) {
+        if (m_engine) {
+            m_engine->setAudioDelay(m_engine->audioDelay() - 0.05);
+            showAudioSyncOsd();
+        }
+    });
+    registerCommand(core::CommandId::CMD_AUDIO_SYNC_RESET, [this, showAudioSyncOsd](const QVariantMap&) {
+        if (m_engine) {
+            m_engine->setAudioDelay(0.0);
+            showAudioSyncOsd();
+        }
+    });
+
+    // Subtitle Sync
+    auto showSubtitleSyncOsd = [this]() {
+        if (m_engine && m_osdOverlay) {
+            const double delay = m_engine->subtitleDelay();
+            QString sign = (delay > 0.0) ? QStringLiteral("+") : QString();
+            m_osdOverlay->showMessage(
+                QStringLiteral("Subtitle Sync: %1%2 s").arg(sign).arg(QString::number(delay, 'f', 1)),
+                1500, OsdPosition::TopLeft);
+        }
+    };
+
+    registerCommand(core::CommandId::CMD_SUB_SYNC_FASTER, [this, showSubtitleSyncOsd](const QVariantMap&) {
+        if (m_engine) {
+            m_engine->setSubtitleDelay(m_engine->subtitleDelay() + 0.5);
+            showSubtitleSyncOsd();
+        }
+    });
+    registerCommand(core::CommandId::CMD_SUB_SYNC_SLOWER, [this, showSubtitleSyncOsd](const QVariantMap&) {
+        if (m_engine) {
+            m_engine->setSubtitleDelay(m_engine->subtitleDelay() - 0.5);
+            showSubtitleSyncOsd();
+        }
+    });
+    registerCommand(core::CommandId::CMD_SUB_SYNC_RESET, [this, showSubtitleSyncOsd](const QVariantMap&) {
+        if (m_engine) {
+            m_engine->setSubtitleDelay(0.0);
+            showSubtitleSyncOsd();
+        }
+    });
 }
 
 void MainWindow::setupNavigationConnections()
@@ -754,6 +1097,7 @@ void MainWindow::setupNavigationConnections()
     });
 
     connect(m_contextMenuManager.get(), &ContextMenuManager::togglePlaylistRequested, this, &MainWindow::togglePlaylist);
+    connect(m_contextMenuManager.get(), &ContextMenuManager::toggleControlPanelRequested, this, &MainWindow::toggleControlPanel);
 }
 
 void MainWindow::registerCommand(core::CommandId id, core::CommandRegistry::Handler handler)
