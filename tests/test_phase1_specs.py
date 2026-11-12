@@ -210,8 +210,50 @@ def test_task4():
 
     print(f"Task 4 spec verification passed ({len(pref_rows)} preferences rows across {len(primary_categories)} categories).")
 
+def test_task5():
+    ui_path = "docs/spec/ui-layout.md"
+    assert os.path.exists(ui_path), "ui-layout.md missing"
+    with open(ui_path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    # Required section headers / components
+    required_sections = [
+        "Main Window",
+        "Titlebar",
+        "Control Bar",
+        "Time Slider",
+        "OSD",
+        "Playlist Dock (F6)",
+        "Control Panel (F7)",
+    ]
+    for section in required_sections:
+        assert section in content, f"Required section '{section}' missing in ui-layout.md"
+
+    # Required hex color tokens
+    required_colors = ["#1b1b1b", "#1e1e1e", "#252525", "#383838", "#ffaa00", "#e09b1f", "#ffffff", "#aaaaaa", "#d48800"]
+    for color in required_colors:
+        assert color in content, f"Color token '{color}' missing in ui-layout.md"
+
+    # Layout metrics
+    assert "320x180" in content or ("320" in content and "180" in content), "Window minimum size (320x180) missing in ui-layout.md"
+    assert "30px" in content, "Titlebar height (30px) missing in ui-layout.md"
+    assert "40px" in content, "Control bar height (40px) missing in ui-layout.md"
+    assert "14px" in content and "4px" in content, "Time slider metrics (14px height, 4px groove) missing in ui-layout.md"
+    assert ("24x24" in content or "28x28" in content), "Button dimensions (24x24 / 28x28) missing in ui-layout.md"
+
+    # Clean-room audit citation
+    assert "CR-007" in content, "Clean-room reference CR-007 missing in ui-layout.md"
+
+    # Clean-room log verification
+    with open("docs/clean-room-log.md", "r", encoding="utf-8") as f:
+        log_content = f.read()
+    assert "### Entry CR-007:" in log_content, "CR-007 missing in clean-room-log.md"
+
+    print("Task 5 spec verification passed.")
+
 if __name__ == "__main__":
     test_task1()
     test_task2()
     test_task3()
     test_task4()
+    test_task5()

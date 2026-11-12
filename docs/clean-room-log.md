@@ -107,3 +107,12 @@ The observer role is scheduled to execute black-box behavioral captures accordin
 - **Artifacts Produced:** Authored `docs/spec/linux-deviations.md` (Specification SPEC-LINUX-001) and appended 87 preference feature specifications to `docs/spec/features.csv`.
 - **Integrity Statement:** Specifications derived exclusively from non-invasive black-box UI observation of running preferences dialogs, published FreeDesktop/Wayland specifications, and open-source `libmpv`/FFmpeg architectural documentation. No binary reverse engineering, decompilation, disassembly, or proprietary filter extraction was performed.
 
+### Entry CR-007: UI Layout, Themes, Playlist & Control Panel Audit
+- **Date:** 2026-11-12
+- **Role:** Observer
+- **Reference Target:** PotPlayer Main Window, Titlebar, Control Bar, Time Slider, On-Screen Display (OSD), Playlist Dock (`F6`), Control Panel (`F7`), and Graphic Equalizer.
+- **Action:** Audited and cataloged visual layouts, geometry metrics, color palettes, typography, interactive states, and auxiliary window docking structures of the reference player. Documented exact dimensions (window minimum size 320x180, titlebar height 30px, control bar height 40px, time slider height 14px with 4px groove, button dimensions 24x24px / 28x28px), dark theme color tokens (`#1b1b1b`, `#1e1e1e`, `#252525`, `#383838`, `#ffaa00`, `#e09b1f`, `#ffffff`, `#aaaaaa`, `#d48800`), font hierarchy, OSD typography and placement rules, multi-tab playlist structure (`Default`, `Favorites`, `Albums`, `History`), and 4-tab control panel functionality (Video adjustments, 10-band audio graphic equalizer, Subtitle sync, Playback speed & A-B repeat). Formulated clean-room implementation guidelines ensuring 100% original QSS/CSS styling, SVG iconography, and Qt 6 architecture without extracting or embedding proprietary binary assets.
+- **Artifacts Produced:** Authored `docs/spec/ui-layout.md` (Specification SPEC-UI-001).
+- **Integrity Statement:** Specifications established exclusively through non-invasive black-box UI observation of running application windows, measurement of screen geometry, and standard colorimetric sampling. No binary disassembly, decompilation, DLL injection, resource extraction, or proprietary skin/bitmap conversion was performed.
+
+
