@@ -257,7 +257,6 @@ FEAT-HELP-011,Help,Preferences Dialog,Menu > Preferences... (F5),N/A,"Opens mast
 FEAT-HELP-012,Help,Playlist Window,Menu > Playlist... (F6),N/A,Toggles auxiliary playlist panel docking or floating window.,CR-004,Planned
 FEAT-HELP-013,Help,Control Panel Window,Menu > Control Panel... (F7),N/A,"Toggles auxiliary quick-adjust control panel for audio, video, subtitle, and playback adjustments.",CR-004,Planned
 FEAT-HELP-014,Help,Exit Application,Menu > Exit (Alt+F4),N/A,Saves current playback state and cleanly terminates the player application.,CR-004,Planned
-
 FEAT-PREF-001,Preferences,Allow Multiple Instances,Preferences > General > Startup > Allow Multiple Instances,Disabled,"Controls whether launching a media file opens a new outPlayer window or enqueues into the existing active instance.",CR-006,Planned
 FEAT-PREF-002,Preferences,Single Instance Re-use Window,Preferences > General > Startup > Single Instance Reuse Window,Enabled,"When a new file is launched, replaces current playback in the existing window instead of spawning a new process.",CR-006,Planned
 FEAT-PREF-003,Preferences,Auto-check for Application Updates,Preferences > General > Startup > Auto-check for Updates,Disabled,"Checks repository or release API on startup for newer outPlayer versions without blocking playback.",CR-006,Planned
