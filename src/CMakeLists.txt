@@ -55,6 +55,10 @@ qt_add_library(outplayer_ui STATIC
     ui/ControlBar.cpp
     ui/CustomTitleBar.h
     ui/CustomTitleBar.cpp
+    ui/MediaOpenController.h
+    ui/MediaOpenController.cpp
+    ui/OpenUrlDialog.h
+    ui/OpenUrlDialog.cpp
     ui/OsdOverlay.h
     ui/OsdOverlay.cpp
     ui/TimeFormatter.h

@@ -185,7 +185,20 @@ target_link_libraries(test_context_menu
 
 add_test(NAME test_context_menu COMMAND test_context_menu)
 
+# ==============================================================================
+# Task 2 (Phase 3B): test_media_open_dialogs target
+# ==============================================================================
+qt_add_executable(test_media_open_dialogs
+    test_media_open_dialogs.cpp
+)
 
+target_link_libraries(test_media_open_dialogs
+    PRIVATE
+        outplayer_ui
+        outplayer_core
+        Qt6::Test
+        Qt6::Widgets
+)
 
-
+add_test(NAME test_media_open_dialogs COMMAND test_media_open_dialogs)
 
