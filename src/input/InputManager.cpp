@@ -65,50 +65,47 @@ void InputManager::initDefaultShortcuts() {
     const auto catalog = core::createDefaultCommandCatalog();
     for (const auto& info : catalog) {
         const QString& rawKey = info.defaultKey;
-        if (rawKey.isEmpty() || rawKey == QStringLiteral("None")) {
-            continue;
-        }
+        bool isKeyboardDefault = !rawKey.isEmpty() && rawKey != QStringLiteral("None") &&
+            !rawKey.startsWith(QStringLiteral("LeftClick")) &&
+            !rawKey.startsWith(QStringLiteral("LeftDblClick")) &&
+            !rawKey.startsWith(QStringLiteral("LeftDrag")) &&
+            !rawKey.startsWith(QStringLiteral("MiddleClick")) &&
+            !rawKey.startsWith(QStringLiteral("MiddleDblClick")) &&
+            !rawKey.startsWith(QStringLiteral("RightClick")) &&
+            !rawKey.startsWith(QStringLiteral("Wheel")) &&
+            !rawKey.startsWith(QStringLiteral("XButton"));
 
-        // Skip mouse-bound pseudo-keys
-        if (rawKey.startsWith(QStringLiteral("LeftClick")) ||
-            rawKey.startsWith(QStringLiteral("LeftDblClick")) ||
-            rawKey.startsWith(QStringLiteral("LeftDrag")) ||
-            rawKey.startsWith(QStringLiteral("MiddleClick")) ||
-            rawKey.startsWith(QStringLiteral("MiddleDblClick")) ||
-            rawKey.startsWith(QStringLiteral("RightClick")) ||
-            rawKey.startsWith(QStringLiteral("Wheel")) ||
-            rawKey.startsWith(QStringLiteral("XButton"))) {
-            continue;
-        }
-
-        QString keyStr = rawKey;
-        if (keyStr == QStringLiteral("Numpad_Add")) {
-            keyStr = QStringLiteral("+");
-        } else if (keyStr == QStringLiteral("Numpad_Subtract")) {
-            keyStr = QStringLiteral("-");
-        } else if (keyStr.startsWith(QStringLiteral("Numpad")) && keyStr.length() > 6) {
-            keyStr = keyStr.mid(6);
-        }
-
-        QString fullSeq;
-        if (!info.defaultModifiers.isEmpty() && info.defaultModifiers != QStringLiteral("None")) {
-            fullSeq = info.defaultModifiers + QStringLiteral("+") + keyStr;
-        } else {
-            fullSeq = keyStr;
-        }
-
-        QKeySequence seq(fullSeq, QKeySequence::PortableText);
-        if (!seq.isEmpty()) {
-            m_defaultShortcuts[info.id] = seq;
-
-            // Check if user has an override stored in settings
-            QString settingKey = QStringLiteral("shortcuts/") + core::commandIdToString(info.id);
-            if (core::SettingsManager::instance().contains(settingKey)) {
-                QString customStr = core::SettingsManager::instance().get(settingKey).toString();
-                m_shortcuts[info.id] = QKeySequence::fromString(customStr, QKeySequence::PortableText);
-            } else {
-                m_shortcuts[info.id] = seq;
+        QKeySequence defaultSeq;
+        if (isKeyboardDefault) {
+            QString keyStr = rawKey;
+            if (keyStr == QStringLiteral("Numpad_Add")) {
+                keyStr = QStringLiteral("+");
+            } else if (keyStr == QStringLiteral("Numpad_Subtract")) {
+                keyStr = QStringLiteral("-");
+            } else if (keyStr.startsWith(QStringLiteral("Numpad")) && keyStr.length() > 6) {
+                keyStr = keyStr.mid(6);
             }
+
+            QString fullSeq;
+            if (!info.defaultModifiers.isEmpty() && info.defaultModifiers != QStringLiteral("None")) {
+                fullSeq = info.defaultModifiers + QStringLiteral("+") + keyStr;
+            } else {
+                fullSeq = keyStr;
+            }
+
+            defaultSeq = QKeySequence(fullSeq, QKeySequence::PortableText);
+            if (!defaultSeq.isEmpty()) {
+                m_defaultShortcuts[info.id] = defaultSeq;
+            }
+        }
+
+        // Check if user has an override stored in settings
+        QString settingKey = QStringLiteral("shortcuts/") + core::commandIdToString(info.id);
+        if (core::SettingsManager::instance().contains(settingKey)) {
+            QString customStr = core::SettingsManager::instance().get(settingKey).toString();
+            m_shortcuts[info.id] = QKeySequence::fromString(customStr, QKeySequence::PortableText);
+        } else if (!defaultSeq.isEmpty()) {
+            m_shortcuts[info.id] = defaultSeq;
         }
     }
 }
