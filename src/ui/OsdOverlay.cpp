@@ -14,7 +14,10 @@ namespace outplayer::ui {
 
 OsdOverlay::OsdOverlay(QWidget* parent)
     : QWidget(parent)
+    , m_font(QStringLiteral("Inter"), 18, QFont::DemiBold)
 {
+    m_font.setStyleHint(QFont::SansSerif);
+
     setAttribute(Qt::WA_TransparentForMouseEvents, true);
     setAttribute(Qt::WA_NoSystemBackground, true);
     setAttribute(Qt::WA_TranslucentBackground, true);
@@ -24,6 +27,12 @@ OsdOverlay::OsdOverlay(QWidget* parent)
     connect(&m_fadeTimer, &QTimer::timeout, this, &OsdOverlay::onFadeStep);
 
     updateParentTracking();
+}
+
+OsdOverlay::~OsdOverlay() {
+    if (m_observedParent) {
+        m_observedParent->removeEventFilter(this);
+    }
 }
 
 void OsdOverlay::updateParentTracking() {
@@ -70,7 +79,7 @@ void OsdOverlay::showMessage(const QString& text, int durationMs, OsdPosition po
     m_position = pos;
     m_opacity = 1.0;
 
-    m_fadeDurationMs = std::min(300, durationMs);
+    m_fadeDurationMs = (std::min)(300, durationMs);
     const int holdDurationMs = durationMs - m_fadeDurationMs;
 
     if (holdDurationMs > 0) {
@@ -143,10 +152,8 @@ void OsdOverlay::paintEvent(QPaintEvent* /*event*/) {
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.setRenderHint(QPainter::TextAntialiasing, true);
 
-    QFont font(QStringLiteral("Inter"), 18, QFont::DemiBold);
-    font.setStyleHint(QFont::SansSerif);
-    painter.setFont(font);
-    QFontMetrics fm(font);
+    painter.setFont(m_font);
+    QFontMetrics fm(m_font);
 
     const QStringList lines = m_text.split(QLatin1Char('\n'));
     if (lines.isEmpty()) {
@@ -188,8 +195,8 @@ void OsdOverlay::paintEvent(QPaintEvent* /*event*/) {
         }
         const int y = startY + i * lineHeight;
 
-        textPath.addText(x, y, font, line);
-        shadowPath.addText(x + 1.0, y + 2.0, font, line);
+        textPath.addText(x, y, m_font, line);
+        shadowPath.addText(x + 1.0, y + 2.0, m_font, line);
     }
 
     painter.setOpacity(m_opacity);

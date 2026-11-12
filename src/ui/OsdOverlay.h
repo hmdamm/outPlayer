@@ -2,6 +2,7 @@
 #pragma once
 
 #include <QElapsedTimer>
+#include <QFont>
 #include <QPointer>
 #include <QString>
 #include <QTimer>
@@ -20,7 +21,7 @@ class OsdOverlay : public QWidget {
 
 public:
     explicit OsdOverlay(QWidget* parent = nullptr);
-    ~OsdOverlay() override = default;
+    ~OsdOverlay() override;
 
     void showMessage(const QString& text, int durationMs = 1500, OsdPosition pos = OsdPosition::TopLeft);
     void clear();
@@ -51,6 +52,7 @@ private:
     QTimer m_fadeTimer;
     QElapsedTimer m_fadeElapsedTimer;
     QPointer<QWidget> m_observedParent;
+    QFont m_font;
 };
 
 } // namespace outplayer::ui
