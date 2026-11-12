@@ -9,7 +9,7 @@ This document tracks the roadmap, phase progression, and verification evidence f
 | Phase | Description | Status | Target Gate |
 |---|---|---|---|
 | **Phase 0** | Development Environment & "Hello Player" | Complete | Working `outplayer` binary rendering video via `mpv_render_context` and unit test suite passing. |
-| **Phase 1** | Black-Box Feature Inventory (Observer Role) | Not Started | Complete UI/hotkey/format spec inventory in `docs/spec/` with evidence logged in `docs/clean-room-log.md`. |
+| **Phase 1** | Black-Box Feature Inventory (Observer Role) | Complete | Complete UI/hotkey/format spec inventory in `docs/spec/` with evidence logged in `docs/clean-room-log.md`. |
 | **Phase 2** | Core Architecture & Command Engine | Not Started | Decoupled architecture (`IPlaybackEngine`, `CommandRegistry`, `SettingsManager`) with passing unit tests. |
 | **Phase 3** | Vertical Slices Implementation | Not Started | 12 vertical feature slices implemented via TDD with 100% test coverage for implemented features. |
 | **Phase 4** | Parity Hardening & Verification | Not Started | Automated hotkey parity suite passing, offscreen xvfb visual match, and zero ASan/UBSan issues. |
@@ -49,16 +49,34 @@ This document tracks the roadmap, phase progression, and verification evidence f
 
 ## Phase 1: Black-Box Feature Inventory (Observer Role)
 
-**Gate Requirement:** 100% of visible PotPlayer controls and hotkeys categorized and recorded in `docs/spec/` with clean-room audit citations.
+**Gate Requirement:** 100% of visible PotPlayer controls and hotkeys categorized and recorded in `docs/spec/` with clean-room audit citations.  
+**Phase Gate Status:** **CLEARED / COMPLETE** (ADR 004)
 
 | Task ID | Description | Status | Assignee / Role | Target Deliverables | Verification Evidence |
 |---|---|---|---|---|---|
-| **P1-T1** | Reference Installation & Environment Setup | Done | Observer | Setup Win10/11 PotPlayer 64-bit environment, baseline screenshots | Logged in `docs/clean-room-log.md` (CR-001, CR-002, CR-003) |
+| **P1-T1** | Reference Installation & Environment Setup | Done | Observer | Setup Win10/11 reference environment, baseline screenshots | Logged in `docs/clean-room-log.md` (CR-001) |
 | **P1-T2** | Context Menu & Main Menu Hierarchy Inventory | Done | Observer | `docs/spec/features.csv` (menu section) | `python tests/test_phase1_specs.py` PASS (258 items), commit `116a356` |
 | **P1-T3** | Hotkey Map & Keybinding Matrix | Done | Observer | `docs/spec/hotkeys.csv` | `python tests/test_phase1_specs.py` PASS (253 shortcuts), commit `e264b83` |
 | **P1-T4** | Preferences (F5) Tree & Linux Deviations | Done | Observer | `docs/spec/features.csv` (prefs), `docs/spec/linux-deviations.md` | `python tests/test_phase1_specs.py` PASS (87 prefs items, 9 adaptations), commit `50aa00e` |
 | **P1-T5** | Playlist (F6) & Control Panel (F7) Inventory | Done | Observer | `docs/spec/features.csv` (aux windows), `docs/spec/ui-layout.md` | `python tests/test_phase1_specs.py` PASS (geometry & palette), commit `f5c8c06` |
 | **P1-T6** | Media Formats, CLI & Network Protocols | Done | Observer | `docs/spec/formats.md`, `docs/spec/cli.md` | `python tests/test_phase1_specs.py` PASS, commit `a2b611d` |
+| **P1-T7** | Clean-Room Audit Verification & Phase 1 Gate Clearance | Done | Observer / Implementer | `docs/decisions.md` (ADR 004), `docs/clean-room-log.md` (CR-008), clean-room test guard in `tests/test_phase1_specs.py` | `python tests/test_phase1_specs.py` PASS (100% assertions, 0 clean-room violations) |
+
+### Phase 1 Gate Clearance Evidence
+- **Complete Specification Deliverables:**
+  - `docs/spec/features.csv`: 345 cataloged feature specifications (258 menu actions across 12 functional areas + 87 preference settings across 7 categories) with default values, observed behaviors, and clean-room evidence refs (`CR-004`, `CR-006`).
+  - `docs/spec/hotkeys.csv`: 253 keybinding and mouse gesture mappings with canonical shortcuts, modifiers, and clean `CMD_*` command IDs (`CR-005`).
+  - `docs/spec/formats.md`: Comprehensive media format and streaming protocol support matrix across containers, video codecs, audio codecs, subtitles, and hardware acceleration with `libmpv`/FFmpeg mappings (`CR-003`).
+  - `docs/spec/cli.md`: Full CLI switch mapping (28 switches and arguments) from reference syntax to `outplayer` GNU long options and compatibility aliases (`CR-002`).
+  - `docs/spec/linux-deviations.md`: Complete architectural ledger documenting 9 subsystem adaptations (Wayland borderless, PipeWire/ALSA, XDG base directories, XDG Desktop Portals) with technical rationales (`CR-006`).
+  - `docs/spec/ui-layout.md`: Pixel-accurate layout metrics (320x180 min window, 30px titlebar, 40px control bar, 14px/4px slider), dark theme color tokens, typography, OSD rules, and auxiliary window (F6 playlist, F7 control panel) docking behavior (`CR-007`).
+- **Automated Specification & Clean-Room Verification Suite (`python tests/test_phase1_specs.py`):**
+  - All Phase 1 spec test suites pass (100% assertions satisfied).
+  - Clean-room branding guard (`test_clean_room_guard`): zero forbidden proprietary branding ("PotPlayer", "Daum", "Kakao") in `src/`, code symbols, binary paths, or package IDs.
+- **Linux/WSL Test Suite (`wsl xvfb-run -a ctest --test-dir build --output-on-failure`):**
+  - 3/3 tests pass (100%), 0 failures.
+- **Clean-Room Audit Compliance:**
+  - Complete observation entries CR-001 through CR-008 logged in `docs/clean-room-log.md`.
 
 ---
 

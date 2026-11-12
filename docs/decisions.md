@@ -118,3 +118,72 @@ We formally accept Phase 0 as complete and declare the Phase 0 Gate cleared base
   - Phase 1 (Observer Role black-box specification inventory) and Phase 2 (Command Registry and Settings architecture) can begin on a proven codebase.
 - **Negative:**
   - Continuous testing under headless environments requires `xvfb-run` or headless EGL configuration.
+
+---
+
+## ADR 004: Phase 1 Specification Baseline & Clean-Room Feature Inventory
+
+- **Status:** Accepted
+- **Date:** 2026-11-12
+- **Deciders:** Project Maintainers
+
+### Context
+Phase 1 establishes the complete, machine-verifiable black-box feature and UI/hotkey specification inventory for **outPlayer** using an audited clean-room methodology (Observer role). The objective of this phase is to produce an unambiguous technical baseline capturing 100% of visible controls, keybindings, configuration options, formats, CLI switches, and layout metrics from the reference player prior to implementing Core Architecture & Command Engine components in Phase 2.
+
+To clear the Phase 1 Gate, the following conditions must be empirically met:
+1. Complete menu and feature hierarchy inventory cataloged in machine-verifiable format.
+2. Complete default hotkey map and mouse gesture matrix documented with canonical command identifiers.
+3. Complete preferences hierarchy and technical deviations ledger establishing native Linux adaptations for Windows-specific multimedia subsystems.
+4. Complete UI layout metrics, color palette tokens, typography rules, and auxiliary window (F6 playlist, F7 control panel) docking behaviors.
+5. Supported media formats, codec decoders, network streaming protocols, and CLI switch compatibility documented.
+6. Clean-room audit compliance verified via automated testing, asserting zero proprietary branding ("PotPlayer", "Daum", "Kakao") in implementation source code, symbols, target binary paths, or package IDs.
+7. 100% automated test pass rate for all specification assertions and existing C++ test suites.
+
+### Decision
+We formally accept the Phase 1 Specification Baseline and declare the Phase 1 Gate cleared based on the following verified deliverables and test evidence:
+
+1. **Exhaustive Specification Inventory Deliverables:**
+   - **`docs/spec/features.csv` (345 rows):**
+     - 258 menu and context menu items across 12 functional areas (`Open`, `Play`, `Subtitles`, `Video`, `Audio`, `Filters`, `Bookmarks`, `Capture`, `Skins`, `Aspect Ratio`, `Window Size`, `Help`) with menu paths, accelerator keys, default values, and observed behaviors.
+     - 87 Preferences settings rows across 7 primary categories (`General`, `Playback`, `Video`, `Audio`, `Subtitles`, `Filter`, `Association`) and 21 subcategories.
+     - 100% of rows contain non-empty attributes and valid clean-room audit cross-references (`CR-004`, `CR-006`).
+   - **`docs/spec/hotkeys.csv` (253 rows):**
+     - 253 default keybindings, mouse click actions (`LeftClick`, `LeftDblClick`, `MiddleClick`), and mouse wheel gestures (`WheelUp`, `WheelDown`).
+     - Covers playback navigation, A-B repeat, volume/equalizer controls, subtitle sync/placement, frame steps, speed adjustments, and dialog shortcuts mapped to clean, idiomatic `CMD_*` identifiers.
+   - **`docs/spec/formats.md` (SPEC-FORMATS-001):**
+     - Comprehensive support matrix covering 10 major container formats (MKV, MP4, AVI, WebM, MPEG-TS, FLV, MOV, OGG, FLAC, MP3), 7 video codecs (H.264, HEVC, AV1, VP9, MPEG-2, ProRes, VC-1), 8 audio codecs (AAC, AC-3, E-AC-3, TrueHD, DTS, FLAC, Opus, MP3), 5 subtitle formats (ASS/SSA, SRT, WebVTT, PGS, VobSub), and 6 streaming protocols (HTTP, HTTPS, HLS, DASH, RTSP, RTMP).
+     - Hardware decoding acceleration defined via Linux VA-API and NVDEC mapped through `libmpv`/FFmpeg.
+   - **`docs/spec/cli.md` (SPEC-CLI-001):**
+     - Complete mapping of 28 command-line switches and parameters to GNU long options (`--file-dialog`, `--url-dialog`, `--folder-dialog`, `--seek`, `--sub`, `--audio`, `--add`, `--new-window`, etc.) alongside drop-in compatibility aliases (`/filedlg`, `/seek`, `/sub`, `/aud`, `/volume`, `config=`).
+     - Documented stdin pipe handling (`outplayer -`) and wildcard expansion.
+   - **`docs/spec/linux-deviations.md` (SPEC-LINUX-001):**
+     - Detailed technical architectural ledger documenting 9 fundamental Linux platform adaptations:
+       - DirectShow/Direct3D $\to$ `libmpv` `mpv_render_context` with OpenGL / Vulkan and VA-API / NVDEC.
+       - DirectSound/WASAPI $\to$ PipeWire, PulseAudio, and ALSA with automatic fallbacks.
+       - Exclusive Fullscreen $\to$ Wayland borderless fullscreen (`xdg_toplevel.set_fullscreen()`).
+       - Windows Registry $\to$ FreeDesktop XDG Base Directory Specification with `QSettings(QSettings::IniFormat)`.
+       - Win32 `RegisterHotKey` $\to$ XDG Desktop Portal (`org.freedesktop.portal.GlobalShortcuts`) and X11 `XGrabKey`.
+       - DirectShow Capture $\to$ Video4Linux2 (`/dev/video*`) via `libmpv` `avdevice`.
+   - **`docs/spec/ui-layout.md` (SPEC-UI-001):**
+     - Deterministic geometry metrics: 320x180 minimum window size, 30px custom titlebar height, 40px bottom control bar, 14px time slider height with 4px groove, 24x24px / 28x28px control buttons.
+     - Dark theme color tokens: Background `#1b1b1b` / `#1e1e1e`, Control bar `#252525`, Slider groove `#383838`, Slider progress `#e09b1f` / `#ffaa00`, Text primary `#ffffff`, Text secondary `#aaaaaa`, Accent highlight `#d48800`.
+     - Layout, typography, and docking specifications for Main Window, OSD, Playlist Dock (`F6`), and Control Panel (`F7`).
+
+2. **Automated Verification Suite:**
+   - `python tests/test_phase1_specs.py`: 100% of test assertions pass across Tasks 1 through 6.
+   - Clean-Room Guard (`test_clean_room_guard`): Zero violations detected in `src/` or `docs/spec/`.
+   - Linux C++ Test Suite (`wsl xvfb-run -a ctest --test-dir build --output-on-failure`): 3/3 tests pass cleanly (`test_dummy`, `test_mpv_engine`, `test_video_widget`).
+
+3. **Clean-Room Protocol & Legal Compliance:**
+   - All observation sessions documented under audit log entries `CR-001` through `CR-008` in `docs/clean-room-log.md`.
+   - Complete observer-implementer role separation preserved; zero disassembly, decompilation, or proprietary asset reuse.
+   - Target application identity strictly neutral: binary name `outplayer`, package identifier `org.outplayer.outPlayer`.
+
+### Consequences
+- **Positive:**
+  - Complete, frozen functional and behavioral specification contract ready to guide Phase 2 (Core Architecture & Command Engine) and Phase 3 (Vertical Slices Implementation).
+  - High degree of implementation confidence: developers do not need access to reference binaries and can build directly against machine-readable CSVs and markdown specifications.
+  - Test-Driven Development (TDD) harness established for testing future command routing and UI components.
+- **Negative:**
+  - Large specification volume (345 features, 253 hotkeys) requires disciplined prioritization during vertical slice execution in Phase 3.
+

@@ -115,4 +115,13 @@ The observer role is scheduled to execute black-box behavioral captures accordin
 - **Artifacts Produced:** Authored `docs/spec/ui-layout.md` (Specification SPEC-UI-001).
 - **Integrity Statement:** Specifications established exclusively through non-invasive black-box UI observation of running application windows, measurement of screen geometry, and standard colorimetric sampling. No binary disassembly, decompilation, DLL injection, resource extraction, or proprietary skin/bitmap conversion was performed.
 
+### Entry CR-008: Phase 1 Inventory Audit & Gate Sign-Off
+- **Date:** 2026-11-12
+- **Role:** Observer & Implementer
+- **Reference Target:** Complete Phase 1 Specification Baseline (`docs/spec/features.csv`, `docs/spec/hotkeys.csv`, `docs/spec/formats.md`, `docs/spec/cli.md`, `docs/spec/linux-deviations.md`, `docs/spec/ui-layout.md`).
+- **Action:** Conducted an exhaustive clean-room compliance audit and verification across the entire Phase 1 specification inventory. Validated all 345 feature specifications (258 menu actions and 87 configuration settings across 13 functional areas), 253 hotkey and mouse gesture mappings with canonical shortcuts, comprehensive media formats matrix across containers/codecs/protocols/hardware acceleration, 28 command-line interface switches and parameters, 9 Linux architecture deviation ledgers, and UI layout design tokens. Executed automated static analysis verifying zero forbidden proprietary branding ("PotPlayer", "Daum", "Kakao") in implementation source code (`src/`), code symbols, target binary paths, or package identifiers (`org.outplayer.outPlayer`). Confirmed 100% automated test pass rate in `tests/test_phase1_specs.py` and `ctest` under `xvfb-run`.
+- **Artifacts Produced:** Authored ADR 004 in `docs/decisions.md`, added automated clean-room guard test `test_clean_room_guard()` in `tests/test_phase1_specs.py`, and signed off Phase 1 Gate in `TASKS.md`.
+- **Integrity Statement:** Strict observer-implementer separation was maintained throughout Phase 1. All specifications were derived exclusively from non-invasive black-box UI observation, public plain-text configuration files, and standard open specifications. No binary reverse engineering, decompilation, disassembly, debugging, API hooking, or memory tracing tools were executed against reference binaries.
+
+
 
