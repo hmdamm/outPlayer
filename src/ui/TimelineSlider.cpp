@@ -5,6 +5,7 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QToolTip>
+#include <QWheelEvent>
 #include <algorithm>
 #include <cmath>
 
@@ -171,6 +172,12 @@ void TimelineSlider::leaveEvent(QEvent* event)
     QToolTip::hideText();
     update();
     QSlider::leaveEvent(event);
+}
+
+void TimelineSlider::wheelEvent(QWheelEvent* event)
+{
+    // Ignore wheel events so they bubble up to MainWindow/InputManager for volume control
+    event->ignore();
 }
 
 void TimelineSlider::paintEvent(QPaintEvent* /*event*/)

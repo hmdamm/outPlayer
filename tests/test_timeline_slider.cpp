@@ -145,6 +145,7 @@ void TestTimelineSlider::testChaptersAndBuffer()
     slider.setDuration(100.0);
 
     slider.setBufferProgress(0.65);
+    QCOMPARE(slider.bufferProgress(), 0.65);
 
     QList<outplayer::engine::ChapterInfo> chapters = {
         {0, QStringLiteral("Intro"), 0.0},
@@ -152,9 +153,18 @@ void TestTimelineSlider::testChaptersAndBuffer()
         {2, QStringLiteral("Scene 2"), 75.0}
     };
     slider.setChapters(chapters);
+    QCOMPARE(slider.chapters().size(), 3);
+    QCOMPARE(slider.chapters().at(1).title, QStringLiteral("Scene 1"));
 
     slider.show();
     QVERIFY(slider.isVisible());
+
+    // Verify wheel events are ignored so they bubble up to MainWindow/InputManager
+    QWheelEvent wheelEv(QPointF(10, 7), QPointF(10, 7), QPoint(0, 120), QPoint(0, 120),
+                        Qt::NoButton, Qt::NoModifier, Qt::NoScrollPhase, false);
+    wheelEv.accept();
+    QApplication::sendEvent(&slider, &wheelEv);
+    QVERIFY(!wheelEv.isAccepted());
 }
 
 void TestTimelineSlider::testPaintEventExecution()
