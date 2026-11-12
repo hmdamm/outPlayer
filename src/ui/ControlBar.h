@@ -2,6 +2,7 @@
 #pragma once
 
 #include <QWidget>
+#include <QPointer>
 
 class QLabel;
 class QPushButton;
@@ -75,7 +76,7 @@ private:
     void setupUi();
     void applyStyle();
 
-    engine::IPlaybackEngine* m_engine{nullptr};
+    QPointer<engine::IPlaybackEngine> m_engine;
 
     QPushButton* m_playPauseBtn{nullptr};
     QPushButton* m_stopBtn{nullptr};
