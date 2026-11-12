@@ -116,4 +116,21 @@ target_link_libraries(test_timeline_slider
 
 add_test(NAME test_timeline_slider COMMAND test_timeline_slider)
 
+# ==============================================================================
+# Task 2: test_control_bar target
+# ==============================================================================
+qt_add_executable(test_control_bar
+    test_control_bar.cpp
+)
+
+target_link_libraries(test_control_bar
+    PRIVATE
+        outplayer_ui
+        outplayer_core
+        Qt6::Test
+        Qt6::Widgets
+)
+
+add_test(NAME test_control_bar COMMAND test_control_bar)
+
 
