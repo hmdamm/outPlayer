@@ -99,3 +99,21 @@ target_link_libraries(test_input_manager
 
 add_test(NAME test_input_manager COMMAND test_input_manager)
 
+# ==============================================================================
+# Task 1: test_timeline_slider target
+# ==============================================================================
+qt_add_executable(test_timeline_slider
+    test_timeline_slider.cpp
+)
+
+target_link_libraries(test_timeline_slider
+    PRIVATE
+        outplayer_ui
+        outplayer_core
+        Qt6::Test
+        Qt6::Widgets
+)
+
+add_test(NAME test_timeline_slider COMMAND test_timeline_slider)
+
+
