@@ -486,7 +486,7 @@ inline constexpr RawCommandData kRawCommandData[] = {
     { CommandId::CMD_REOPEN_LAST, "CMD_REOPEN_LAST", "Reopen Current / Last Played Item", "Y", "Ctrl", "Window", "Menu > Open > Reopen Current/Last Item", "Reopen Current / Last Played Item" },
     { CommandId::CMD_FAVORITES_ADD_ITEM, "CMD_FAVORITES_ADD_ITEM", "Add Current Item to Favorites", "Insert", "Alt", "Window", "Menu > Favorites > Add Current Item to Favorites", "Add Current Item to Favorites" },
     { CommandId::CMD_FAVORITES_ADD_FOLDER, "CMD_FAVORITES_ADD_FOLDER", "Add Current Folder to Favorites", "Insert", "Ctrl", "Window", "Menu > Favorites > Add Current Folder to Favorites", "Add Current Folder to Favorites" },
-    { CommandId::CMD_BOOKMARK_ADD, "CMD_BOOKMARK_ADD", "Add Bookmark at Current Position", "H", "None", "Window", "Menu > Bookmarks > Add to Bookmarks", "Add Bookmark at Current Position" },
+    { CommandId::CMD_BOOKMARK_ADD, "CMD_BOOKMARK_ADD", "Add Bookmark at Current Position", "P", "Ctrl", "Window", "Menu > Bookmarks > Add to Bookmarks", "Add Bookmark at Current Position" },
     { CommandId::CMD_BOOKMARK_PREV, "CMD_BOOKMARK_PREV", "Jump to Previous Bookmark", "H", "Shift", "Window", "Menu > Bookmarks > Previous Bookmark", "Jump to Previous Bookmark" },
     { CommandId::CMD_BOOKMARK_NEXT, "CMD_BOOKMARK_NEXT", "Jump to Next Bookmark", "H", "Ctrl", "Window", "Menu > Bookmarks > Next Bookmark", "Jump to Next Bookmark" },
     { CommandId::CMD_BOOKMARK_MANAGE, "CMD_BOOKMARK_MANAGE", "Manage Bookmarks Window", "P", "None", "Window", "Menu > Bookmarks > Bookmark Manager...", "Manage Bookmarks Window" },
