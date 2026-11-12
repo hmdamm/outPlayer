@@ -133,4 +133,22 @@ target_link_libraries(test_control_bar
 
 add_test(NAME test_control_bar COMMAND test_control_bar)
 
+# ==============================================================================
+# Task 3: test_osd_overlay target
+# ==============================================================================
+qt_add_executable(test_osd_overlay
+    test_osd_overlay.cpp
+)
+
+target_link_libraries(test_osd_overlay
+    PRIVATE
+        outplayer_ui
+        outplayer_core
+        Qt6::Test
+        Qt6::Widgets
+)
+
+add_test(NAME test_osd_overlay COMMAND test_osd_overlay)
+
+
 

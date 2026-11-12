@@ -51,6 +51,8 @@ target_link_libraries(outplayer_input
 qt_add_library(outplayer_ui STATIC
     ui/ControlBar.h
     ui/ControlBar.cpp
+    ui/OsdOverlay.h
+    ui/OsdOverlay.cpp
     ui/TimeFormatter.h
     ui/TimelineSlider.h
     ui/TimelineSlider.cpp
