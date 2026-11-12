@@ -38,6 +38,21 @@ target_link_libraries(test_command_registry
 add_test(NAME test_command_registry COMMAND test_command_registry)
 
 # ==============================================================================
+# Task 2: test_settings_manager target
+# ==============================================================================
+qt_add_executable(test_settings_manager
+    test_settings_manager.cpp
+)
+
+target_link_libraries(test_settings_manager
+    PRIVATE
+        outplayer_core
+        Qt6::Test
+)
+
+add_test(NAME test_settings_manager COMMAND test_settings_manager)
+
+# ==============================================================================
 # Task 3: test_mpv_engine target
 # ==============================================================================
 qt_add_executable(test_mpv_engine
