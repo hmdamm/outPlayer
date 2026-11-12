@@ -446,6 +446,27 @@ target_link_libraries(test_hotkey_parity
 
 add_test(NAME test_hotkey_parity COMMAND test_hotkey_parity)
 
+# ==============================================================================
+# Phase 4 Task 2: test_ui_layout_validation target
+# ==============================================================================
+qt_add_executable(test_ui_layout_validation
+    test_ui_layout_validation.cpp
+)
+
+target_link_libraries(test_ui_layout_validation
+    PRIVATE
+        outplayer_ui
+        outplayer_playlist
+        outplayer_input
+        outplayer_core
+        Qt6::Test
+        Qt6::Widgets
+        Qt6::DBus
+)
+
+add_test(NAME test_ui_layout_validation COMMAND test_ui_layout_validation)
+
+
 
 
 
