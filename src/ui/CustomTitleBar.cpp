@@ -124,6 +124,11 @@ QLabel* CustomTitleBar::titleLabel() const noexcept
     return m_titleLabel;
 }
 
+QLabel* CustomTitleBar::iconLabel() const noexcept
+{
+    return m_iconLabel;
+}
+
 QPushButton* CustomTitleBar::minimizeButton() const noexcept
 {
     return m_minBtn;
@@ -152,6 +157,11 @@ QSize CustomTitleBar::minimumSizeHint() const
 void CustomTitleBar::mousePressEvent(QMouseEvent* event)
 {
     if (event->button() == Qt::LeftButton) {
+        if (m_iconLabel && m_iconLabel->geometry().contains(event->pos())) {
+            emit logoClicked();
+            event->accept();
+            return;
+        }
         if (window()) {
             if (!window()->windowHandle()) {
                 window()->winId();

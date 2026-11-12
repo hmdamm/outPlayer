@@ -28,6 +28,7 @@ public:
     [[nodiscard]] bool isMaximizedState() const noexcept;
 
     [[nodiscard]] QLabel* titleLabel() const noexcept;
+    [[nodiscard]] QLabel* iconLabel() const noexcept;
     [[nodiscard]] QPushButton* minimizeButton() const noexcept;
     [[nodiscard]] QPushButton* maximizeButton() const noexcept;
     [[nodiscard]] QPushButton* closeButton() const noexcept;
@@ -36,6 +37,7 @@ public:
     [[nodiscard]] QSize minimumSizeHint() const override;
 
 signals:
+    void logoClicked();
     void minimizeClicked();
     void maximizeRestoreClicked();
     void closeClicked();
