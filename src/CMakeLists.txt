@@ -96,6 +96,8 @@ qt_add_library(outplayer_ui STATIC
     ui/VideoWidget.cpp
     ui/MainWindow.h
     ui/MainWindow.cpp
+    ui/PreferencesDialog.h
+    ui/PreferencesDialog.cpp
     ui/ThemeManager.h
     ui/ThemeManager.cpp
 )
