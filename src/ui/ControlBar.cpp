@@ -68,6 +68,11 @@ void ControlBar::setupUi()
 
     // Integrated expanding timeline slider
     m_timelineSlider = new TimelineSlider(this);
+    connect(m_timelineSlider, &TimelineSlider::seekRequested, this, [this](double sec) {
+        if (m_engine) {
+            m_engine->seek(sec);
+        }
+    });
     layout->addWidget(m_timelineSlider, 1);
 
     // Mute / Volume trigger button (24x24)
@@ -200,9 +205,6 @@ void ControlBar::setPlaybackEngine(engine::IPlaybackEngine* engine)
 {
     if (m_engine) {
         disconnect(m_engine, nullptr, this, nullptr);
-        if (m_timelineSlider) {
-            disconnect(m_timelineSlider, nullptr, m_engine, nullptr);
-        }
     }
 
     m_engine = engine;
@@ -228,14 +230,6 @@ void ControlBar::setPlaybackEngine(engine::IPlaybackEngine* engine)
             m_timelineSlider->setChapters(m_engine->chapters());
         }
     });
-
-    if (m_timelineSlider) {
-        connect(m_timelineSlider, &TimelineSlider::seekRequested, this, [this](double sec) {
-            if (m_engine) {
-                m_engine->seek(sec);
-            }
-        });
-    }
 
     // Initialize UI from current engine state
     setPlaying(!m_engine->isPaused());
@@ -336,7 +330,7 @@ QSize ControlBar::sizeHint() const
 
 QSize ControlBar::minimumSizeHint() const
 {
-    return QSize(320, 40);
+    return QSize(450, 40);
 }
 
 void ControlBar::onPlayPauseClicked()
