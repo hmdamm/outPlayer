@@ -19,6 +19,7 @@
 
 #include "core/BookmarkManager.h"
 #include "core/CommandRegistry.h"
+#include "core/DeviceStreamManager.h"
 #include "core/SettingsManager.h"
 #include "engine/MpvEngine.h"
 #include "input/InputManager.h"
@@ -28,10 +29,13 @@
 #include "ui/ControlBar.h"
 #include "ui/ControlPanel.h"
 #include "ui/CustomTitleBar.h"
+#include "ui/DesktopIntegration.h"
 #include "ui/MediaOpenController.h"
 #include "ui/OsdOverlay.h"
 #include "ui/PlaylistDock.h"
+#include "ui/PreferencesDialog.h"
 #include "ui/ScreenCaptureController.h"
+#include "ui/ThemeManager.h"
 #include "ui/TimeFormatter.h"
 #include "ui/VideoWidget.h"
 
@@ -44,6 +48,8 @@ MainWindow::MainWindow(QWidget* parent)
     , m_captureController(std::make_unique<ScreenCaptureController>(m_engine.get(), &core::SettingsManager::instance(), this))
     , m_contextMenuManager(std::make_unique<ContextMenuManager>(this))
     , m_mediaOpenController(std::make_unique<MediaOpenController>(m_engine.get(), this))
+    , m_deviceStreamManager(std::make_unique<core::DeviceStreamManager>(this))
+    , m_preferencesDialog(std::make_unique<PreferencesDialog>(&core::SettingsManager::instance(), this))
 {
     m_engine->initialize();
 
@@ -76,6 +82,49 @@ MainWindow::MainWindow(QWidget* parent)
     centralLayout->addWidget(m_playlistDock, 0);
 
     setCentralWidget(m_centralContainer);
+
+    // Desktop integration (MPRIS2, system tray, screensaver inhibition)
+    m_desktopIntegration = std::make_unique<DesktopIntegration>(m_engine.get(), m_playlistModel, this, this);
+    connect(m_desktopIntegration.get(), &DesktopIntegration::playPauseRequested, this, [this]() {
+        if (m_engine) {
+            m_engine->togglePause();
+        }
+    });
+    connect(m_desktopIntegration.get(), &DesktopIntegration::stopRequested, this, &MainWindow::stopPlayback);
+    connect(m_desktopIntegration.get(), &DesktopIntegration::nextRequested, this, &MainWindow::playNext);
+    connect(m_desktopIntegration.get(), &DesktopIntegration::previousRequested, this, &MainWindow::playPrevious);
+    connect(m_desktopIntegration.get(), &DesktopIntegration::raiseWindowRequested, this, [this]() {
+        showNormal();
+        raise();
+        activateWindow();
+    });
+    connect(m_desktopIntegration.get(), &DesktopIntegration::preferencesRequested, this, &MainWindow::showPreferences);
+
+    // Theming & opacity configuration
+    setStyleSheet(ThemeManager::instance().styleSheet());
+    connect(&ThemeManager::instance(), &ThemeManager::themeChanged, this, [this]() {
+        setStyleSheet(ThemeManager::instance().styleSheet());
+    });
+    const int initialOpacity = core::SettingsManager::instance().get(QStringLiteral("General/WindowOpacity"), 100).toInt();
+    if (initialOpacity > 0 && initialOpacity <= 100) {
+        setWindowOpacity(std::clamp(initialOpacity, 10, 100) / 100.0);
+    }
+    connect(m_preferencesDialog.get(), &PreferencesDialog::settingsApplied, this, [this]() {
+        const QString accentStr = core::SettingsManager::instance().get(QStringLiteral("General/AccentColor"), QStringLiteral("Amber")).toString();
+        ThemeManager::AccentColor color = ThemeManager::AccentColor::Amber;
+        if (accentStr.compare(QStringLiteral("Blue"), Qt::CaseInsensitive) == 0) {
+            color = ThemeManager::AccentColor::Blue;
+        } else if (accentStr.compare(QStringLiteral("Green"), Qt::CaseInsensitive) == 0) {
+            color = ThemeManager::AccentColor::Green;
+        } else if (accentStr.compare(QStringLiteral("Crimson"), Qt::CaseInsensitive) == 0) {
+            color = ThemeManager::AccentColor::Crimson;
+        }
+        ThemeManager::instance().setAccentColor(color);
+        setStyleSheet(ThemeManager::instance().styleSheet());
+
+        const int opacity = core::SettingsManager::instance().get(QStringLiteral("General/WindowOpacity"), 100).toInt();
+        setWindowOpacity(std::clamp(opacity, 10, 100) / 100.0);
+    });
 
     // OSD overlay layer atop the video canvas
     m_osdOverlay = new OsdOverlay(m_videoWidget);
@@ -153,6 +202,11 @@ MainWindow::~MainWindow()
     m_inputManager.reset();
     m_captureController.reset();
     m_bookmarkManager.reset();
+
+    // Reset desktop integration, preferences dialog, and device stream manager
+    m_desktopIntegration.reset();
+    m_preferencesDialog.reset();
+    m_deviceStreamManager.reset();
 
     // Explicitly delete video widget and osd overlay before engine is destroyed
     // to guarantee mpv_render_context_free() happens before mpv_terminate_destroy().
@@ -232,6 +286,30 @@ core::BookmarkManager* MainWindow::bookmarkManager() const noexcept
 ScreenCaptureController* MainWindow::screenCaptureController() const noexcept
 {
     return m_captureController.get();
+}
+
+PreferencesDialog* MainWindow::preferencesDialog() const noexcept
+{
+    return m_preferencesDialog.get();
+}
+
+core::DeviceStreamManager* MainWindow::deviceStreamManager() const noexcept
+{
+    return m_deviceStreamManager.get();
+}
+
+DesktopIntegration* MainWindow::desktopIntegration() const noexcept
+{
+    return m_desktopIntegration.get();
+}
+
+void MainWindow::showPreferences()
+{
+    if (m_preferencesDialog) {
+        m_preferencesDialog->show();
+        m_preferencesDialog->raise();
+        m_preferencesDialog->activateWindow();
+    }
 }
 
 bool MainWindow::isChromeVisible() const noexcept
@@ -332,6 +410,7 @@ bool MainWindow::openMedia(const QString& pathOrUrl)
     if (!m_engine) {
         return false;
     }
+    m_userStopped = false;
     if (m_videoWidget) {
         m_videoWidget->ensureInitialized();
     }
@@ -415,6 +494,8 @@ void MainWindow::playPlaylistItem(int row)
         return;
     }
 
+    m_userStopped = false;
+
     m_playlistModel->setCurrentIndex(row);
     const auto optItem = m_playlistModel->currentItem();
     if (!optItem.has_value()) {
@@ -459,6 +540,14 @@ void MainWindow::playPrevious()
     const int prevIdx = m_playlistModel->previousIndex();
     if (prevIdx >= 0) {
         playPlaylistItem(prevIdx);
+    }
+}
+
+void MainWindow::stopPlayback()
+{
+    m_userStopped = true;
+    if (m_engine) {
+        m_engine->stop();
     }
 }
 
@@ -599,12 +688,36 @@ void MainWindow::setupEngineConnections()
     connect(m_engine.get(), &engine::IPlaybackEngine::playbackFinished, this, [this]() {
         m_autohideTimer->stop();
         setChromeVisible(true);
+        if (m_userStopped) {
+            m_userStopped = false;
+            return;
+        }
         playNext();
     });
 
     connect(m_engine.get(), &engine::IPlaybackEngine::fileLoaded, this, [this]() {
         if (!m_engine->isPaused()) {
             m_autohideTimer->start(2500);
+        }
+        if (m_desktopIntegration) {
+            QString title;
+            double dur = m_engine->duration();
+            if (m_playlistModel) {
+                auto cur = m_playlistModel->currentItem();
+                if (cur.has_value()) {
+                    title = cur->title;
+                    if (cur->duration > 0.0) {
+                        dur = cur->duration;
+                    }
+                }
+            }
+            if (title.isEmpty()) {
+                title = QFileInfo(m_currentFile).fileName();
+                if (title.isEmpty()) {
+                    title = m_currentFile;
+                }
+            }
+            m_desktopIntegration->updateMetadata(title, QString(), dur);
         }
     });
 }
@@ -623,11 +736,9 @@ void MainWindow::setupCommandHandlers()
     });
 
     registerCommand(core::CommandId::CMD_PLAY_STOP, [this](const QVariantMap&) {
-        if (m_engine) {
-            m_engine->stop();
-            if (m_osdOverlay) {
-                m_osdOverlay->showMessage(QStringLiteral("Stop"), 1500, OsdPosition::Center);
-            }
+        stopPlayback();
+        if (m_osdOverlay) {
+            m_osdOverlay->showMessage(QStringLiteral("Stop"), 1500, OsdPosition::Center);
         }
     });
 
@@ -1028,6 +1139,37 @@ void MainWindow::setupCommandHandlers()
             showSubtitleSyncOsd();
         }
     });
+
+    // Preferences configuration (F5)
+    registerCommand(core::CommandId::CMD_PREFERENCES, [this](const QVariantMap&) {
+        showPreferences();
+    });
+
+    // DVD playback (Ctrl+D)
+    registerCommand(core::CommandId::CMD_OPEN_DVD, [this](const QVariantMap&) {
+        QString devPath;
+        if (m_deviceStreamManager) {
+            const auto drives = m_deviceStreamManager->availableOpticalDrives();
+            if (!drives.isEmpty()) {
+                devPath = drives.first().path;
+            }
+        }
+        const QString url = core::DeviceStreamManager::formatDvdUrl(devPath);
+        openMedia(url);
+    });
+
+    // Video capture / webcam device playback (Ctrl+J)
+    registerCommand(core::CommandId::CMD_OPEN_DEVICE, [this](const QVariantMap&) {
+        QString devPath;
+        if (m_deviceStreamManager) {
+            const auto devices = m_deviceStreamManager->availableVideoDevices();
+            if (!devices.isEmpty()) {
+                devPath = devices.first().path;
+            }
+        }
+        const QString url = core::DeviceStreamManager::formatV4l2Url(devPath);
+        openMedia(url);
+    });
 }
 
 void MainWindow::setupNavigationConnections()
@@ -1098,6 +1240,7 @@ void MainWindow::setupNavigationConnections()
 
     connect(m_contextMenuManager.get(), &ContextMenuManager::togglePlaylistRequested, this, &MainWindow::togglePlaylist);
     connect(m_contextMenuManager.get(), &ContextMenuManager::toggleControlPanelRequested, this, &MainWindow::toggleControlPanel);
+    connect(m_contextMenuManager.get(), &ContextMenuManager::preferencesRequested, this, &MainWindow::showPreferences);
 }
 
 void MainWindow::registerCommand(core::CommandId id, core::CommandRegistry::Handler handler)

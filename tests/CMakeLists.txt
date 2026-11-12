@@ -404,6 +404,27 @@ target_link_libraries(test_desktop_integration
 
 add_test(NAME test_desktop_integration COMMAND test_desktop_integration)
 
+# ==============================================================================
+# Phase 3D Task 5: test_main_window_integration target
+# ==============================================================================
+qt_add_executable(test_main_window_integration
+    test_main_window_integration.cpp
+)
+
+target_link_libraries(test_main_window_integration
+    PRIVATE
+        outplayer_ui
+        outplayer_playlist
+        outplayer_input
+        outplayer_core
+        Qt6::Test
+        Qt6::Widgets
+        Qt6::DBus
+)
+
+add_test(NAME test_main_window_integration COMMAND test_main_window_integration)
+
+
 
 
 
