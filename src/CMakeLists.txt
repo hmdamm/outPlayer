@@ -49,6 +49,8 @@ target_link_libraries(outplayer_input
 # ==============================================================================
 
 qt_add_library(outplayer_ui STATIC
+    ui/ContextMenuManager.h
+    ui/ContextMenuManager.cpp
     ui/ControlBar.h
     ui/ControlBar.cpp
     ui/CustomTitleBar.h
