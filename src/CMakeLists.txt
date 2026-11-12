@@ -45,6 +45,26 @@ target_link_libraries(outplayer_input
 )
 
 # ==============================================================================
+# outplayer_playlist library
+# ==============================================================================
+
+qt_add_library(outplayer_playlist STATIC
+    playlist/PlaylistItem.h
+    playlist/PlaylistModel.h
+    playlist/PlaylistModel.cpp
+)
+
+target_include_directories(outplayer_playlist
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+target_link_libraries(outplayer_playlist
+    PUBLIC
+        Qt6::Core
+)
+
+# ==============================================================================
 # outplayer_ui library
 # ==============================================================================
 
@@ -79,6 +99,7 @@ target_link_libraries(outplayer_ui
     PUBLIC
         outplayer_core
         outplayer_input
+        outplayer_playlist
         Qt6::Widgets
         Qt6::OpenGLWidgets
         PkgConfig::MPV
@@ -96,6 +117,7 @@ target_link_libraries(outplayer
     PRIVATE
         outplayer_ui
         outplayer_input
+        outplayer_playlist
         Qt6::Widgets
         Qt6::OpenGLWidgets
 )
