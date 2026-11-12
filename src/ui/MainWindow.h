@@ -16,6 +16,7 @@ class QContextMenuEvent;
 
 namespace outplayer::core {
 class BookmarkManager;
+class DeviceStreamManager;
 }
 
 namespace outplayer::engine {
@@ -41,6 +42,8 @@ class ContextMenuManager;
 class MediaOpenController;
 class ControlPanel;
 class ScreenCaptureController;
+class PreferencesDialog;
+class DesktopIntegration;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -68,6 +71,9 @@ public:
     [[nodiscard]] ControlPanel* controlPanel() const noexcept;
     [[nodiscard]] core::BookmarkManager* bookmarkManager() const noexcept;
     [[nodiscard]] ScreenCaptureController* screenCaptureController() const noexcept;
+    [[nodiscard]] PreferencesDialog* preferencesDialog() const noexcept;
+    [[nodiscard]] core::DeviceStreamManager* deviceStreamManager() const noexcept;
+    [[nodiscard]] DesktopIntegration* desktopIntegration() const noexcept;
 
     [[nodiscard]] bool isChromeVisible() const noexcept;
     void setChromeVisible(bool visible);
@@ -85,6 +91,7 @@ public:
     void playPlaylistItem(int row);
     void playNext();
     void playPrevious();
+    void stopPlayback();
 
     // Drag and drop events declared public for unit testing access
     void dragEnterEvent(QDragEnterEvent* event) override;
@@ -92,6 +99,7 @@ public:
 
 public slots:
     void setWindowTitle(const QString& title);
+    void showPreferences();
 
 protected:
     void resizeEvent(QResizeEvent* event) override;
@@ -121,6 +129,9 @@ private:
     std::unique_ptr<ScreenCaptureController> m_captureController;
     std::unique_ptr<ContextMenuManager> m_contextMenuManager;
     std::unique_ptr<MediaOpenController> m_mediaOpenController;
+    std::unique_ptr<PreferencesDialog> m_preferencesDialog;
+    std::unique_ptr<core::DeviceStreamManager> m_deviceStreamManager;
+    std::unique_ptr<DesktopIntegration> m_desktopIntegration;
 
     QString m_currentFile;
 
@@ -131,6 +142,7 @@ private:
 
     QTimer* m_autohideTimer{nullptr};
     bool m_chromeVisible{true};
+    bool m_userStopped{false};
 
     bool m_isResizing{false};
     Qt::Edges m_resizeEdges{};
