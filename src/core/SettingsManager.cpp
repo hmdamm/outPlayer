@@ -40,22 +40,22 @@ void SettingsManager::initDefaults() {
 }
 
 QString SettingsManager::defaultConfigurationPath() {
-    const QString xdgConfig = qEnvironmentVariable("XDG_CONFIG_HOME");
-    if (!xdgConfig.isEmpty()) {
-        return QDir(xdgConfig).filePath(QStringLiteral("outplayer/outplayer.ini"));
+    QString configDir = qEnvironmentVariable("XDG_CONFIG_HOME");
+    if (configDir.isEmpty()) {
+        configDir = QDir::home().filePath(QStringLiteral(".config"));
     }
-
-    const QString appConfig = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-    if (!appConfig.isEmpty()) {
-        return QDir(appConfig).filePath(QStringLiteral("outplayer.ini"));
-    }
-
-    return QDir::home().filePath(QStringLiteral(".config/outplayer/outplayer.ini"));
+    return QDir(configDir).filePath(QStringLiteral("outplayer/outplayer.ini"));
 }
 
 void SettingsManager::ensureInitialized() const {
     if (!m_settings) {
-        const_cast<SettingsManager*>(this)->init();
+        QString configPath = defaultConfigurationPath();
+        QFileInfo fileInfo(configPath);
+        QDir dir = fileInfo.dir();
+        if (!dir.exists()) {
+            dir.mkpath(QStringLiteral("."));
+        }
+        m_settings = std::make_unique<QSettings>(configPath, QSettings::IniFormat);
     }
 }
 
@@ -91,6 +91,9 @@ QVariant SettingsManager::get(const QString& key, const QVariant& defaultValue) 
 
 void SettingsManager::set(const QString& key, const QVariant& value) {
     ensureInitialized();
+    if (m_settings->contains(key) && m_settings->value(key) == value) {
+        return;
+    }
     m_settings->setValue(key, value);
     emit settingChanged(key, value);
 }
