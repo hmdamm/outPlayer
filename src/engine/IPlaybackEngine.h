@@ -41,6 +41,8 @@ public:
     virtual void togglePause() = 0;
     virtual void stop() = 0;
     virtual void seek(double seconds, bool exact = false) = 0;
+    virtual void frameStep() {}
+    virtual void frameBackStep() {}
     [[nodiscard]] virtual double position() const = 0;
     [[nodiscard]] virtual double duration() const = 0;
     [[nodiscard]] virtual bool isPaused() const = 0;

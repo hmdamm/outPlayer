@@ -426,6 +426,24 @@ void MpvEngine::seek(double seconds, bool exact)
     mpv_command_async(m_mpv, 0, cmd);
 }
 
+void MpvEngine::frameStep()
+{
+    if (!m_mpv) {
+        return;
+    }
+    const char* cmd[] = {"frame-step", nullptr};
+    mpv_command_async(m_mpv, 0, cmd);
+}
+
+void MpvEngine::frameBackStep()
+{
+    if (!m_mpv) {
+        return;
+    }
+    const char* cmd[] = {"frame-back-step", nullptr};
+    mpv_command_async(m_mpv, 0, cmd);
+}
+
 double MpvEngine::position() const
 {
     return m_position;

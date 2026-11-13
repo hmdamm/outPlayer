@@ -27,6 +27,8 @@ public:
     void togglePause() override;
     void stop() override;
     void seek(double seconds, bool exact = false) override;
+    void frameStep() override;
+    void frameBackStep() override;
     [[nodiscard]] double position() const override;
     [[nodiscard]] double duration() const override;
     [[nodiscard]] bool isPaused() const override;

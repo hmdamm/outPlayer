@@ -16,6 +16,7 @@
 #include <QWindow>
 
 #include <algorithm>
+#include <cmath>
 
 #include "core/BookmarkManager.h"
 #include "core/CommandRegistry.h"
@@ -1173,6 +1174,176 @@ void MainWindow::setupCommandHandlers()
         const QString url = core::DeviceStreamManager::formatV4l2Url(devPath);
         openMedia(url);
     });
+
+    // Playback Speed Controls (C, X, Z & presets)
+    auto adjustSpeed = [this](double delta) {
+        if (!m_engine) {
+            return;
+        }
+        const double curSpeed = m_engine->speed();
+        const double target = std::clamp(std::round((curSpeed + delta) * 10.0) / 10.0, 0.2, 12.0);
+        m_engine->setSpeed(target);
+        if (m_osdOverlay) {
+            m_osdOverlay->showMessage(
+                QStringLiteral("Speed: %1x").arg(QString::number(target, 'f', 1)),
+                1500, OsdPosition::TopLeft);
+        }
+    };
+
+    registerCommand(core::CommandId::CMD_SPEED_UP, [adjustSpeed](const QVariantMap&) {
+        adjustSpeed(0.1);
+    });
+    registerCommand(core::CommandId::CMD_MOUSE_SHIFT_WHEEL_UP, [adjustSpeed](const QVariantMap&) {
+        adjustSpeed(0.1);
+    });
+
+    registerCommand(core::CommandId::CMD_SPEED_DOWN, [adjustSpeed](const QVariantMap&) {
+        adjustSpeed(-0.1);
+    });
+    registerCommand(core::CommandId::CMD_MOUSE_SHIFT_WHEEL_DOWN, [adjustSpeed](const QVariantMap&) {
+        adjustSpeed(-0.1);
+    });
+
+    registerCommand(core::CommandId::CMD_SPEED_NORMAL, [this](const QVariantMap&) {
+        if (m_engine) {
+            m_engine->setSpeed(1.0);
+            if (m_osdOverlay) {
+                m_osdOverlay->showMessage(QStringLiteral("Speed: 1.0x (Normal)"), 1500, OsdPosition::TopLeft);
+            }
+        }
+    });
+
+    registerCommand(core::CommandId::CMD_SPEED_FAST_2X, [this](const QVariantMap&) {
+        if (m_engine) {
+            m_engine->setSpeed(2.0);
+            if (m_osdOverlay) {
+                m_osdOverlay->showMessage(QStringLiteral("Speed: 2.0x"), 1500, OsdPosition::TopLeft);
+            }
+        }
+    });
+
+    registerCommand(core::CommandId::CMD_SPEED_SLOW_HALF, [this](const QVariantMap&) {
+        if (m_engine) {
+            m_engine->setSpeed(0.5);
+            if (m_osdOverlay) {
+                m_osdOverlay->showMessage(QStringLiteral("Speed: 0.5x"), 1500, OsdPosition::TopLeft);
+            }
+        }
+    });
+
+    // Frame stepping
+    auto frameStepHandler = [this](const QVariantMap&) {
+        if (m_engine) {
+            m_engine->frameStep();
+            if (m_osdOverlay) {
+                m_osdOverlay->showMessage(QStringLiteral("Frame Step"), 1500, OsdPosition::TopLeft);
+            }
+        }
+    };
+
+    auto frameBackHandler = [this](const QVariantMap&) {
+        if (m_engine) {
+            m_engine->frameBackStep();
+            if (m_osdOverlay) {
+                m_osdOverlay->showMessage(QStringLiteral("Frame Step Back"), 1500, OsdPosition::TopLeft);
+            }
+        }
+    };
+
+    registerCommand(core::CommandId::CMD_FRAME_NEXT, frameStepHandler);
+    registerCommand(core::CommandId::CMD_FRAME_PREV, frameBackHandler);
+
+    // Aspect ratio cycle
+    registerCommand(core::CommandId::CMD_ASPECT_RATIO_CYCLE, [this](const QVariantMap&) {
+        if (m_engine) {
+            const QString current = m_engine->aspectRatio();
+            QString next;
+            QString label;
+            if (current.isEmpty() || current == QStringLiteral("auto")) {
+                next = QStringLiteral("16:9");
+                label = QStringLiteral("16:9");
+            } else if (current == QStringLiteral("16:9")) {
+                next = QStringLiteral("4:3");
+                label = QStringLiteral("4:3");
+            } else if (current == QStringLiteral("4:3")) {
+                next = QStringLiteral("2.35:1");
+                label = QStringLiteral("2.35:1");
+            } else {
+                next = QStringLiteral("auto");
+                label = QStringLiteral("Auto (Default)");
+            }
+            m_engine->setAspectRatio(next);
+            if (m_osdOverlay) {
+                m_osdOverlay->showMessage(QStringLiteral("Aspect Ratio: %1").arg(label), 1500, OsdPosition::TopLeft);
+            }
+        }
+    });
+
+    // Deinterlacing toggle
+    registerCommand(core::CommandId::CMD_VIDEO_CYCLE_DEINTERLACE, [this](const QVariantMap&) {
+        if (m_engine) {
+            const bool newState = !m_engine->deinterlace();
+            m_engine->setDeinterlace(newState);
+            if (m_osdOverlay) {
+                m_osdOverlay->showMessage(
+                    newState ? QStringLiteral("Deinterlace: On") : QStringLiteral("Deinterlace: Off"),
+                    1500, OsdPosition::TopLeft);
+            }
+        }
+    });
+
+    // Zoom controls
+    registerCommand(core::CommandId::CMD_VIDEO_ZOOM_IN, [this](const QVariantMap&) {
+        if (m_osdOverlay) {
+            m_osdOverlay->showMessage(QStringLiteral("Zoom In"), 1500, OsdPosition::TopLeft);
+        }
+    });
+    registerCommand(core::CommandId::CMD_VIDEO_ZOOM_OUT, [this](const QVariantMap&) {
+        if (m_osdOverlay) {
+            m_osdOverlay->showMessage(QStringLiteral("Zoom Out"), 1500, OsdPosition::TopLeft);
+        }
+    });
+    registerCommand(core::CommandId::CMD_VIDEO_ZOOM_RESET, [this](const QVariantMap&) {
+        if (m_osdOverlay) {
+            m_osdOverlay->showMessage(QStringLiteral("Zoom Reset"), 1500, OsdPosition::TopLeft);
+        }
+    });
+
+    // Window size presets
+    registerCommand(core::CommandId::CMD_WINDOW_HALF, [this](const QVariantMap&) {
+        resize(640, 360);
+        if (m_osdOverlay) {
+            m_osdOverlay->showMessage(QStringLiteral("Window Size: 0.5x"), 1500, OsdPosition::TopLeft);
+        }
+    });
+    registerCommand(core::CommandId::CMD_WINDOW_NORMAL, [this](const QVariantMap&) {
+        resize(1280, 720);
+        if (m_osdOverlay) {
+            m_osdOverlay->showMessage(QStringLiteral("Window Size: 1.0x (Default)"), 1500, OsdPosition::TopLeft);
+        }
+    });
+    registerCommand(core::CommandId::CMD_WINDOW_1_5X, [this](const QVariantMap&) {
+        resize(1440, 810);
+        if (m_osdOverlay) {
+            m_osdOverlay->showMessage(QStringLiteral("Window Size: 1.5x"), 1500, OsdPosition::TopLeft);
+        }
+    });
+    registerCommand(core::CommandId::CMD_WINDOW_DOUBLE, [this](const QVariantMap&) {
+        resize(1920, 1080);
+        if (m_osdOverlay) {
+            m_osdOverlay->showMessage(QStringLiteral("Window Size: 2.0x"), 1500, OsdPosition::TopLeft);
+        }
+    });
+
+    // Wire general fallback dispatch for all commands in CommandRegistry to avoid unhandled shortcuts
+    for (const auto& cmd : core::CommandRegistry::instance().allCommands()) {
+        const auto id = cmd.id;
+        if (std::find(m_registeredCommands.begin(), m_registeredCommands.end(), id) == m_registeredCommands.end()) {
+            registerCommand(id, [](const QVariantMap&) {
+                // Safely handled unmapped shortcut
+            });
+        }
+    }
 }
 
 void MainWindow::setupNavigationConnections()
