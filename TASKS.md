@@ -15,7 +15,7 @@ This document tracks the roadmap, phase progression, and verification evidence f
 | **Phase 4** | Parity Hardening & Verification | Complete | Automated hotkey parity suite passing, offscreen xvfb visual match, and zero ASan/UBSan issues. |
 | **Phase 5** | Packaging & Distribution | Complete | Flatpak, RPM, DEB, Arch PKGBUILD, and AppImage packages verified in automated tests. |
 
-**Overall Project Status:** **100% COMPLETE** (All 6 Phases Cleared, 29/29 CTest Targets Passing, Multi-Distribution Packaging Certified)
+**Overall Project Status:** **100% COMPLETE** (All 6 Phases Cleared, 33/33 CTest Targets Passing, Hotkeys/Subtitles/Control Bar Redesign Certified, Multi-Distribution Packaging Certified)
 
 ---
 
@@ -457,3 +457,78 @@ With the clearance of the Phase 5 Gate, the **outPlayer** project has fulfilled 
 - **Phase 5:** Complete (Packaging and distribution: Flatpak, DEB, RPM, PKGBUILD, AppImage, FreeDesktop desktop/appstream assets, comprehensive documentation, and ADR 011).
 
 **Project Status: 100% COMPLETE.**
+
+---
+
+## Post-Phase 5 Milestone: Hotkeys, Subtitles & Control Bar Redesign
+
+**Gate Requirement:** Full functional parity for playback speed shortcuts (`C`/`X`/`Z`), automatic subtitle detection and drag-and-drop loading, comprehensive custom subtitle styling engine, authentic 2-tier control bar layout, 33/33 CTest targets passing, and ADR 012 recorded.  
+**Milestone Status:** **CLEARED / COMPLETE** (ADR 012)
+
+| Task ID | Description | Status | Assignee / Role | Target Deliverables | Verification Evidence |
+|---|---|---|---|---|---|
+| **M1-T1** | Playback Speed Routing & Expanded Command Handlers | Done | Implementer | `src/ui/MainWindow.h`, `src/ui/MainWindow.cpp`, `tests/test_main_window_hotkeys.cpp`, `tests/CMakeLists.txt` | `ctest -R test_main_window_hotkeys` PASS (`C`, `X`, `Z` adjust speed ±0.1x / 1.0x, OSD notifications, presets, frame step), commit `35d1df2` |
+| **M1-T2** | Subtitle Detection, Drag-Drop & Visibility Engine | Done | Implementer | `src/engine/IPlaybackEngine.h`, `src/engine/MpvEngine.h`, `src/engine/MpvEngine.cpp`, `src/ui/MediaOpenController.h`, `src/ui/MediaOpenController.cpp`, `src/ui/MainWindow.h`, `src/ui/MainWindow.cpp`, `tests/test_subtitle_pipeline.cpp`, `tests/CMakeLists.txt` | `ctest -R test_subtitle_pipeline` PASS (`sub-auto=fuzzy`, `sub-visibility=yes`, drag-and-drop `.srt`/`.ass`, `Alt+H` toggle), commit `230f4f6` |
+| **M1-T3** | Subtitle Font, Size, Color & Appearance Customization | Done | Implementer | `src/engine/IPlaybackEngine.h`, `src/engine/MpvEngine.h`, `src/engine/MpvEngine.cpp`, `src/ui/PreferencesDialog.h`, `src/ui/PreferencesDialog.cpp`, `src/ui/ControlPanel.h`, `src/ui/ControlPanel.cpp`, `tests/test_subtitle_font_customization.cpp`, `tests/CMakeLists.txt` | `ctest -R test_subtitle_font_customization` PASS (font family, size, bold/italic, color, border, shadow, SettingsManager sync, F5/F7 UI controls), commit `07a71a0` |
+| **M1-T4** | 2-Tier Control Bar Redesign (Seek/Volume Top, Transport/Badges Bottom) | Done | Implementer | `src/ui/ControlBar.h`, `src/ui/ControlBar.cpp`, `src/ui/MainWindow.h`, `src/ui/MainWindow.cpp`, `tests/test_control_bar_layout.cpp`, `tests/CMakeLists.txt` | `ctest -R test_control_bar_layout` PASS (56px 2-tier layout, top-row seek+volume, bottom-row transport+badges+tools, open file / settings signals), commit `a713c0c` |
+| **M1-T5** | Parity & Regression Hardening, ADR 012 & Full Verification | Done | Implementer | `tests/test_ui_layout_validation.cpp`, `docs/decisions.md` (ADR 012), `TASKS.md` | 33/33 CTest suites passing, all 5 packaging verification suites passing, clean-room audit passing, synthetic video playback certified |
+
+### Milestone Verification Evidence
+
+- **Full Automated CTest Suite (`QT_QPA_PLATFORM=xcb xvfb-run -a ctest --test-dir build --output-on-failure`):**
+  - `test_dummy`: PASSED (0.01s)
+  - `test_command_registry`: PASSED (0.25s)
+  - `test_settings_manager`: PASSED (0.27s)
+  - `test_mpv_engine`: PASSED (0.58s)
+  - `test_mpv_engine_av`: PASSED (0.81s)
+  - `test_video_widget`: PASSED (0.59s)
+  - `test_input_manager`: PASSED (0.28s)
+  - `test_timeline_slider`: PASSED (0.27s)
+  - `test_control_bar`: PASSED (0.27s)
+  - `test_osd_overlay`: PASSED (0.44s)
+  - `test_main_window_ui`: PASSED (7.20s)
+  - `test_context_menu`: PASSED (0.31s)
+  - `test_media_open_dialogs`: PASSED (0.37s)
+  - `test_playlist_model`: PASSED (0.19s)
+  - `test_playlist_dock`: PASSED (0.35s)
+  - `test_main_window_navigation`: PASSED (2.01s)
+  - `test_bookmark_manager`: PASSED (0.35s)
+  - `test_screen_capture`: PASSED (0.48s)
+  - `test_control_panel`: PASSED (0.38s)
+  - `test_main_window_av`: PASSED (5.02s)
+  - `test_theme_manager`: PASSED (0.32s)
+  - `test_preferences_dialog`: PASSED (0.65s)
+  - `test_device_stream_manager`: PASSED (0.39s)
+  - `test_desktop_integration`: PASSED (0.44s)
+  - `test_main_window_integration`: PASSED (2.59s)
+  - `test_hotkey_parity`: PASSED (0.35s)
+  - `test_ui_layout_validation`: PASSED (0.81s)
+  - `test_format_matrix`: PASSED (3.94s)
+  - `test_benchmarks`: PASSED (1.36s)
+  - `test_main_window_hotkeys`: PASSED (2.10s)
+  - `test_subtitle_pipeline`: PASSED (3.33s)
+  - `test_subtitle_font_customization`: PASSED (0.64s)
+  - `test_control_bar_layout`: PASSED (0.33s)
+  - Result: 33/33 tests passed (100%), 0 failures (Total test time = 38.46s).
+
+- **Multi-Distribution Packaging Verification Suites:**
+  - `python3 tests/test_packaging_assets.py`: PASSED (`desktop-file-validate`, `appstreamcli validate`, icons, install rules).
+  - `python3 tests/test_flatpak_manifest.py`: PASSED (JSON schema, finish-args, modules, flatpak-builder inspection).
+  - `python3 tests/test_debian_packaging.py`: PASSED (Debian control syntax, rules, format, changelog, DEP-5 copyright, `.deb` package verification).
+  - `python3 tests/test_rpm_arch_packaging.py`: PASSED (RPM spec query via `rpmspec`, `.rpm` binary build, PKGBUILD syntax).
+  - `python3 tests/test_appimage_packaging.py`: PASSED (AppRun bash syntax, AppDir build, standalone execution test under xvfb).
+
+- **End-to-End Synthetic Media Playback (`xvfb-run -a ./build/src/outplayer --test-run lavfi://nullsrc=s=640x360:d=1`):**
+  - Exit code: `0`
+  - Render Surface: `QOpenGLWidget` + `mpv_render_context` using OpenGL FBO (`rgba16f`, Mesa llvmpipe desktop OpenGL 4.6).
+  - Subtitle pipeline initialized with properties (`sub-visibility=yes`, `sub-font=sans-serif`, `sub-font-size=24`, `sub-color=#ffffffff`, etc.).
+  - Demuxed `lavfi` source (640x360 @ 25fps), presented frames through `mpv_render_context_render()`, reached container EOF, and exited cleanly.
+
+- **Specification & Scaffold Verification Suites:**
+  - `python3 tests/test_phase1_specs.py`: PASSED (all Phase 1 spec assertions satisfied, 0 clean-room branding violations).
+  - `python3 tests/test_project_scaffold.py`: PASSED (scaffolding and governance verified).
+
+- **Clean-Room & Legal Neutrality Audit:**
+  - Zero occurrences of forbidden proprietary trademarks across implementation code, packaging metadata, and assets.
+  - ADR 012 formally recorded in `docs/decisions.md`.
+

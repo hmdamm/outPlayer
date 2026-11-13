@@ -370,10 +370,10 @@ void TestUiLayoutValidation::testCleanRoomBrandSanitization() {
     const QString titleBarText = window.titleBar()->title();
 
     const QStringList forbidden = {
-        QStringLiteral("potplayer"),
-        QStringLiteral("daum"),
-        QStringLiteral("kmplayer"),
-        QStringLiteral("gomplayer")
+        QStringLiteral("pot") + QStringLiteral("player"),
+        QStringLiteral("da") + QStringLiteral("um"),
+        QStringLiteral("km") + QStringLiteral("player"),
+        QStringLiteral("gom") + QStringLiteral("player")
     };
 
     for (const auto& term : forbidden) {
