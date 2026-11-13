@@ -139,3 +139,8 @@ target_link_libraries(outplayer
         Qt6::Widgets
         Qt6::OpenGLWidgets
 )
+
+install(TARGETS outplayer
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    BUNDLE DESTINATION ${CMAKE_INSTALL_BINDIR}
+)

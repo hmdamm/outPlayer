@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>org.outplayer.outPlayer</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <name>outPlayer</name>
+  <summary>High-performance media player powered by Qt 6 and libmpv</summary>
+  
+  <description>
+    <p>
+      outPlayer is a modern, high-performance Linux desktop media player engineered for smooth,
+      hardware-accelerated playback and exhaustive keyboard control. Built natively with Qt 6
+      and libmpv, it provides an uncompromising multimedia experience across all major video,
+      audio, container, and streaming protocols.
+    </p>
+    <p>Key highlights include:</p>
+    <ul>
+      <li>Hardware-accelerated decoding via VA-API, NVDEC, and Vulkan Video.</li>
+      <li>Exhaustive hotkey parity with 253 configurable actions and mouse gesture controls.</li>
+      <li>Sub-second seeking, frame-by-frame stepping, and A-B looping.</li>
+      <li>Advanced subtitle engine supporting styled ASS/SSA, SRT, WebVTT, SAMI, and PGS overlays.</li>
+      <li>Native audio passthrough bitstreaming for AC-3, E-AC-3, TrueHD, and DTS-HD audio.</li>
+      <li>Rich playlist management handling tens of thousands of items with instant filtering and search.</li>
+      <li>Comprehensive network stream playback covering HTTP/HTTPS, HLS, DASH, RTSP, and RTMP.</li>
+      <li>Modern dark UI with frameless window design, customizable controls, and minimal OSD overlays.</li>
+    </ul>
+  </description>
+
+  <launchable type="desktop-id">org.outplayer.outPlayer.desktop</launchable>
+
+  <url type="homepage">https://github.com/outplayer/outplayer</url>
+  <url type="bugtracker">https://github.com/outplayer/outplayer/issues</url>
+
+  <provides>
+    <binary>outplayer</binary>
+  </provides>
+
+  <screenshots>
+    <screenshot type="default">
+      <caption>outPlayer media playback and playlist dock</caption>
+      <image>https://raw.githubusercontent.com/outplayer/outplayer/main/docs/screenshots/main_window.png</image>
+    </screenshot>
+  </screenshots>
+
+  <categories>
+    <category>AudioVideo</category>
+    <category>Player</category>
+    <category>Recorder</category>
+    <category>TV</category>
+  </categories>
+
+  <content_rating type="oars-1.1"/>
+
+  <developer id="org.outplayer">
+    <name>outPlayer Development Team</name>
+  </developer>
+
+  <releases>
+    <release version="0.1.0" date="2026-11-13">
+      <description>
+        <p>
+          Initial public release featuring comprehensive media playback parity,
+          253 hotkey mappings, frame-accurate seeking, and multi-format demuxing.
+        </p>
+      </description>
+    </release>
+  </releases>
+</component>

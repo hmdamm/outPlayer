@@ -31,5 +31,30 @@ pkg_check_modules(MPV REQUIRED IMPORTED_TARGET mpv)
 
 enable_testing()
 
+include(GNUInstallDirs)
+
 add_subdirectory(src)
 add_subdirectory(tests)
+
+# ==============================================================================
+# Desktop Integration Assets Installation
+# ==============================================================================
+
+install(FILES data/org.outplayer.outPlayer.desktop
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/applications
+)
+
+install(FILES data/org.outplayer.outPlayer.metainfo.xml
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo
+)
+
+install(FILES data/icons/hicolor/scalable/apps/org.outplayer.outPlayer.svg
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps
+)
+
+foreach(SIZE 16 32 48 64 128 256 512)
+    install(FILES data/icons/hicolor/${SIZE}x${SIZE}/apps/org.outplayer.outPlayer.png
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/${SIZE}x${SIZE}/apps
+    )
+endforeach()
+

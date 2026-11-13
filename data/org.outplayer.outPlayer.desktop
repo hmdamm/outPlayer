@@ -1,0 +1,30 @@
+[Desktop Entry]
+Type=Application
+Name=outPlayer
+GenericName=Media Player
+Comment=High-performance modern media player
+Exec=outplayer %U
+Icon=org.outplayer.outPlayer
+Terminal=false
+StartupNotify=true
+StartupWMClass=outplayer
+Categories=AudioVideo;Audio;Video;Player;Recorder;TV;Qt;
+Keywords=Video;Audio;Player;Media;Subtitle;Stream;Broadcast;
+MimeType=application/dash+xml;application/ogg;application/vnd.apple.mpegurl;application/vnd.rn-realmedia;application/x-extension-m4a;application/x-flac;application/x-matroska;application/x-mpegurl;application/x-ogg;application/x-scpls;audio/aac;audio/ac3;audio/eac3;audio/flac;audio/mp4;audio/mpeg;audio/ogg;audio/opus;audio/vnd.dts;audio/vnd.dts.hd;audio/wav;audio/webm;audio/x-alac;audio/x-ape;audio/x-m4a;audio/x-matroska;audio/x-mp3;audio/x-mpegurl;audio/x-ms-wma;audio/x-scpls;audio/x-vorbis+ogg;audio/x-wav;audio/x-wavpack;video/3gpp;video/3gpp2;video/avi;video/divx;video/mp2t;video/mp4;video/mpeg;video/msvideo;video/ogg;video/quicktime;video/webm;video/x-flv;video/x-m4v;video/x-matroska;video/x-ms-asf;video/x-ms-wmv;video/x-msvideo;video/x-theora;x-scheme-handler/http;x-scheme-handler/https;x-scheme-handler/mms;x-scheme-handler/rtmp;x-scheme-handler/rtmps;x-scheme-handler/rtsp;
+Actions=PlayPause;Stop;Next;Previous;
+
+[Desktop Action PlayPause]
+Name=Play/Pause
+Exec=outplayer --play-pause
+
+[Desktop Action Stop]
+Name=Stop
+Exec=outplayer --stop
+
+[Desktop Action Next]
+Name=Next Track
+Exec=outplayer --next
+
+[Desktop Action Previous]
+Name=Previous Track
+Exec=outplayer --prev
