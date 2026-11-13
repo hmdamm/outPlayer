@@ -6,6 +6,7 @@
 #include <QPushButton>
 #include <QSignalBlocker>
 #include <QSlider>
+#include <QVBoxLayout>
 #include <algorithm>
 #include <cmath>
 
@@ -20,7 +21,7 @@ namespace outplayer::ui {
 ControlBar::ControlBar(QWidget* parent)
     : QWidget(parent)
 {
-    setFixedHeight(40);
+    setFixedHeight(56);
     setAttribute(Qt::WA_StyledBackground, true);
     setupUi();
     applyStyle();
@@ -28,43 +29,15 @@ ControlBar::ControlBar(QWidget* parent)
 
 void ControlBar::setupUi()
 {
-    auto* layout = new QHBoxLayout(this);
-    layout->setContentsMargins(8, 0, 8, 0);
-    layout->setSpacing(6);
-    layout->setAlignment(Qt::AlignVCenter);
+    auto* mainLayout = new QVBoxLayout(this);
+    mainLayout->setContentsMargins(8, 2, 8, 4);
+    mainLayout->setSpacing(2);
 
-    // Play/Pause button (28x28 prominent)
-    m_playPauseBtn = new QPushButton(QStringLiteral("▶"), this);
-    m_playPauseBtn->setFixedSize(28, 28);
-    m_playPauseBtn->setToolTip(QStringLiteral("Play (Space)"));
-    connect(m_playPauseBtn, &QPushButton::clicked, this, &ControlBar::onPlayPauseClicked);
-    layout->addWidget(m_playPauseBtn);
-
-    // Stop button (24x24)
-    m_stopBtn = new QPushButton(QStringLiteral("■"), this);
-    m_stopBtn->setFixedSize(24, 24);
-    m_stopBtn->setToolTip(QStringLiteral("Stop (Ctrl+Space)"));
-    connect(m_stopBtn, &QPushButton::clicked, this, &ControlBar::onStopClicked);
-    layout->addWidget(m_stopBtn);
-
-    // Previous track / chapter button (24x24)
-    m_prevBtn = new QPushButton(QStringLiteral("|◀"), this);
-    m_prevBtn->setFixedSize(24, 24);
-    m_prevBtn->setToolTip(QStringLiteral("Previous (PageUp)"));
-    connect(m_prevBtn, &QPushButton::clicked, this, &ControlBar::onPrevClicked);
-    layout->addWidget(m_prevBtn);
-
-    // Next track / chapter button (24x24)
-    m_nextBtn = new QPushButton(QStringLiteral("▶|"), this);
-    m_nextBtn->setFixedSize(24, 24);
-    m_nextBtn->setToolTip(QStringLiteral("Next (PageDown)"));
-    connect(m_nextBtn, &QPushButton::clicked, this, &ControlBar::onNextClicked);
-    layout->addWidget(m_nextBtn);
-
-    // Elapsed / Total duration label
-    m_timeLabel = new QLabel(QStringLiteral("00:00 / 00:00"), this);
-    m_timeLabel->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
-    layout->addWidget(m_timeLabel);
+    // --- Top Tier: Timeline Slider + Mute + Volume (~18px) ---
+    auto* topLayout = new QHBoxLayout();
+    topLayout->setContentsMargins(0, 0, 0, 0);
+    topLayout->setSpacing(6);
+    topLayout->setAlignment(Qt::AlignVCenter);
 
     // Integrated expanding timeline slider
     m_timelineSlider = new TimelineSlider(this);
@@ -73,44 +46,145 @@ void ControlBar::setupUi()
             m_engine->seek(sec);
         }
     });
-    layout->addWidget(m_timelineSlider, 1);
+    topLayout->addWidget(m_timelineSlider, 1);
 
-    // Mute / Volume trigger button (24x24)
+    // Mute button (20x20)
     m_muteBtn = new QPushButton(QStringLiteral("VOL"), this);
-    m_muteBtn->setFixedSize(24, 24);
+    m_muteBtn->setFixedSize(20, 20);
     m_muteBtn->setToolTip(QStringLiteral("Mute / Unmute (M)"));
     connect(m_muteBtn, &QPushButton::clicked, this, &ControlBar::onMuteClicked);
-    layout->addWidget(m_muteBtn);
+    topLayout->addWidget(m_muteBtn);
 
     // Volume slider (70px width, 0 to 100)
     m_volumeSlider = new QSlider(Qt::Horizontal, this);
     m_volumeSlider->setRange(0, 100);
     m_volumeSlider->setValue(100);
     m_volumeSlider->setFixedWidth(70);
+    m_volumeSlider->setFixedHeight(16);
     m_volumeSlider->setToolTip(QStringLiteral("Volume"));
     connect(m_volumeSlider, &QSlider::valueChanged, this, &ControlBar::onVolumeSliderValueChanged);
-    layout->addWidget(m_volumeSlider);
+    topLayout->addWidget(m_volumeSlider);
+
+    mainLayout->addLayout(topLayout);
+
+    // --- Bottom Tier: Play/Pause, Stop, Prev, Next, Open, Time, Badges, Right Utilities (~38px) ---
+    auto* bottomLayout = new QHBoxLayout();
+    bottomLayout->setContentsMargins(0, 0, 0, 0);
+    bottomLayout->setSpacing(4);
+    bottomLayout->setAlignment(Qt::AlignVCenter);
+
+    // Play/Pause button (28x28)
+    m_playPauseBtn = new QPushButton(QStringLiteral("▶"), this);
+    m_playPauseBtn->setFixedSize(28, 28);
+    m_playPauseBtn->setToolTip(QStringLiteral("Play (Space)"));
+    connect(m_playPauseBtn, &QPushButton::clicked, this, &ControlBar::onPlayPauseClicked);
+    bottomLayout->addWidget(m_playPauseBtn);
+
+    // Stop button (24x24)
+    m_stopBtn = new QPushButton(QStringLiteral("■"), this);
+    m_stopBtn->setFixedSize(24, 24);
+    m_stopBtn->setToolTip(QStringLiteral("Stop (Ctrl+Space)"));
+    connect(m_stopBtn, &QPushButton::clicked, this, &ControlBar::onStopClicked);
+    bottomLayout->addWidget(m_stopBtn);
+
+    // Previous track / chapter button (24x24)
+    m_prevBtn = new QPushButton(QStringLiteral("|◀"), this);
+    m_prevBtn->setFixedSize(24, 24);
+    m_prevBtn->setToolTip(QStringLiteral("Previous (PageUp)"));
+    connect(m_prevBtn, &QPushButton::clicked, this, &ControlBar::onPrevClicked);
+    bottomLayout->addWidget(m_prevBtn);
+
+    // Next track / chapter button (24x24)
+    m_nextBtn = new QPushButton(QStringLiteral("▶|"), this);
+    m_nextBtn->setFixedSize(24, 24);
+    m_nextBtn->setToolTip(QStringLiteral("Next (PageDown)"));
+    connect(m_nextBtn, &QPushButton::clicked, this, &ControlBar::onNextClicked);
+    bottomLayout->addWidget(m_nextBtn);
+
+    // Open File button (24x24, ⏏)
+    m_openFileBtn = new QPushButton(QStringLiteral("⏏"), this);
+    m_openFileBtn->setFixedSize(24, 24);
+    m_openFileBtn->setToolTip(QStringLiteral("Open File... (Ctrl+O)"));
+    connect(m_openFileBtn, &QPushButton::clicked, this, &ControlBar::onOpenFileClicked);
+    bottomLayout->addWidget(m_openFileBtn);
+
+    // Elapsed / Total duration label
+    m_timeLabel = new QLabel(QStringLiteral("00:00:00 / 00:00:00"), this);
+    m_timeLabel->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+    bottomLayout->addWidget(m_timeLabel);
+
+    // H/W badge
+    m_hwBadge = new QLabel(QStringLiteral("H/W"), this);
+    m_hwBadge->setObjectName(QStringLiteral("hwBadge"));
+    m_hwBadge->setStyleSheet(QStringLiteral(
+        "color: #ffaa00; background-color: #332800; border: 1px solid #665200; "
+        "border-radius: 2px; padding: 1px 4px; font-size: 9px; font-weight: bold;"
+    ));
+    m_hwBadge->setVisible(false);
+    bottomLayout->addWidget(m_hwBadge);
+
+    // Video codec badge
+    m_videoCodecBadge = new QLabel(this);
+    m_videoCodecBadge->setObjectName(QStringLiteral("videoCodecBadge"));
+    m_videoCodecBadge->setStyleSheet(QStringLiteral(
+        "color: #cccccc; background-color: #1a1a1a; border: 1px solid #333333; "
+        "border-radius: 2px; padding: 1px 4px; font-size: 9px; font-weight: bold;"
+    ));
+    m_videoCodecBadge->setVisible(false);
+    bottomLayout->addWidget(m_videoCodecBadge);
+
+    // Audio codec badge
+    m_audioCodecBadge = new QLabel(this);
+    m_audioCodecBadge->setObjectName(QStringLiteral("audioCodecBadge"));
+    m_audioCodecBadge->setStyleSheet(QStringLiteral(
+        "color: #cccccc; background-color: #1a1a1a; border: 1px solid #333333; "
+        "border-radius: 2px; padding: 1px 4px; font-size: 9px; font-weight: bold;"
+    ));
+    m_audioCodecBadge->setVisible(false);
+    bottomLayout->addWidget(m_audioCodecBadge);
+
+    // Audio channels badge
+    m_audioChannelsBadge = new QLabel(this);
+    m_audioChannelsBadge->setObjectName(QStringLiteral("audioChannelsBadge"));
+    m_audioChannelsBadge->setStyleSheet(QStringLiteral(
+        "color: #cccccc; background-color: #1a1a1a; border: 1px solid #333333; "
+        "border-radius: 2px; padding: 1px 4px; font-size: 9px; font-weight: bold;"
+    ));
+    m_audioChannelsBadge->setVisible(false);
+    bottomLayout->addWidget(m_audioChannelsBadge);
+
+    // Stretch between stream badges and right utility buttons
+    bottomLayout->addStretch(1);
 
     // Subtitle toggle button (24x24)
     m_subBtn = new QPushButton(QStringLiteral("SUB"), this);
     m_subBtn->setFixedSize(24, 24);
     m_subBtn->setToolTip(QStringLiteral("Subtitles (Alt+H)"));
     connect(m_subBtn, &QPushButton::clicked, this, &ControlBar::onSubtitleClicked);
-    layout->addWidget(m_subBtn);
-
-    // Playlist toggle button (24x24)
-    m_playlistBtn = new QPushButton(QStringLiteral("PL"), this);
-    m_playlistBtn->setFixedSize(24, 24);
-    m_playlistBtn->setToolTip(QStringLiteral("Playlist (F6)"));
-    connect(m_playlistBtn, &QPushButton::clicked, this, &ControlBar::onPlaylistClicked);
-    layout->addWidget(m_playlistBtn);
+    bottomLayout->addWidget(m_subBtn);
 
     // Control panel toggle button (24x24)
     m_controlPanelBtn = new QPushButton(QStringLiteral("CP"), this);
     m_controlPanelBtn->setFixedSize(24, 24);
     m_controlPanelBtn->setToolTip(QStringLiteral("Control Panel (F7)"));
     connect(m_controlPanelBtn, &QPushButton::clicked, this, &ControlBar::onControlPanelClicked);
-    layout->addWidget(m_controlPanelBtn);
+    bottomLayout->addWidget(m_controlPanelBtn);
+
+    // Settings button (24x24)
+    m_settingsBtn = new QPushButton(QStringLiteral("⚙"), this);
+    m_settingsBtn->setFixedSize(24, 24);
+    m_settingsBtn->setToolTip(QStringLiteral("Preferences (F5)"));
+    connect(m_settingsBtn, &QPushButton::clicked, this, &ControlBar::onSettingsClicked);
+    bottomLayout->addWidget(m_settingsBtn);
+
+    // Playlist toggle button (24x24)
+    m_playlistBtn = new QPushButton(QStringLiteral("☰"), this);
+    m_playlistBtn->setFixedSize(24, 24);
+    m_playlistBtn->setToolTip(QStringLiteral("Playlist (F6)"));
+    connect(m_playlistBtn, &QPushButton::clicked, this, &ControlBar::onPlaylistClicked);
+    bottomLayout->addWidget(m_playlistBtn);
+
+    mainLayout->addLayout(bottomLayout);
 }
 
 void ControlBar::applyStyle()
@@ -148,7 +222,7 @@ void ControlBar::applyStyle()
         "    border-radius: 2px;"
         "}"
         "QSlider::sub-page:horizontal {"
-        "    background: #e09b1f;"
+        "    background: #ffaa00;"
         "    border-radius: 2px;"
         "}"
         "QSlider::handle:horizontal {"
@@ -198,6 +272,30 @@ void ControlBar::setMuted(bool isMuted)
         m_muteBtn->setText(isMuted ? QStringLiteral("MUT") : QStringLiteral("VOL"));
         m_muteBtn->setToolTip(isMuted ? QStringLiteral("Unmute (M)") : QStringLiteral("Mute (M)"));
         m_muteBtn->setStyleSheet(isMuted ? QStringLiteral("color: #ffaa00;") : QString());
+    }
+}
+
+void ControlBar::setVideoInfo(bool hwDec, const QString& videoCodec, const QString& audioCodec, const QString& channels)
+{
+    m_isHwDecoding = hwDec;
+    m_videoCodec = videoCodec;
+    m_audioCodec = audioCodec;
+    m_audioChannels = channels;
+
+    if (m_hwBadge) {
+        m_hwBadge->setVisible(hwDec);
+    }
+    if (m_videoCodecBadge) {
+        m_videoCodecBadge->setText(videoCodec.toUpper());
+        m_videoCodecBadge->setVisible(!videoCodec.trimmed().isEmpty());
+    }
+    if (m_audioCodecBadge) {
+        m_audioCodecBadge->setText(audioCodec.toUpper());
+        m_audioCodecBadge->setVisible(!audioCodec.trimmed().isEmpty());
+    }
+    if (m_audioChannelsBadge) {
+        m_audioChannelsBadge->setText(channels.toUpper());
+        m_audioChannelsBadge->setVisible(!channels.trimmed().isEmpty());
     }
 }
 
@@ -273,6 +371,11 @@ QPushButton* ControlBar::nextButton() const noexcept
     return m_nextBtn;
 }
 
+QPushButton* ControlBar::openFileButton() const noexcept
+{
+    return m_openFileBtn;
+}
+
 QPushButton* ControlBar::muteButton() const noexcept
 {
     return m_muteBtn;
@@ -296,6 +399,31 @@ QPushButton* ControlBar::playlistButton() const noexcept
 QPushButton* ControlBar::controlPanelButton() const noexcept
 {
     return m_controlPanelBtn;
+}
+
+QPushButton* ControlBar::settingsButton() const noexcept
+{
+    return m_settingsBtn;
+}
+
+QLabel* ControlBar::hwBadge() const noexcept
+{
+    return m_hwBadge;
+}
+
+QLabel* ControlBar::videoCodecBadge() const noexcept
+{
+    return m_videoCodecBadge;
+}
+
+QLabel* ControlBar::audioCodecBadge() const noexcept
+{
+    return m_audioCodecBadge;
+}
+
+QLabel* ControlBar::audioChannelsBadge() const noexcept
+{
+    return m_audioChannelsBadge;
 }
 
 bool ControlBar::isPlaying() const noexcept
@@ -323,14 +451,34 @@ double ControlBar::duration() const noexcept
     return m_duration;
 }
 
+bool ControlBar::isHwDecoding() const noexcept
+{
+    return m_isHwDecoding;
+}
+
+QString ControlBar::videoCodec() const noexcept
+{
+    return m_videoCodec;
+}
+
+QString ControlBar::audioCodec() const noexcept
+{
+    return m_audioCodec;
+}
+
+QString ControlBar::audioChannels() const noexcept
+{
+    return m_audioChannels;
+}
+
 QSize ControlBar::sizeHint() const
 {
-    return QSize(600, 40);
+    return QSize(600, 56);
 }
 
 QSize ControlBar::minimumSizeHint() const
 {
-    return QSize(450, 40);
+    return QSize(450, 56);
 }
 
 void ControlBar::onPlayPauseClicked()
@@ -355,6 +503,12 @@ void ControlBar::onNextClicked()
 {
     emit nextClicked();
     core::CommandRegistry::instance().execute(core::CommandId::CMD_PLAYLIST_NEXT);
+}
+
+void ControlBar::onOpenFileClicked()
+{
+    emit openFileClicked();
+    core::CommandRegistry::instance().execute(core::CommandId::CMD_OPEN_FILE);
 }
 
 void ControlBar::onMuteClicked()
@@ -388,6 +542,12 @@ void ControlBar::onControlPanelClicked()
 {
     emit controlPanelToggled();
     core::CommandRegistry::instance().execute(core::CommandId::CMD_CONTROL_PANEL);
+}
+
+void ControlBar::onSettingsClicked()
+{
+    emit preferencesClicked();
+    core::CommandRegistry::instance().execute(core::CommandId::CMD_PREFERENCES);
 }
 
 } // namespace outplayer::ui

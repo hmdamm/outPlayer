@@ -560,4 +560,24 @@ target_link_libraries(test_subtitle_font_customization
 
 add_test(NAME test_subtitle_font_customization COMMAND test_subtitle_font_customization)
 
+# ==============================================================================
+# Task 4: test_control_bar_layout target
+# ==============================================================================
+qt_add_executable(test_control_bar_layout
+    test_control_bar_layout.cpp
+)
+
+target_link_libraries(test_control_bar_layout
+    PRIVATE
+        outplayer_ui
+        outplayer_playlist
+        outplayer_input
+        outplayer_core
+        Qt6::Test
+        Qt6::Widgets
+)
+
+add_test(NAME test_control_bar_layout COMMAND test_control_bar_layout)
+
+
 

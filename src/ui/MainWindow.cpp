@@ -153,7 +153,7 @@ MainWindow::MainWindow(QWidget* parent)
     });
     connect(m_titleBar, &CustomTitleBar::closeClicked, this, &MainWindow::close);
 
-    // 40px ControlBar at bottom
+    // 56px ControlBar at bottom
     m_controlBar = new ControlBar(this);
     m_controlBar->setPlaybackEngine(m_engine.get());
     m_controlBar->show();
@@ -555,6 +555,9 @@ void MainWindow::stopPlayback()
         m_engine->pause();
         m_engine->stop();
     }
+    if (m_controlBar) {
+        m_controlBar->setVideoInfo(false, QString(), QString(), QString());
+    }
 }
 
 void MainWindow::dragEnterEvent(QDragEnterEvent* event)
@@ -681,7 +684,7 @@ void MainWindow::updateChromeLayout()
     }
 
     if (m_controlBar) {
-        m_controlBar->setGeometry(0, h - 40, w, 40);
+        m_controlBar->setGeometry(0, h - 56, w, 56);
         if (m_chromeVisible) {
             m_controlBar->show();
             m_controlBar->raise();
@@ -710,6 +713,9 @@ void MainWindow::setupEngineConnections()
     connect(m_engine.get(), &engine::IPlaybackEngine::playbackFinished, this, [this]() {
         m_autohideTimer->stop();
         setChromeVisible(true);
+        if (m_controlBar) {
+            m_controlBar->setVideoInfo(false, QString(), QString(), QString());
+        }
         if (m_userStopped) {
             m_userStopped = false;
             return;
@@ -718,6 +724,7 @@ void MainWindow::setupEngineConnections()
     });
 
     connect(m_engine.get(), &engine::IPlaybackEngine::fileLoaded, this, [this]() {
+        updateVideoInfoBadges();
         if (!m_engine->isPaused()) {
             m_autohideTimer->start(2500);
         }
@@ -741,6 +748,10 @@ void MainWindow::setupEngineConnections()
             }
             m_desktopIntegration->updateMetadata(title, QString(), dur);
         }
+    });
+
+    connect(m_engine.get(), &engine::IPlaybackEngine::tracksChanged, this, [this]() {
+        updateVideoInfoBadges();
     });
 }
 
@@ -1580,6 +1591,76 @@ void MainWindow::setupNavigationConnections()
     connect(m_contextMenuManager.get(), &ContextMenuManager::togglePlaylistRequested, this, &MainWindow::togglePlaylist);
     connect(m_contextMenuManager.get(), &ContextMenuManager::toggleControlPanelRequested, this, &MainWindow::toggleControlPanel);
     connect(m_contextMenuManager.get(), &ContextMenuManager::preferencesRequested, this, &MainWindow::showPreferences);
+
+    if (m_controlBar) {
+        connect(m_controlBar, &ControlBar::openFileClicked, this, [this]() {
+            const QStringList files = m_mediaOpenController->promptOpenFiles(this);
+            if (!files.isEmpty()) {
+                openFiles(files, true /* play first */);
+            }
+        });
+        connect(m_controlBar, &ControlBar::preferencesClicked, this, &MainWindow::showPreferences);
+    }
+}
+
+void MainWindow::updateVideoInfoBadges()
+{
+    if (!m_controlBar || !m_engine) {
+        return;
+    }
+
+    // Hardware decoding status
+    const QString hwdec = m_engine->getPropertyString(QStringLiteral("hwdec-current"));
+    const bool isHw = !hwdec.isEmpty() && hwdec != QStringLiteral("no");
+
+    // Video codec
+    QString videoCodec;
+    const auto videoTracks = m_engine->tracks(QStringLiteral("video"));
+    for (const auto& t : videoTracks) {
+        if (t.selected && !t.codec.isEmpty()) {
+            videoCodec = t.codec;
+            break;
+        }
+    }
+    if (videoCodec.isEmpty() && !videoTracks.isEmpty()) {
+        videoCodec = videoTracks.first().codec;
+    }
+    if (videoCodec.isEmpty()) {
+        videoCodec = m_engine->getPropertyString(QStringLiteral("video-format"));
+    }
+
+    // Audio codec
+    QString audioCodec;
+    const auto audioTracks = m_engine->tracks(QStringLiteral("audio"));
+    for (const auto& t : audioTracks) {
+        if (t.selected && !t.codec.isEmpty()) {
+            audioCodec = t.codec;
+            break;
+        }
+    }
+    if (audioCodec.isEmpty() && !audioTracks.isEmpty()) {
+        audioCodec = audioTracks.first().codec;
+    }
+    if (audioCodec.isEmpty()) {
+        audioCodec = m_engine->getPropertyString(QStringLiteral("audio-codec-name"));
+    }
+
+    // Audio channels
+    QString channels = m_engine->getPropertyString(QStringLiteral("audio-params/channels"));
+    if (channels.isEmpty()) {
+        channels = m_engine->getPropertyString(QStringLiteral("audio-channels"));
+    }
+    if (channels.compare(QLatin1String("stereo"), Qt::CaseInsensitive) == 0) {
+        channels = QStringLiteral("2.0");
+    } else if (channels.compare(QLatin1String("mono"), Qt::CaseInsensitive) == 0) {
+        channels = QStringLiteral("1.0");
+    } else if (channels.contains(QLatin1String("5.1"))) {
+        channels = QStringLiteral("5.1");
+    } else if (channels.contains(QLatin1String("7.1"))) {
+        channels = QStringLiteral("7.1");
+    }
+
+    m_controlBar->setVideoInfo(isHw, videoCodec, audioCodec, channels);
 }
 
 void MainWindow::registerCommand(core::CommandId id, core::CommandRegistry::Handler handler)

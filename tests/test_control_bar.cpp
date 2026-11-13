@@ -133,14 +133,14 @@ void TestControlBar::cleanup()
 void TestControlBar::testDimensionsAndDefaults()
 {
     ui::ControlBar bar;
-    QCOMPARE(bar.height(), 40);
-    QCOMPARE(bar.minimumHeight(), 40);
-    QCOMPARE(bar.maximumHeight(), 40);
-    QCOMPARE(bar.sizeHint().height(), 40);
+    QCOMPARE(bar.height(), 56);
+    QCOMPARE(bar.minimumHeight(), 56);
+    QCOMPARE(bar.maximumHeight(), 56);
+    QCOMPARE(bar.sizeHint().height(), 56);
 
     QVERIFY(bar.timelineSlider() != nullptr);
     QVERIFY(bar.timeLabel() != nullptr);
-    QCOMPARE(bar.timeLabel()->text(), QStringLiteral("00:00 / 00:00"));
+    QCOMPARE(bar.timeLabel()->text(), QStringLiteral("00:00:00 / 00:00:00"));
 
     QVERIFY(!bar.isPlaying());
     QVERIFY(!bar.isMuted());

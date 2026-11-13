@@ -115,6 +115,7 @@ private:
     void setupEngineConnections();
     void setupCommandHandlers();
     void setupNavigationConnections();
+    void updateVideoInfoBadges();
     void registerCommand(core::CommandId id, core::CommandRegistry::Handler handler);
     void handleMouseMove(QMouseEvent* event, QObject* watched);
     bool handleMousePress(QMouseEvent* event, QObject* watched);

@@ -102,11 +102,11 @@ void TestUiLayoutValidation::testCustomTitleBarGeometryAndMetrics() {
 void TestUiLayoutValidation::testControlBarGeometryAndMetrics() {
     ui::ControlBar controlBar;
 
-    // Height contract: exactly 40px
-    QCOMPARE(controlBar.sizeHint().height(), 40);
-    QCOMPARE(controlBar.minimumHeight(), 40);
-    QCOMPARE(controlBar.maximumHeight(), 40);
-    QCOMPARE(controlBar.minimumSizeHint().height(), 40);
+    // Height contract: exactly 56px
+    QCOMPARE(controlBar.sizeHint().height(), 56);
+    QCOMPARE(controlBar.minimumHeight(), 56);
+    QCOMPARE(controlBar.maximumHeight(), 56);
+    QCOMPARE(controlBar.minimumSizeHint().height(), 56);
 
     // Style and palette verification: #252525 background, #2e2e2e top border
     const QString style = controlBar.styleSheet();
@@ -130,9 +130,13 @@ void TestUiLayoutValidation::testControlBarGeometryAndMetrics() {
     QCOMPARE(controlBar.nextButton()->width(), 24);
     QCOMPARE(controlBar.nextButton()->height(), 24);
 
+    QVERIFY(controlBar.openFileButton() != nullptr);
+    QCOMPARE(controlBar.openFileButton()->width(), 24);
+    QCOMPARE(controlBar.openFileButton()->height(), 24);
+
     QVERIFY(controlBar.muteButton() != nullptr);
-    QCOMPARE(controlBar.muteButton()->width(), 24);
-    QCOMPARE(controlBar.muteButton()->height(), 24);
+    QCOMPARE(controlBar.muteButton()->width(), 20);
+    QCOMPARE(controlBar.muteButton()->height(), 20);
 
     QVERIFY(controlBar.volumeSlider() != nullptr);
     QCOMPARE(controlBar.volumeSlider()->width(), 70);
@@ -148,6 +152,15 @@ void TestUiLayoutValidation::testControlBarGeometryAndMetrics() {
     QVERIFY(controlBar.controlPanelButton() != nullptr);
     QCOMPARE(controlBar.controlPanelButton()->width(), 24);
     QCOMPARE(controlBar.controlPanelButton()->height(), 24);
+
+    QVERIFY(controlBar.settingsButton() != nullptr);
+    QCOMPARE(controlBar.settingsButton()->width(), 24);
+    QCOMPARE(controlBar.settingsButton()->height(), 24);
+
+    QVERIFY(controlBar.hwBadge() != nullptr);
+    QVERIFY(controlBar.videoCodecBadge() != nullptr);
+    QVERIFY(controlBar.audioCodecBadge() != nullptr);
+    QVERIFY(controlBar.audioChannelsBadge() != nullptr);
 
     QVERIFY(controlBar.timeLabel() != nullptr);
     QVERIFY(controlBar.timelineSlider() != nullptr);
@@ -294,10 +307,10 @@ void TestUiLayoutValidation::testMainWindowCompositeLayout() {
     QVERIFY(!window.titleBar()->isHidden());
     QCOMPARE(window.titleBar()->geometry(), QRect(0, 0, 1280, 30));
 
-    // 2. ControlBar at bottom (y=680, h=40, w=1280)
+    // 2. ControlBar at bottom (y=664, h=56, w=1280)
     QVERIFY(window.controlBar() != nullptr);
     QVERIFY(!window.controlBar()->isHidden());
-    QCOMPARE(window.controlBar()->geometry(), QRect(0, 720 - 40, 1280, 40));
+    QCOMPARE(window.controlBar()->geometry(), QRect(0, 720 - 56, 1280, 56));
 
     // 3. Central container contains VideoWidget and PlaylistDock
     QVERIFY(window.videoWidget() != nullptr);
