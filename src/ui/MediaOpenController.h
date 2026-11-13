@@ -2,6 +2,7 @@
 #pragma once
 
 #include <QObject>
+#include <QSet>
 #include <QStringList>
 
 class QWidget;
@@ -21,6 +22,8 @@ public:
     ~MediaOpenController() override = default;
 
     static bool isMediaFile(const QString& filePath);
+    static const QSet<QString>& subtitleExtensions();
+    static bool isSubtitleFile(const QString& filePath);
     static QStringList supportedMediaFilter();
     static QString supportedMediaFilterString();
     static QStringList scanDirectory(const QString& dirPath, bool recursive = true);

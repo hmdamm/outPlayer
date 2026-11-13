@@ -95,6 +95,35 @@ bool MediaOpenController::isMediaFile(const QString& filePath)
     return allMediaExtensions().contains(ext);
 }
 
+const QSet<QString>& MediaOpenController::subtitleExtensions()
+{
+    static const QSet<QString> s_subtitles = {
+        QStringLiteral("srt"), QStringLiteral("ass"), QStringLiteral("ssa"),
+        QStringLiteral("vtt"), QStringLiteral("sub"), QStringLiteral("idx"),
+        QStringLiteral("sup")
+    };
+    return s_subtitles;
+}
+
+bool MediaOpenController::isSubtitleFile(const QString& filePath)
+{
+    if (filePath.isEmpty()) {
+        return false;
+    }
+
+    const QFileInfo fileInfo(filePath);
+    if (fileInfo.isDir()) {
+        return false;
+    }
+
+    const QString ext = fileInfo.suffix().toLower();
+    if (ext.isEmpty()) {
+        return false;
+    }
+
+    return subtitleExtensions().contains(ext);
+}
+
 QStringList MediaOpenController::supportedMediaFilter()
 {
     static const QStringList s_filters = []() {

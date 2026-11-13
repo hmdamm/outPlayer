@@ -79,6 +79,8 @@ enum class CommandId : uint16_t {
     CMD_SUB_TOGGLE_VISIBILITY,
     CMD_SUB_SHOW_HIDE = CMD_SUB_TOGGLE_VISIBILITY,
     CMD_SUB_CYCLE,
+    CMD_SUB_TRACK_NEXT = CMD_SUB_CYCLE,
+    CMD_SUB_TRACK_PREV,
     CMD_SUB_CYCLE_SECOND,
     CMD_SUB_TOGGLE_SECOND,
     CMD_SUB_SYNC_FASTER,
@@ -372,6 +374,7 @@ inline constexpr RawCommandData kRawCommandData[] = {
     { CommandId::CMD_AUDIO_SETTINGS, "CMD_AUDIO_SETTINGS", "Audio Processing Settings...", "X", "Shift", "Window", "Menu > Audio > Audio Processing Settings...", "Audio Processing Settings..." },
     { CommandId::CMD_SUB_TOGGLE_VISIBILITY, "CMD_SUB_TOGGLE_VISIBILITY", "Show/Hide Subtitles", "H", "Alt", "Window", "Menu > Subtitles > Show/Hide Subtitles", "Show/Hide Subtitles" },
     { CommandId::CMD_SUB_CYCLE, "CMD_SUB_CYCLE", "Cycle Subtitle Track / Stream", "L", "None", "Window", "Menu > Subtitles > Select Subtitle Stream", "Cycle Subtitle Track / Stream" },
+    { CommandId::CMD_SUB_TRACK_PREV, "CMD_SUB_TRACK_PREV", "Previous Subtitle Track / Stream", "L", "Shift", "Window", "Menu > Subtitles > Previous Subtitle Stream", "Previous Subtitle Track / Stream" },
     { CommandId::CMD_SUB_CYCLE_SECOND, "CMD_SUB_CYCLE_SECOND", "Cycle Second Subtitle Stream", "L", "Alt", "Window", "Menu > Subtitles > Second Subtitles > Select Subtitle Stream", "Cycle Second Subtitle Stream" },
     { CommandId::CMD_SUB_TOGGLE_SECOND, "CMD_SUB_TOGGLE_SECOND", "Toggle Second Subtitle Visibility", "K", "Alt", "Window", "Menu > Subtitles > Second Subtitles > Show/Hide Second Subtitle", "Toggle Second Subtitle Visibility" },
     { CommandId::CMD_SUB_SYNC_FASTER, "CMD_SUB_SYNC_FASTER", "Subtitle Sync 0.5 Sec Faster", ",", "None", "Window", "Menu > Subtitles > Subtitle Sync > 0.5 Sec. Faster", "Subtitle Sync 0.5 Sec Faster" },
@@ -639,6 +642,7 @@ inline constexpr size_t TotalCommands = sizeof(kRawCommandData) / sizeof(kRawCom
     case CommandId::CMD_AUDIO_SETTINGS: return QStringLiteral("CMD_AUDIO_SETTINGS");
     case CommandId::CMD_SUB_TOGGLE_VISIBILITY: return QStringLiteral("CMD_SUB_TOGGLE_VISIBILITY");
     case CommandId::CMD_SUB_CYCLE: return QStringLiteral("CMD_SUB_CYCLE");
+    case CommandId::CMD_SUB_TRACK_PREV: return QStringLiteral("CMD_SUB_TRACK_PREV");
     case CommandId::CMD_SUB_CYCLE_SECOND: return QStringLiteral("CMD_SUB_CYCLE_SECOND");
     case CommandId::CMD_SUB_TOGGLE_SECOND: return QStringLiteral("CMD_SUB_TOGGLE_SECOND");
     case CommandId::CMD_SUB_SYNC_FASTER: return QStringLiteral("CMD_SUB_SYNC_FASTER");
@@ -910,6 +914,8 @@ inline constexpr size_t TotalCommands = sizeof(kRawCommandData) / sizeof(kRawCom
         { "CMD_SUB_TOGGLE_VISIBILITY", CommandId::CMD_SUB_TOGGLE_VISIBILITY },
         { "CMD_SUB_SHOW_HIDE", CommandId::CMD_SUB_SHOW_HIDE },
         { "CMD_SUB_CYCLE", CommandId::CMD_SUB_CYCLE },
+        { "CMD_SUB_TRACK_NEXT", CommandId::CMD_SUB_TRACK_NEXT },
+        { "CMD_SUB_TRACK_PREV", CommandId::CMD_SUB_TRACK_PREV },
         { "CMD_SUB_CYCLE_SECOND", CommandId::CMD_SUB_CYCLE_SECOND },
         { "CMD_SUB_TOGGLE_SECOND", CommandId::CMD_SUB_TOGGLE_SECOND },
         { "CMD_SUB_SYNC_FASTER", CommandId::CMD_SUB_SYNC_FASTER },

@@ -189,6 +189,7 @@ bool MpvEngine::initialize()
     mpv_set_option_string(m_mpv, "terminal", "yes");
     mpv_set_option_string(m_mpv, "msg-level", "all=v");
     mpv_set_option_string(m_mpv, "vo", "libmpv,null");
+    mpv_set_option_string(m_mpv, "sub-auto", "fuzzy");
 
     int status = mpv_initialize(m_mpv);
     if (status < 0) {
@@ -196,6 +197,8 @@ bool MpvEngine::initialize()
         m_mpv = nullptr;
         return false;
     }
+
+    mpv_set_property_string(m_mpv, "sub-visibility", "yes");
 
     // Observe core playback properties
     mpv_observe_property(m_mpv, 0, "time-pos", MPV_FORMAT_DOUBLE);
@@ -207,6 +210,7 @@ bool MpvEngine::initialize()
     mpv_observe_property(m_mpv, 0, "track-list", MPV_FORMAT_NODE);
     mpv_observe_property(m_mpv, 0, "chapter-list", MPV_FORMAT_NODE);
     mpv_observe_property(m_mpv, 0, "video-aspect-override", MPV_FORMAT_STRING);
+    mpv_observe_property(m_mpv, 0, "sub-visibility", MPV_FORMAT_FLAG);
 
     // Setup event wakeup notification for Qt event loop
     mpv_set_wakeup_callback(m_mpv, &MpvEngine::onMpvWakeup, this);
@@ -329,6 +333,14 @@ void MpvEngine::processEvent(mpv_event* event)
                 auto* node = static_cast<mpv_node*>(prop->data);
                 m_chapters = parseChapterList(node);
                 emit chaptersChanged();
+            }
+        } else if (std::strcmp(prop->name, "sub-visibility") == 0) {
+            if (prop->format == MPV_FORMAT_FLAG && prop->data) {
+                bool visible = (*static_cast<int*>(prop->data) != 0);
+                if (m_subtitleVisible != visible) {
+                    m_subtitleVisible = visible;
+                    emit subtitleSettingsChanged();
+                }
             }
         }
         break;
@@ -814,13 +826,63 @@ void MpvEngine::setSubtitleScale(double scale)
     emit subtitleSettingsChanged();
 }
 
+bool MpvEngine::isSubtitleVisible() const
+{
+    if (m_mpv) {
+        int flag = 1;
+        if (mpv_get_property(m_mpv, "sub-visibility", MPV_FORMAT_FLAG, &flag) >= 0) {
+            return flag != 0;
+        }
+    }
+    return m_subtitleVisible;
+}
+
+void MpvEngine::setSubtitleVisible(bool visible)
+{
+    m_subtitleVisible = visible;
+    if (m_mpv) {
+        mpv_set_property_string(m_mpv, "sub-visibility", visible ? "yes" : "no");
+    }
+    emit subtitleSettingsChanged();
+}
+
+int MpvEngine::currentSubtitleTrack() const
+{
+    if (m_mpv) {
+        char* val = mpv_get_property_string(m_mpv, "sid");
+        if (val) {
+            QString s = QString::fromUtf8(val);
+            mpv_free(val);
+            bool ok = false;
+            int id = s.toInt(&ok);
+            if (ok && id > 0) {
+                return id;
+            }
+            if (s == QStringLiteral("no")) {
+                return 0;
+            }
+        }
+    }
+    for (const auto& track : m_tracks) {
+        if (track.type == QLatin1String("sub") && track.selected) {
+            return track.id;
+        }
+    }
+    return 0;
+}
+
+bool MpvEngine::setSubtitleTrack(int trackId)
+{
+    return setTrack(QStringLiteral("sub"), trackId);
+}
+
 bool MpvEngine::loadSubtitle(const QString& filePath)
 {
     if (!m_mpv || filePath.isEmpty()) {
         return false;
     }
     const QByteArray pathUtf8 = filePath.toUtf8();
-    const char* cmd[] = {"sub-add", pathUtf8.constData(), "auto", nullptr};
+    const char* cmd[] = {"sub-add", pathUtf8.constData(), "select", nullptr};
     return mpv_command(m_mpv, cmd) >= 0;
 }
 
