@@ -503,6 +503,26 @@ target_link_libraries(test_benchmarks
 
 add_test(NAME test_benchmarks COMMAND test_benchmarks)
 
+# ==============================================================================
+# Task 1: test_main_window_hotkeys target
+# ==============================================================================
+qt_add_executable(test_main_window_hotkeys
+    test_main_window_hotkeys.cpp
+)
+
+target_link_libraries(test_main_window_hotkeys
+    PRIVATE
+        outplayer_ui
+        outplayer_playlist
+        outplayer_input
+        outplayer_core
+        Qt6::Test
+        Qt6::Widgets
+)
+
+add_test(NAME test_main_window_hotkeys COMMAND test_main_window_hotkeys)
+
+
 
 
 

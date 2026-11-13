@@ -29,7 +29,9 @@ enum class CommandId : uint16_t {
     CMD_SEEK_PREV_KEYFRAME,
     CMD_SEEK_NEXT_KEYFRAME,
     CMD_FRAME_PREV,
+    CMD_FRAME_BACK = CMD_FRAME_PREV,
     CMD_FRAME_NEXT,
+    CMD_FRAME_STEP = CMD_FRAME_NEXT,
     CMD_SEEK_START,
     CMD_SEEK_MIDDLE,
     CMD_SEEK_END_30SEC,
@@ -44,6 +46,8 @@ enum class CommandId : uint16_t {
     CMD_SPEED_NORMAL,
     CMD_SPEED_DOWN,
     CMD_SPEED_UP,
+    CMD_SPEED_FAST_2X,
+    CMD_SPEED_SLOW_HALF,
     CMD_REPEAT_AB_START,
     CMD_REPEAT_AB_RESET_A,
     CMD_REPEAT_AB_A_BACKWARD,
@@ -336,6 +340,8 @@ inline constexpr RawCommandData kRawCommandData[] = {
     { CommandId::CMD_SPEED_NORMAL, "CMD_SPEED_NORMAL", "Playback Speed Normal (1.0x)", "Z", "None", "Window", "Menu > Playback > Playback Speed > Default/Last used", "Playback Speed Normal (1.0x)" },
     { CommandId::CMD_SPEED_DOWN, "CMD_SPEED_DOWN", "Decrease Playback Speed (-0.1x)", "X", "None", "Window", "Menu > Playback > Playback Speed > Decrease speed", "Decrease Playback Speed (-0.1x)" },
     { CommandId::CMD_SPEED_UP, "CMD_SPEED_UP", "Increase Playback Speed (+0.1x)", "C", "None", "Window", "Menu > Playback > Playback Speed > Increase speed", "Increase Playback Speed (+0.1x)" },
+    { CommandId::CMD_SPEED_FAST_2X, "CMD_SPEED_FAST_2X", "Fast Playback Speed (2.0x)", "", "None", "Window", "Menu > Playback > Playback Speed > Fast (2.0x)", "Fast Playback Speed (2.0x)" },
+    { CommandId::CMD_SPEED_SLOW_HALF, "CMD_SPEED_SLOW_HALF", "Slow Playback Speed (0.5x)", "", "None", "Window", "Menu > Playback > Playback Speed > Slow (0.5x)", "Slow Playback Speed (0.5x)" },
     { CommandId::CMD_REPEAT_AB_START, "CMD_REPEAT_AB_START", "Set A-B Repeat Starting Point (A)", "[", "None", "Window", "Menu > Playback > A-B Repeat > Set Starting Point (A)", "Set A-B Repeat Starting Point (A)" },
     { CommandId::CMD_REPEAT_AB_RESET_A, "CMD_REPEAT_AB_RESET_A", "Reset Point A", "[", "Shift", "Window", "Menu > Playback > A-B Repeat > Reset Point A", "Reset Point A" },
     { CommandId::CMD_REPEAT_AB_A_BACKWARD, "CMD_REPEAT_AB_A_BACKWARD", "Move Point A 0.1 Sec Backward", "[", "Ctrl", "Window", "Menu > Playback > A-B Repeat > Move Point A 0.1 Sec. Backward", "Move Point A 0.1 Sec Backward" },
@@ -601,6 +607,8 @@ inline constexpr size_t TotalCommands = sizeof(kRawCommandData) / sizeof(kRawCom
     case CommandId::CMD_SPEED_NORMAL: return QStringLiteral("CMD_SPEED_NORMAL");
     case CommandId::CMD_SPEED_DOWN: return QStringLiteral("CMD_SPEED_DOWN");
     case CommandId::CMD_SPEED_UP: return QStringLiteral("CMD_SPEED_UP");
+    case CommandId::CMD_SPEED_FAST_2X: return QStringLiteral("CMD_SPEED_FAST_2X");
+    case CommandId::CMD_SPEED_SLOW_HALF: return QStringLiteral("CMD_SPEED_SLOW_HALF");
     case CommandId::CMD_REPEAT_AB_START: return QStringLiteral("CMD_REPEAT_AB_START");
     case CommandId::CMD_REPEAT_AB_RESET_A: return QStringLiteral("CMD_REPEAT_AB_RESET_A");
     case CommandId::CMD_REPEAT_AB_A_BACKWARD: return QStringLiteral("CMD_REPEAT_AB_A_BACKWARD");
@@ -867,6 +875,10 @@ inline constexpr size_t TotalCommands = sizeof(kRawCommandData) / sizeof(kRawCom
         { "CMD_SPEED_NORMAL", CommandId::CMD_SPEED_NORMAL },
         { "CMD_SPEED_DOWN", CommandId::CMD_SPEED_DOWN },
         { "CMD_SPEED_UP", CommandId::CMD_SPEED_UP },
+        { "CMD_SPEED_FAST_2X", CommandId::CMD_SPEED_FAST_2X },
+        { "CMD_SPEED_SLOW_HALF", CommandId::CMD_SPEED_SLOW_HALF },
+        { "CMD_FRAME_STEP", CommandId::CMD_FRAME_STEP },
+        { "CMD_FRAME_BACK", CommandId::CMD_FRAME_BACK },
         { "CMD_REPEAT_AB_START", CommandId::CMD_REPEAT_AB_START },
         { "CMD_REPEAT_AB_RESET_A", CommandId::CMD_REPEAT_AB_RESET_A },
         { "CMD_REPEAT_AB_A_BACKWARD", CommandId::CMD_REPEAT_AB_A_BACKWARD },
