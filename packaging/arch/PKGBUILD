@@ -1,0 +1,42 @@
+# Maintainer: outPlayer Developers <dev@outplayer.org>
+
+pkgname=outplayer
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Modern, high-performance Linux media player"
+arch=('x86_64' 'aarch64')
+url="https://github.com/outplayer/outplayer"
+license=('GPL-3.0-or-later')
+depends=(
+    'qt6-base'
+    'qt6-svg'
+    'mpv'
+    'hicolor-icon-theme'
+)
+makedepends=(
+    'cmake'
+    'ninja'
+    'pkgconf'
+)
+source=("${pkgname}-${pkgver}.tar.gz::https://github.com/outplayer/outplayer/archive/v${pkgver}.tar.gz")
+sha256sums=('SKIP')
+
+build() {
+    local src_dir="${srcdir}/${pkgname}-${pkgver}"
+    if [ ! -d "$src_dir" ] && [ -f "$startdir/../../CMakeLists.txt" ]; then
+        src_dir="$startdir/../.."
+    elif [ ! -d "$src_dir" ]; then
+        src_dir="$srcdir"
+    fi
+
+    cmake -B build -S "$src_dir" \
+        -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=/usr \
+        -DBUILD_TESTING=OFF
+    cmake --build build
+}
+
+package() {
+    DESTDIR="$pkgdir" cmake --install build
+}
