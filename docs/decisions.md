@@ -697,3 +697,80 @@ We formally approve ADR 010 and certify Phase 4 Parity Hardening and Verificatio
 - **Negative:**
   - Hardware-accelerated decoding performance remains dependent on system GPU drivers (VA-API/NVDEC) on client host environments.
 
+---
+
+## ADR 011: Multi-Distribution Linux Packaging & Desktop Integration
+
+- **Status:** Approved
+- **Date:** 2026-11-13
+- **Deciders:** Project Maintainers
+
+### Context
+Following the completion of core engine architecture (Phase 2), 13 vertical feature slices (Phase 3), and rigorous parity hardening, performance benchmarking, and sanitizer audits (Phase 4), Phase 5 requires establishing production-grade, reproducible packaging manifests, standalone bundle recipes, desktop integration assets, AppStream metadata, and installation procedures across all major Linux distribution channels.
+
+The primary challenges and requirements for Linux media player distribution include:
+1. **Universal Desktop Integration:** Adhering strictly to FreeDesktop.org standards with a reverse-DNS identifier (`org.outplayer.outPlayer`), desktop entry specification 1.5, AppStream 1.0 metadata, and full multi-resolution hicolor icon sets (SVG and 16x16 through 512x512 PNGs).
+2. **Containerized Flatpak Sandboxing:** Providing a Flathub-ready Flatpak manifest that strictly manages sandbox boundaries (Wayland/X11, PipeWire/PulseAudio, DRI/GPU devices, optical disc drives, host media filesystem access, MPRIS2 D-Bus, and screensaver inhibit portals) without breaking high-performance multimedia presentation.
+3. **Native Distribution Packaging:** Supporting tier-one Linux package formats:
+   - Debian / Ubuntu: Debian source package control structures targeting `debhelper-compat (= 13)` and `cmake+ninja` with DEP-5 machine-readable copyright.
+   - Fedora / RHEL / CentOS Stream: RPM spec (`outplayer.spec`) leveraging standard macros (`%cmake`, `%cmake_build`, `%cmake_install`).
+   - Arch Linux: Arch User Repository `PKGBUILD` adhering to Arch Packaging Standards.
+4. **Standalone Portability:** Producing self-contained, zero-install AppImage and AppDir bundles bundling required runtime libraries and Qt plugins with a relocatable launcher (`AppRun`).
+5. **Clean-Room & Legal Neutrality:** Enforcing 100% clean-room trademark neutrality with zero proprietary brand strings in packaging metadata, desktop files, spec files, control files, or release documentation.
+6. **Automated Verification:** Establishing reproducible automated verification test suites for each packaging ecosystem.
+
+### Decision
+We formally adopt multi-distribution packaging and approved desktop integration assets for outPlayer across five distribution channels:
+
+1. **FreeDesktop.org Desktop Integration (`data/`):**
+   - Application ID: `org.outplayer.outPlayer`
+   - Desktop Entry (`data/org.outplayer.outPlayer.desktop`): Conforms to FreeDesktop Desktop Entry 1.5 with categories `AudioVideo;Player;Recorder;TV;`, 40+ media MIME type associations, and desktop quicklist actions (`OpenMedia`, `OpenURL`, `OpenDevice`, `Preferences`).
+   - AppStream Metainfo (`data/org.outplayer.outPlayer.metainfo.xml`): Conforms to AppStream 1.0 specification with `<component type="desktop-application">`, release notes, OARS 1.1 content rating, developer ID, and validation by `appstreamcli validate --no-net`.
+   - Hicolor Icon Hierarchy: Vector SVG master (`data/icons/hicolor/scalable/apps/org.outplayer.outPlayer.svg`) with pre-rendered raster PNGs across 16x16, 32x32, 48x48, 64x64, 128x128, 256x256, and 512x512 resolutions.
+   - CMake Installation Rules: Configured with `GNUInstallDirs` exporting the `outplayer` binary, desktop entry, metainfo XML, and full hicolor icon hierarchy to `${CMAKE_INSTALL_PREFIX}`.
+
+2. **Flathub & Flatpak Manifest (`packaging/flatpak/org.outplayer.outPlayer.json`):**
+   - Runtime: `org.kde.Platform` 6.8 with `org.kde.Sdk` 6.8.
+   - Granular Sandbox Permissions:
+     - Display: `--socket=wayland`, `--socket=fallback-x11`, `--share=ipc`
+     - Audio: `--socket=pulseaudio`, `--filesystem=xdg-run/pipewire-0`
+     - Hardware: `--device=all` (DRI/GPU acceleration `/dev/dri/*`, optical drives `/dev/sr*`, `/dev/cdrom`)
+     - Filesystem: Read-only host media access (`--filesystem=host:ro`), XDG media directories (`xdg-download:ro`, `xdg-videos:ro`, `xdg-music:ro`, `xdg-pictures:ro`)
+     - D-Bus: MPRIS2 desktop media control (`--talk-name=org.mpris.MediaPlayer2.*`), ScreenSaver inhibit (`--talk-name=org.freedesktop.ScreenSaver`)
+   - Modules: Builds `libmpv` (v0.38.0+) via Meson with minimal overhead, followed by `outplayer` via CMake+Ninja.
+
+3. **Debian & Ubuntu Packaging (`packaging/debian/`):**
+   - Control metadata conforming to Debian Policy Manual 4.6.2 and Debhelper 13.
+   - Machine-readable copyright file conforming to DEP-5.
+   - Standard `debian/rules` dispatching to `dh $@ --buildsystem=cmake+ninja`.
+   - Automated builder script `packaging/debian/build-deb.sh` producing compliant `.deb` binary packages verified with `dpkg-deb`.
+
+4. **Fedora / RHEL RPM & Arch Linux PKGBUILD:**
+   - RPM spec file (`packaging/rpm/outplayer.spec`) supporting `%cmake`, `%cmake_build`, `%cmake_install`, and fallback definitions for legacy buildroots, verified with `rpmspec` and `rpmbuild`.
+   - Automated builder script `packaging/rpm/build-rpm.sh` producing verified `.rpm` binary packages.
+   - Arch Linux recipe (`packaging/arch/PKGBUILD`) adhering to Arch Packaging Standards with explicit dependencies (`qt6-base`, `qt6-svg`, `mpv`, `hicolor-icon-theme`) and build routines.
+
+5. **Standalone AppImage & Portable AppDir (`packaging/appimage/`):**
+   - Custom `AppRun` shell launcher script handling dynamic path resolution for `APPDIR`, `PATH`, `LD_LIBRARY_PATH` (`usr/lib` and `usr/lib64`), `QT_PLUGIN_PATH` (platforms, imageformats, iconengines), and `XDG_DATA_DIRS`.
+   - Automated builder script `packaging/appimage/build-appimage.sh` staging an AppDir, deploying desktop assets, bundling Qt plugins and runtime libraries, producing a portable `.AppDir.tar.gz` archive, and packaging standalone `.AppImage` via `appimagetool` when available.
+
+6. **Comprehensive Automated Packaging Verification Suite:**
+   - `tests/test_packaging_assets.py`: Validates desktop entry (`desktop-file-validate`), AppStream metainfo (`appstreamcli validate`), icon assets (SVG + 7 PNG sizes), and CMake `install()` to `DESTDIR`.
+   - `tests/test_flatpak_manifest.py`: Validates Flatpak JSON structure, required permissions, runtime definitions, and `flatpak-builder --show-manifest`.
+   - `tests/test_debian_packaging.py`: Validates debian control syntax, DEP-5 copyright, and executes `build-deb.sh` verifying generated `.deb` package contents.
+   - `tests/test_rpm_arch_packaging.py`: Validates RPM spec via `rpmspec`, runs `build-rpm.sh` generating validated `.rpm`, and verifies `PKGBUILD` syntax and variables.
+   - `tests/test_appimage_packaging.py`: Validates `AppRun` bash syntax and environment paths, executes `build-appimage.sh`, and validates standalone AppDir execution under `xvfb-run`.
+
+7. **Documentation & Distribution Guidance:**
+   - Authored `docs/distribution.md` detailing end-user installation, repository setup, build steps, sandbox overrides, desktop verification, and uninstallation across all 5 distribution channels.
+
+### Consequences
+- **Positive:**
+  - Complete, seamless accessibility across all major Linux distributions (Debian, Ubuntu, Fedora, RHEL, CentOS, Arch Linux, and generic distributions).
+  - First-class desktop integration with Wayland, X11, MPRIS2 media remotes, and screensaver power management.
+  - Robust, automated packaging verification pipelines ensuring zero regressions and reproducible builds.
+  - Zero proprietary branding or licensing contamination, maintaining strict legal neutrality.
+- **Negative:**
+  - Maintaining separate packaging recipes across multiple distinct packaging formats requires continued synchronization as dependencies or CMake targets evolve.
+
+
