@@ -29,12 +29,15 @@ qt_standard_project_setup(REQUIRES 6.5)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(MPV REQUIRED IMPORTED_TARGET mpv)
 
-enable_testing()
-
 include(GNUInstallDirs)
 
 add_subdirectory(src)
-add_subdirectory(tests)
+
+option(BUILD_TESTING "Build unit tests" ON)
+if(BUILD_TESTING)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
 
 # ==============================================================================
 # Desktop Integration Assets Installation
