@@ -9,6 +9,7 @@ required_files = [
     "THIRD_PARTY_NOTICES.md",
     ".gitignore",
     "README.md",
+    "LICENSE",
 ]
 
 for f in required_files:

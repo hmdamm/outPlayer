@@ -1,6 +1,6 @@
-# Project: PotPlayer-Linux (Qt6 + libmpv)
+# outPlayer (Linux Media Player)
 
-An AI-driven development project inside **Google AntiGravity** to build a modern, high-performance Linux media player offering functional and hotkey parity with Daum PotPlayer, powered by Qt 6 and `libmpv`.
+A modern, high-performance Linux media player offering functional, workflow, and hotkey parity with desktop media players, powered by Qt 6 and `libmpv`.
 
 ---
 
