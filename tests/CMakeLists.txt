@@ -483,6 +483,27 @@ target_link_libraries(test_format_matrix
 
 add_test(NAME test_format_matrix COMMAND test_format_matrix)
 
+# ==============================================================================
+# Phase 4 Task 4: test_benchmarks target
+# ==============================================================================
+qt_add_executable(test_benchmarks
+    test_benchmarks.cpp
+)
+
+target_link_libraries(test_benchmarks
+    PRIVATE
+        outplayer_ui
+        outplayer_playlist
+        outplayer_input
+        outplayer_core
+        Qt6::Test
+        Qt6::Widgets
+        Qt6::DBus
+)
+
+add_test(NAME test_benchmarks COMMAND test_benchmarks)
+
+
 
 
 

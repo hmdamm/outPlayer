@@ -175,6 +175,8 @@ MainWindow::MainWindow(QWidget* parent)
 
     // 2.5s mouse inactivity timer
     m_autohideTimer = new QTimer(this);
+    m_autohideTimer->setObjectName(QStringLiteral("autohideTimer"));
+    m_autohideTimer->setTimerType(Qt::PreciseTimer);
     m_autohideTimer->setSingleShot(true);
     m_autohideTimer->setInterval(2500);
     connect(m_autohideTimer, &QTimer::timeout, this, &MainWindow::onAutohideTimeout);
