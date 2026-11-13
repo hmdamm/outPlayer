@@ -4,6 +4,7 @@
 [![Qt6](https://img.shields.io/badge/framework-Qt%206.8-green.svg)](https://www.qt.io/)
 [![libmpv](https://img.shields.io/badge/engine-libmpv-orange.svg)](https://mpv.io/)
 [![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue.svg)](LICENSE)
+[![CI](https://github.com/hmdamm/outPlayer/actions/workflows/ci.yml/badge.svg)](https://github.com/hmdamm/outPlayer/actions)
 [![CTest](https://img.shields.io/badge/tests-29%2F29%20passed%20(100%25)-brightgreen.svg)](tests/)
 [![Packaging](https://img.shields.io/badge/packages-Flatpak%20%7C%20DEB%20%7C%20RPM%20%7C%20AUR%20%7C%20AppImage-success.svg)](docs/distribution.md)
 

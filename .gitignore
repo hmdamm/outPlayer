@@ -26,9 +26,11 @@ compile_commands.json
 *.swp
 *~
 
-# Superpowers Workflow Directory
+# Superpowers & Agent Artifacts
 .superpowers/
 .superpowers
+.agents/
+skills-lock.json
 
 # External Reference Checkouts
 mpv/
@@ -37,6 +39,14 @@ mpv-examples/
 # Python Cache
 __pycache__/
 *.py[cod]
+.pytest_cache/
+
+# Packaging & Flatpak Cache
+.flatpak-builder/
+*.deb
+*.rpm
+*.AppImage
+*.tar.gz
 
 # Temporary Test Media & Artifacts
 tests/media/temp_*
