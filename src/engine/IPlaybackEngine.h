@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 
+#include <QColor>
 #include <QList>
 #include <QObject>
 #include <QString>
@@ -94,6 +95,26 @@ public:
     [[nodiscard]] virtual int currentSubtitleTrack() const { return 0; }
     virtual bool setSubtitleTrack(int /*trackId*/) { return false; }
     virtual bool loadSubtitle(const QString& filePath) = 0;
+
+    // Subtitle Appearance & Font Customization
+    [[nodiscard]] virtual QString subtitleFont() const { return QStringLiteral("sans-serif"); }
+    virtual void setSubtitleFont(const QString& /*fontName*/) {}
+    [[nodiscard]] virtual int subtitleFontSize() const { return 24; }
+    virtual void setSubtitleFontSize(int /*pt*/) {}
+    [[nodiscard]] virtual QColor subtitleColor() const { return QColor(255, 255, 255, 255); }
+    virtual void setSubtitleColor(const QColor& /*color*/) {}
+    [[nodiscard]] virtual bool isSubtitleBold() const { return false; }
+    virtual void setSubtitleBold(bool /*bold*/) {}
+    [[nodiscard]] virtual bool isSubtitleItalic() const { return false; }
+    virtual void setSubtitleItalic(bool /*italic*/) {}
+    [[nodiscard]] virtual QColor subtitleBorderColor() const { return QColor(0, 0, 0, 255); }
+    virtual void setSubtitleBorderColor(const QColor& /*color*/) {}
+    [[nodiscard]] virtual double subtitleBorderSize() const { return 2.0; }
+    virtual void setSubtitleBorderSize(double /*size*/) {}
+    [[nodiscard]] virtual QColor subtitleShadowColor() const { return QColor(0, 0, 0, 128); }
+    virtual void setSubtitleShadowColor(const QColor& /*color*/) {}
+    [[nodiscard]] virtual double subtitleShadowOffset() const { return 0.0; }
+    virtual void setSubtitleShadowOffset(double /*offset*/) {}
 
     // Frame Capture
     virtual bool captureFrame(const QString& destinationPath) = 0;

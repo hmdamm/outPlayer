@@ -2,8 +2,10 @@
 #include "ui/PreferencesDialog.h"
 
 #include <QCheckBox>
+#include <QColorDialog>
 #include <QComboBox>
 #include <QDoubleSpinBox>
+#include <QFontComboBox>
 #include <QFormLayout>
 #include <QGridLayout>
 #include <QGroupBox>
@@ -22,6 +24,7 @@
 
 #include "core/CommandRegistry.h"
 #include "core/SettingsManager.h"
+#include "engine/IPlaybackEngine.h"
 #include "ui/ThemeManager.h"
 
 namespace outplayer::ui {
@@ -324,13 +327,110 @@ QWidget* PreferencesDialog::createSubtitlesPage()
     m_subtitleLanguageEdit->setPlaceholderText(tr("e.g., en, ja, es, ko"));
     formLayout->addRow(tr("Default Language:"), m_subtitleLanguageEdit);
 
+    m_subtitleFontCombo = new QFontComboBox(subGroup);
+    connect(m_subtitleFontCombo, &QFontComboBox::currentFontChanged, this, [this](const QFont&) {
+        updateSubtitlePreview();
+    });
+    formLayout->addRow(tr("Font Family:"), m_subtitleFontCombo);
+
     m_subtitleFontSizeSpinBox = new QSpinBox(subGroup);
-    m_subtitleFontSizeSpinBox->setRange(12, 72);
+    m_subtitleFontSizeSpinBox->setRange(10, 96);
     m_subtitleFontSizeSpinBox->setValue(24);
     m_subtitleFontSizeSpinBox->setSuffix(QStringLiteral(" pt"));
+    connect(m_subtitleFontSizeSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, [this](int) {
+        updateSubtitlePreview();
+    });
     formLayout->addRow(tr("Font Size:"), m_subtitleFontSizeSpinBox);
 
+    auto* styleRow = new QHBoxLayout();
+    m_subtitleBoldCheck = new QCheckBox(tr("Bold"), subGroup);
+    m_subtitleItalicCheck = new QCheckBox(tr("Italic"), subGroup);
+    styleRow->addWidget(m_subtitleBoldCheck);
+    styleRow->addWidget(m_subtitleItalicCheck);
+    styleRow->addStretch(1);
+    connect(m_subtitleBoldCheck, &QCheckBox::toggled, this, [this](bool) { updateSubtitlePreview(); });
+    connect(m_subtitleItalicCheck, &QCheckBox::toggled, this, [this](bool) { updateSubtitlePreview(); });
+    formLayout->addRow(tr("Font Style:"), styleRow);
+
+    // Text Color
+    m_subtitleColorBtn = new QPushButton(subGroup);
+    m_subtitleColorBtn->setFixedWidth(100);
+    updateColorButtonSwatch(m_subtitleColorBtn, m_subtitleColor);
+    connect(m_subtitleColorBtn, &QPushButton::clicked, this, [this]() {
+        const QColor c = QColorDialog::getColor(m_subtitleColor, this, tr("Select Subtitle Text Color"), QColorDialog::ShowAlphaChannel);
+        if (c.isValid()) {
+            setSubtitleColor(c);
+        }
+    });
+    formLayout->addRow(tr("Text Color:"), m_subtitleColorBtn);
+
+    // Border Color and Size
+    auto* borderRow = new QHBoxLayout();
+    m_subtitleBorderColorBtn = new QPushButton(subGroup);
+    m_subtitleBorderColorBtn->setFixedWidth(100);
+    updateColorButtonSwatch(m_subtitleBorderColorBtn, m_subtitleBorderColor);
+    connect(m_subtitleBorderColorBtn, &QPushButton::clicked, this, [this]() {
+        const QColor c = QColorDialog::getColor(m_subtitleBorderColor, this, tr("Select Subtitle Border Color"), QColorDialog::ShowAlphaChannel);
+        if (c.isValid()) {
+            setSubtitleBorderColor(c);
+        }
+    });
+    borderRow->addWidget(m_subtitleBorderColorBtn);
+
+    auto* borderSizeLabel = new QLabel(tr("Size:"), subGroup);
+    borderRow->addWidget(borderSizeLabel);
+    m_subtitleBorderSizeSpinBox = new QDoubleSpinBox(subGroup);
+    m_subtitleBorderSizeSpinBox->setRange(0.0, 10.0);
+    m_subtitleBorderSizeSpinBox->setSingleStep(0.5);
+    m_subtitleBorderSizeSpinBox->setValue(2.0);
+    m_subtitleBorderSizeSpinBox->setSuffix(QStringLiteral(" px"));
+    connect(m_subtitleBorderSizeSpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, [this](double) {
+        updateSubtitlePreview();
+    });
+    borderRow->addWidget(m_subtitleBorderSizeSpinBox);
+    borderRow->addStretch(1);
+    formLayout->addRow(tr("Border:"), borderRow);
+
+    // Shadow Color and Offset
+    auto* shadowRow = new QHBoxLayout();
+    m_subtitleShadowColorBtn = new QPushButton(subGroup);
+    m_subtitleShadowColorBtn->setFixedWidth(100);
+    updateColorButtonSwatch(m_subtitleShadowColorBtn, m_subtitleShadowColor);
+    connect(m_subtitleShadowColorBtn, &QPushButton::clicked, this, [this]() {
+        const QColor c = QColorDialog::getColor(m_subtitleShadowColor, this, tr("Select Subtitle Shadow Color"), QColorDialog::ShowAlphaChannel);
+        if (c.isValid()) {
+            setSubtitleShadowColor(c);
+        }
+    });
+    shadowRow->addWidget(m_subtitleShadowColorBtn);
+
+    auto* shadowOffsetLabel = new QLabel(tr("Offset:"), subGroup);
+    shadowRow->addWidget(shadowOffsetLabel);
+    m_subtitleShadowOffsetSpinBox = new QDoubleSpinBox(subGroup);
+    m_subtitleShadowOffsetSpinBox->setRange(0.0, 10.0);
+    m_subtitleShadowOffsetSpinBox->setSingleStep(0.5);
+    m_subtitleShadowOffsetSpinBox->setValue(0.0);
+    m_subtitleShadowOffsetSpinBox->setSuffix(QStringLiteral(" px"));
+    connect(m_subtitleShadowOffsetSpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, [this](double) {
+        updateSubtitlePreview();
+    });
+    shadowRow->addWidget(m_subtitleShadowOffsetSpinBox);
+    shadowRow->addStretch(1);
+    formLayout->addRow(tr("Shadow:"), shadowRow);
+
     layout->addWidget(subGroup);
+
+    // Live Preview box
+    auto* previewGroup = new QGroupBox(tr("Live Preview"), page);
+    auto* previewLayout = new QVBoxLayout(previewGroup);
+    m_subtitlePreviewLabel = new QLabel(tr("Sample Subtitle Text (00:01:23)"), previewGroup);
+    m_subtitlePreviewLabel->setAlignment(Qt::AlignCenter);
+    m_subtitlePreviewLabel->setMinimumHeight(64);
+    previewLayout->addWidget(m_subtitlePreviewLabel);
+    layout->addWidget(previewGroup);
+
+    updateSubtitlePreview();
+
     layout->addStretch(1);
     return page;
 }
@@ -610,8 +710,44 @@ void PreferencesDialog::loadSettings()
     const QString subLang = m_settings->get(QStringLiteral("Subtitles/DefaultLanguage"), QStringLiteral("en")).toString();
     m_subtitleLanguageEdit->setText(subLang);
 
+    const QString subFont = m_settings->get(QStringLiteral("Subtitles/Font"), QStringLiteral("sans-serif")).toString();
+    if (m_subtitleFontCombo) {
+        m_subtitleFontCombo->setCurrentFont(QFont(subFont));
+    }
+
     const int subFontSize = m_settings->get(QStringLiteral("Subtitles/FontSize"), 24).toInt();
     m_subtitleFontSizeSpinBox->setValue(subFontSize);
+
+    const QString colorStr = m_settings->get(QStringLiteral("Subtitles/Color"), QStringLiteral("#ffffffff")).toString();
+    setSubtitleColor(QColor::isValidColorName(colorStr) ? QColor(colorStr) : QColor(255, 255, 255, 255));
+
+    const bool subBold = m_settings->get(QStringLiteral("Subtitles/Bold"), false).toBool();
+    if (m_subtitleBoldCheck) {
+        m_subtitleBoldCheck->setChecked(subBold);
+    }
+
+    const bool subItalic = m_settings->get(QStringLiteral("Subtitles/Italic"), false).toBool();
+    if (m_subtitleItalicCheck) {
+        m_subtitleItalicCheck->setChecked(subItalic);
+    }
+
+    const QString borderColStr = m_settings->get(QStringLiteral("Subtitles/BorderColor"), QStringLiteral("#ff000000")).toString();
+    setSubtitleBorderColor(QColor::isValidColorName(borderColStr) ? QColor(borderColStr) : QColor(0, 0, 0, 255));
+
+    const double borderSize = m_settings->get(QStringLiteral("Subtitles/BorderSize"), 2.0).toDouble();
+    if (m_subtitleBorderSizeSpinBox) {
+        m_subtitleBorderSizeSpinBox->setValue(borderSize);
+    }
+
+    const QString shadowColStr = m_settings->get(QStringLiteral("Subtitles/ShadowColor"), QStringLiteral("#80000000")).toString();
+    setSubtitleShadowColor(QColor::isValidColorName(shadowColStr) ? QColor(shadowColStr) : QColor(0, 0, 0, 128));
+
+    const double shadowOffset = m_settings->get(QStringLiteral("Subtitles/ShadowOffset"), 0.0).toDouble();
+    if (m_subtitleShadowOffsetSpinBox) {
+        m_subtitleShadowOffsetSpinBox->setValue(shadowOffset);
+    }
+
+    updateSubtitlePreview();
 
     // Take snapshot for cancel
     m_snapshot.singleInstance = singleInst;
@@ -630,7 +766,15 @@ void PreferencesDialog::loadSettings()
     m_snapshot.normalizer = norm;
     m_snapshot.audioDelayStep = delayStep;
     m_snapshot.subtitleLanguage = subLang;
+    m_snapshot.subtitleFont = subFont;
     m_snapshot.subtitleFontSize = subFontSize;
+    m_snapshot.subtitleColor = m_subtitleColor;
+    m_snapshot.subtitleBold = subBold;
+    m_snapshot.subtitleItalic = subItalic;
+    m_snapshot.subtitleBorderColor = m_subtitleBorderColor;
+    m_snapshot.subtitleBorderSize = borderSize;
+    m_snapshot.subtitleShadowColor = m_subtitleShadowColor;
+    m_snapshot.subtitleShadowOffset = shadowOffset;
 
     m_snapshot.extensionStates.clear();
     for (auto* cb : m_extensionCheckBoxes) {
@@ -673,7 +817,36 @@ void PreferencesDialog::saveSettings()
 
     // Subtitles
     m_settings->set(QStringLiteral("Subtitles/DefaultLanguage"), m_subtitleLanguageEdit->text());
+    const QString subFont = m_subtitleFontCombo ? m_subtitleFontCombo->currentFont().family() : QStringLiteral("sans-serif");
+    m_settings->set(QStringLiteral("Subtitles/Font"), subFont);
     m_settings->set(QStringLiteral("Subtitles/FontSize"), m_subtitleFontSizeSpinBox->value());
+    m_settings->set(QStringLiteral("Subtitles/Color"), m_subtitleColor.name(QColor::HexArgb));
+    m_settings->set(QStringLiteral("Subtitles/Bold"), m_subtitleBoldCheck ? m_subtitleBoldCheck->isChecked() : false);
+    m_settings->set(QStringLiteral("Subtitles/Italic"), m_subtitleItalicCheck ? m_subtitleItalicCheck->isChecked() : false);
+    m_settings->set(QStringLiteral("Subtitles/BorderColor"), m_subtitleBorderColor.name(QColor::HexArgb));
+    m_settings->set(QStringLiteral("Subtitles/BorderSize"), m_subtitleBorderSizeSpinBox ? m_subtitleBorderSizeSpinBox->value() : 2.0);
+    m_settings->set(QStringLiteral("Subtitles/ShadowColor"), m_subtitleShadowColor.name(QColor::HexArgb));
+    m_settings->set(QStringLiteral("Subtitles/ShadowOffset"), m_subtitleShadowOffsetSpinBox ? m_subtitleShadowOffsetSpinBox->value() : 0.0);
+
+    if (m_engine) {
+        m_engine->setSubtitleFont(subFont);
+        m_engine->setSubtitleFontSize(m_subtitleFontSizeSpinBox->value());
+        m_engine->setSubtitleColor(m_subtitleColor);
+        if (m_subtitleBoldCheck) {
+            m_engine->setSubtitleBold(m_subtitleBoldCheck->isChecked());
+        }
+        if (m_subtitleItalicCheck) {
+            m_engine->setSubtitleItalic(m_subtitleItalicCheck->isChecked());
+        }
+        m_engine->setSubtitleBorderColor(m_subtitleBorderColor);
+        if (m_subtitleBorderSizeSpinBox) {
+            m_engine->setSubtitleBorderSize(m_subtitleBorderSizeSpinBox->value());
+        }
+        m_engine->setSubtitleShadowColor(m_subtitleShadowColor);
+        if (m_subtitleShadowOffsetSpinBox) {
+            m_engine->setSubtitleShadowOffset(m_subtitleShadowOffsetSpinBox->value());
+        }
+    }
 
     m_settings->sync();
 
@@ -694,7 +867,15 @@ void PreferencesDialog::saveSettings()
     m_snapshot.normalizer = m_normalizerCheckBox->isChecked();
     m_snapshot.audioDelayStep = m_audioDelayStepSpinBox->value();
     m_snapshot.subtitleLanguage = m_subtitleLanguageEdit->text();
+    m_snapshot.subtitleFont = subFont;
     m_snapshot.subtitleFontSize = m_subtitleFontSizeSpinBox->value();
+    m_snapshot.subtitleColor = m_subtitleColor;
+    m_snapshot.subtitleBold = m_subtitleBoldCheck ? m_subtitleBoldCheck->isChecked() : false;
+    m_snapshot.subtitleItalic = m_subtitleItalicCheck ? m_subtitleItalicCheck->isChecked() : false;
+    m_snapshot.subtitleBorderColor = m_subtitleBorderColor;
+    m_snapshot.subtitleBorderSize = m_subtitleBorderSizeSpinBox ? m_subtitleBorderSizeSpinBox->value() : 2.0;
+    m_snapshot.subtitleShadowColor = m_subtitleShadowColor;
+    m_snapshot.subtitleShadowOffset = m_subtitleShadowOffsetSpinBox ? m_subtitleShadowOffsetSpinBox->value() : 0.0;
 
     m_snapshot.extensionStates.clear();
     for (auto* cb : m_extensionCheckBoxes) {
@@ -726,7 +907,26 @@ void PreferencesDialog::resetDefaults()
     m_audioDelayStepSpinBox->setValue(0.05);
 
     m_subtitleLanguageEdit->setText(QStringLiteral("en"));
+    if (m_subtitleFontCombo) {
+        m_subtitleFontCombo->setCurrentFont(QFont(QStringLiteral("sans-serif")));
+    }
     m_subtitleFontSizeSpinBox->setValue(24);
+    if (m_subtitleBoldCheck) {
+        m_subtitleBoldCheck->setChecked(false);
+    }
+    if (m_subtitleItalicCheck) {
+        m_subtitleItalicCheck->setChecked(false);
+    }
+    setSubtitleColor(QColor(255, 255, 255, 255));
+    setSubtitleBorderColor(QColor(0, 0, 0, 255));
+    if (m_subtitleBorderSizeSpinBox) {
+        m_subtitleBorderSizeSpinBox->setValue(2.0);
+    }
+    setSubtitleShadowColor(QColor(0, 0, 0, 128));
+    if (m_subtitleShadowOffsetSpinBox) {
+        m_subtitleShadowOffsetSpinBox->setValue(0.0);
+    }
+    updateSubtitlePreview();
 
     for (auto* cb : m_extensionCheckBoxes) {
         cb->setChecked(true);
@@ -766,13 +966,93 @@ void PreferencesDialog::reject()
     m_audioDelayStepSpinBox->setValue(m_snapshot.audioDelayStep);
 
     m_subtitleLanguageEdit->setText(m_snapshot.subtitleLanguage);
+    if (m_subtitleFontCombo) {
+        m_subtitleFontCombo->setCurrentFont(QFont(m_snapshot.subtitleFont));
+    }
     m_subtitleFontSizeSpinBox->setValue(m_snapshot.subtitleFontSize);
+    setSubtitleColor(m_snapshot.subtitleColor);
+    if (m_subtitleBoldCheck) {
+        m_subtitleBoldCheck->setChecked(m_snapshot.subtitleBold);
+    }
+    if (m_subtitleItalicCheck) {
+        m_subtitleItalicCheck->setChecked(m_snapshot.subtitleItalic);
+    }
+    setSubtitleBorderColor(m_snapshot.subtitleBorderColor);
+    if (m_subtitleBorderSizeSpinBox) {
+        m_subtitleBorderSizeSpinBox->setValue(m_snapshot.subtitleBorderSize);
+    }
+    setSubtitleShadowColor(m_snapshot.subtitleShadowColor);
+    if (m_subtitleShadowOffsetSpinBox) {
+        m_subtitleShadowOffsetSpinBox->setValue(m_snapshot.subtitleShadowOffset);
+    }
+    updateSubtitlePreview();
 
     for (int i = 0; i < m_extensionCheckBoxes.size() && i < m_snapshot.extensionStates.size(); ++i) {
         m_extensionCheckBoxes[i]->setChecked(m_snapshot.extensionStates[i]);
     }
 
     QDialog::reject();
+}
+
+void PreferencesDialog::setSubtitleColor(const QColor& color)
+{
+    if (!color.isValid()) return;
+    m_subtitleColor = color;
+    updateColorButtonSwatch(m_subtitleColorBtn, m_subtitleColor);
+    updateSubtitlePreview();
+}
+
+void PreferencesDialog::setSubtitleBorderColor(const QColor& color)
+{
+    if (!color.isValid()) return;
+    m_subtitleBorderColor = color;
+    updateColorButtonSwatch(m_subtitleBorderColorBtn, m_subtitleBorderColor);
+    updateSubtitlePreview();
+}
+
+void PreferencesDialog::setSubtitleShadowColor(const QColor& color)
+{
+    if (!color.isValid()) return;
+    m_subtitleShadowColor = color;
+    updateColorButtonSwatch(m_subtitleShadowColorBtn, m_subtitleShadowColor);
+    updateSubtitlePreview();
+}
+
+void PreferencesDialog::updateColorButtonSwatch(QPushButton* btn, const QColor& color)
+{
+    if (!btn) return;
+    btn->setStyleSheet(QStringLiteral(
+        "QPushButton { background-color: %1; color: %2; border: 1px solid #555555; border-radius: 3px; padding: 4px 10px; font-weight: bold; }"
+    ).arg(color.name()).arg(color.lightness() > 128 ? QStringLiteral("#000000") : QStringLiteral("#ffffff")));
+    btn->setText(color.name().toUpper());
+}
+
+void PreferencesDialog::updateSubtitlePreview()
+{
+    if (!m_subtitlePreviewLabel) return;
+    QFont font = m_subtitleFontCombo ? m_subtitleFontCombo->currentFont() : QFont();
+    int ptSize = m_subtitleFontSizeSpinBox ? m_subtitleFontSizeSpinBox->value() : 24;
+    font.setPointSize(std::clamp(ptSize, 12, 32));
+    font.setBold(m_subtitleBoldCheck && m_subtitleBoldCheck->isChecked());
+    font.setItalic(m_subtitleItalicCheck && m_subtitleItalicCheck->isChecked());
+    m_subtitlePreviewLabel->setFont(font);
+
+    const QString weightStr = (m_subtitleBoldCheck && m_subtitleBoldCheck->isChecked()) ? QStringLiteral("bold") : QStringLiteral("normal");
+    const QString italicStr = (m_subtitleItalicCheck && m_subtitleItalicCheck->isChecked()) ? QStringLiteral("italic") : QStringLiteral("normal");
+
+    QString style = QStringLiteral(
+        "background-color: #111111; "
+        "border: 1px solid #333333; "
+        "border-radius: 4px; "
+        "padding: 12px; "
+        "color: %1; "
+        "font-weight: %2; "
+        "font-style: %3;"
+    ).arg(m_subtitleColor.name())
+     .arg(weightStr)
+     .arg(italicStr);
+
+    m_subtitlePreviewLabel->setStyleSheet(style);
 }
 
 void PreferencesDialog::applyDarkTheme()

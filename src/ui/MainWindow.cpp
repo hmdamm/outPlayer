@@ -54,6 +54,7 @@ MainWindow::MainWindow(QWidget* parent)
     , m_preferencesDialog(std::make_unique<PreferencesDialog>(&core::SettingsManager::instance(), this))
 {
     m_engine->initialize();
+    m_preferencesDialog->setPlaybackEngine(m_engine.get());
 
     const bool useSystemDeco = core::SettingsManager::instance().useSystemWindowDecorations();
     if (!useSystemDeco) {

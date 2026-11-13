@@ -541,18 +541,23 @@ target_link_libraries(test_subtitle_pipeline
 
 add_test(NAME test_subtitle_pipeline COMMAND test_subtitle_pipeline)
 
+# ==============================================================================
+# Task 3: test_subtitle_font_customization target
+# ==============================================================================
+qt_add_executable(test_subtitle_font_customization
+    test_subtitle_font_customization.cpp
+)
 
+target_link_libraries(test_subtitle_font_customization
+    PRIVATE
+        outplayer_ui
+        outplayer_playlist
+        outplayer_input
+        outplayer_core
+        Qt6::Test
+        Qt6::Widgets
+)
 
-
-
-
-
-
-
-
-
-
-
-
+add_test(NAME test_subtitle_font_customization COMMAND test_subtitle_font_customization)
 
 

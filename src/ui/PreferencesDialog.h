@@ -2,6 +2,7 @@
 #ifndef OUTPLAYER_UI_PREFERENCESDIALOG_H
 #define OUTPLAYER_UI_PREFERENCESDIALOG_H
 
+#include <QColor>
 #include <QDialog>
 #include <QList>
 #include <QString>
@@ -9,6 +10,7 @@
 class QCheckBox;
 class QComboBox;
 class QDoubleSpinBox;
+class QFontComboBox;
 class QLabel;
 class QLineEdit;
 class QPushButton;
@@ -21,6 +23,10 @@ class QTreeWidgetItem;
 
 namespace outplayer::core {
 class SettingsManager;
+}
+
+namespace outplayer::engine {
+class IPlaybackEngine;
 }
 
 namespace outplayer::ui {
@@ -38,6 +44,7 @@ public:
 
     void selectCategory(const QString& categoryName);
     void setSearchFilter(const QString& query);
+    void setPlaybackEngine(engine::IPlaybackEngine* engine) { m_engine = engine; }
 
     // Dialog layout components
     [[nodiscard]] QTreeWidget* categoryTree() const noexcept { return m_categoryTree; }
@@ -73,7 +80,22 @@ public:
 
     // Page 4: Subtitles Controls
     [[nodiscard]] QLineEdit* subtitleLanguageEdit() const noexcept { return m_subtitleLanguageEdit; }
+    [[nodiscard]] QFontComboBox* subtitleFontCombo() const noexcept { return m_subtitleFontCombo; }
     [[nodiscard]] QSpinBox* subtitleFontSizeSpinBox() const noexcept { return m_subtitleFontSizeSpinBox; }
+    [[nodiscard]] QCheckBox* subtitleBoldCheckBox() const noexcept { return m_subtitleBoldCheck; }
+    [[nodiscard]] QCheckBox* subtitleItalicCheckBox() const noexcept { return m_subtitleItalicCheck; }
+    [[nodiscard]] QPushButton* subtitleColorButton() const noexcept { return m_subtitleColorBtn; }
+    [[nodiscard]] QColor subtitleColor() const noexcept { return m_subtitleColor; }
+    void setSubtitleColor(const QColor& color);
+    [[nodiscard]] QPushButton* subtitleBorderColorButton() const noexcept { return m_subtitleBorderColorBtn; }
+    [[nodiscard]] QColor subtitleBorderColor() const noexcept { return m_subtitleBorderColor; }
+    void setSubtitleBorderColor(const QColor& color);
+    [[nodiscard]] QDoubleSpinBox* subtitleBorderSizeSpinBox() const noexcept { return m_subtitleBorderSizeSpinBox; }
+    [[nodiscard]] QPushButton* subtitleShadowColorButton() const noexcept { return m_subtitleShadowColorBtn; }
+    [[nodiscard]] QColor subtitleShadowColor() const noexcept { return m_subtitleShadowColor; }
+    void setSubtitleShadowColor(const QColor& color);
+    [[nodiscard]] QDoubleSpinBox* subtitleShadowOffsetSpinBox() const noexcept { return m_subtitleShadowOffsetSpinBox; }
+    [[nodiscard]] QLabel* subtitlePreviewLabel() const noexcept { return m_subtitlePreviewLabel; }
 
     // Page 5: Associations Controls
     [[nodiscard]] QPushButton* selectAllExtensionsButton() const noexcept { return m_selectAllExtensionsBtn; }
@@ -110,8 +132,11 @@ private:
     QWidget* createHotkeysPage();
 
     void applyDarkTheme();
+    void updateSubtitlePreview();
+    void updateColorButtonSwatch(QPushButton* btn, const QColor& color);
 
     core::SettingsManager* m_settings{nullptr};
+    engine::IPlaybackEngine* m_engine{nullptr};
 
     // Main layout elements
     QLineEdit* m_searchEdit{nullptr};
@@ -148,7 +173,19 @@ private:
 
     // Subtitles page
     QLineEdit* m_subtitleLanguageEdit{nullptr};
+    QFontComboBox* m_subtitleFontCombo{nullptr};
     QSpinBox* m_subtitleFontSizeSpinBox{nullptr};
+    QCheckBox* m_subtitleBoldCheck{nullptr};
+    QCheckBox* m_subtitleItalicCheck{nullptr};
+    QPushButton* m_subtitleColorBtn{nullptr};
+    QColor m_subtitleColor{255, 255, 255, 255};
+    QPushButton* m_subtitleBorderColorBtn{nullptr};
+    QColor m_subtitleBorderColor{0, 0, 0, 255};
+    QDoubleSpinBox* m_subtitleBorderSizeSpinBox{nullptr};
+    QPushButton* m_subtitleShadowColorBtn{nullptr};
+    QColor m_subtitleShadowColor{0, 0, 0, 128};
+    QDoubleSpinBox* m_subtitleShadowOffsetSpinBox{nullptr};
+    QLabel* m_subtitlePreviewLabel{nullptr};
 
     // Associations page
     QPushButton* m_selectAllExtensionsBtn{nullptr};
@@ -178,7 +215,15 @@ private:
         bool normalizer{false};
         double audioDelayStep{0.05};
         QString subtitleLanguage{QStringLiteral("en")};
+        QString subtitleFont{QStringLiteral("sans-serif")};
         int subtitleFontSize{24};
+        QColor subtitleColor{255, 255, 255, 255};
+        bool subtitleBold{false};
+        bool subtitleItalic{false};
+        QColor subtitleBorderColor{0, 0, 0, 255};
+        double subtitleBorderSize{2.0};
+        QColor subtitleShadowColor{0, 0, 0, 128};
+        double subtitleShadowOffset{0.0};
         QList<bool> extensionStates;
     } m_snapshot;
 };
