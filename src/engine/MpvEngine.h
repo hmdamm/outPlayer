@@ -75,6 +75,10 @@ public:
     void setSubtitleDelay(double seconds) override;
     [[nodiscard]] double subtitleScale() const override;
     void setSubtitleScale(double scale) override;
+    [[nodiscard]] bool isSubtitleVisible() const override;
+    void setSubtitleVisible(bool visible) override;
+    [[nodiscard]] int currentSubtitleTrack() const override;
+    bool setSubtitleTrack(int trackId) override;
     bool loadSubtitle(const QString& filePath) override;
 
     // Frame Capture
@@ -118,6 +122,7 @@ private:
 
     double m_subtitleDelay{0.0};
     double m_subtitleScale{1.0};
+    bool m_subtitleVisible{true};
 };
 
 } // namespace outplayer::engine

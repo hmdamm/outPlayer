@@ -6,6 +6,7 @@
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QEvent>
+#include <QFileDialog>
 #include <QFileInfo>
 #include <QHBoxLayout>
 #include <QMimeData>
@@ -573,6 +574,7 @@ void MainWindow::dropEvent(QDropEvent* event)
     }
 
     QStringList filesToAdd;
+    bool subtitleLoaded = false;
     if (mimeData->hasUrls()) {
         const QList<QUrl> urls = mimeData->urls();
         for (const auto& url : urls) {
@@ -581,6 +583,16 @@ void MainWindow::dropEvent(QDropEvent* event)
                 QFileInfo fi(localPath);
                 if (fi.isDir()) {
                     filesToAdd.append(MediaOpenController::scanDirectory(localPath, true));
+                } else if (fi.isFile() && MediaOpenController::isSubtitleFile(localPath)) {
+                    if (m_engine) {
+                        m_engine->loadSubtitle(localPath);
+                    }
+                    if (m_osdOverlay) {
+                        m_osdOverlay->showMessage(
+                            QStringLiteral("Subtitle loaded: %1").arg(fi.fileName()),
+                            1500, OsdPosition::TopLeft);
+                    }
+                    subtitleLoaded = true;
                 } else if (fi.isFile() && MediaOpenController::isMediaFile(localPath)) {
                     filesToAdd.append(localPath);
                 }
@@ -598,6 +610,11 @@ void MainWindow::dropEvent(QDropEvent* event)
     if (!filesToAdd.isEmpty()) {
         const bool wasEmpty = (m_playlistModel && m_playlistModel->rowCount() == 0);
         openFiles(filesToAdd, wasEmpty || !m_engine || m_engine->isPaused() || m_playlistModel->currentIndex() < 0);
+        event->acceptProposedAction();
+        return;
+    }
+
+    if (subtitleLoaded) {
         event->acceptProposedAction();
         return;
     }
@@ -1141,6 +1158,153 @@ void MainWindow::setupCommandHandlers()
         if (m_engine) {
             m_engine->setSubtitleDelay(0.0);
             showSubtitleSyncOsd();
+        }
+    });
+
+    // Subtitle Visibility Toggle (Alt+H)
+    registerCommand(core::CommandId::CMD_SUB_TOGGLE_VISIBILITY, [this](const QVariantMap&) {
+        if (m_engine) {
+            const bool newState = !m_engine->isSubtitleVisible();
+            m_engine->setSubtitleVisible(newState);
+            if (m_osdOverlay) {
+                m_osdOverlay->showMessage(
+                    newState ? QStringLiteral("Subtitles: On") : QStringLiteral("Subtitles: Off"),
+                    1500, OsdPosition::TopLeft);
+            }
+        }
+    });
+
+    // Subtitle File Load (Alt+O)
+    registerCommand(core::CommandId::CMD_SUB_LOAD, [this](const QVariantMap& args) {
+        if (args.contains(QStringLiteral("path"))) {
+            const QString filePath = args.value(QStringLiteral("path")).toString();
+            if (!filePath.isEmpty() && m_engine) {
+                if (m_engine->loadSubtitle(filePath)) {
+                    if (m_osdOverlay) {
+                        QFileInfo fi(filePath);
+                        m_osdOverlay->showMessage(
+                            QStringLiteral("Subtitle loaded: %1").arg(fi.fileName()),
+                            1500, OsdPosition::TopLeft);
+                    }
+                }
+            }
+            return;
+        }
+
+        const QString filter = QStringLiteral("Subtitle Files (*.srt *.ass *.ssa *.vtt *.sub *.idx *.sup);;All Files (*.*)");
+        auto* dialog = new QFileDialog(this, tr("Open Subtitle"), QString(), filter);
+        dialog->setAttribute(Qt::WA_DeleteOnClose);
+        dialog->setFileMode(QFileDialog::ExistingFile);
+        connect(dialog, &QFileDialog::fileSelected, this, [this](const QString& filePath) {
+            if (!filePath.isEmpty() && m_engine) {
+                if (m_engine->loadSubtitle(filePath)) {
+                    if (m_osdOverlay) {
+                        QFileInfo fi(filePath);
+                        m_osdOverlay->showMessage(
+                            QStringLiteral("Subtitle loaded: %1").arg(fi.fileName()),
+                            1500, OsdPosition::TopLeft);
+                    }
+                }
+            }
+        });
+        dialog->show();
+        dialog->raise();
+        dialog->activateWindow();
+    });
+
+    // Subtitle Track Cycling
+    auto cycleSubTrack = [this](bool next) {
+        if (!m_engine) {
+            return;
+        }
+        const auto subTracks = m_engine->tracks(QStringLiteral("sub"));
+        if (subTracks.isEmpty()) {
+            if (m_osdOverlay) {
+                m_osdOverlay->showMessage(QStringLiteral("No Subtitles"), 1500, OsdPosition::TopLeft);
+            }
+            return;
+        }
+
+        int currentIndex = -1;
+        for (int i = 0; i < subTracks.size(); ++i) {
+            if (subTracks[i].selected) {
+                currentIndex = i;
+                break;
+            }
+        }
+
+        int targetIndex = -1;
+        if (next) {
+            if (currentIndex < 0) {
+                targetIndex = 0;
+            } else if (currentIndex + 1 < subTracks.size()) {
+                targetIndex = currentIndex + 1;
+            } else {
+                targetIndex = -1;
+            }
+        } else {
+            if (currentIndex < 0) {
+                targetIndex = subTracks.size() - 1;
+            } else if (currentIndex > 0) {
+                targetIndex = currentIndex - 1;
+            } else {
+                targetIndex = -1;
+            }
+        }
+
+        if (targetIndex >= 0 && targetIndex < subTracks.size()) {
+            const auto& trk = subTracks[targetIndex];
+            m_engine->setSubtitleTrack(trk.id);
+            if (m_osdOverlay) {
+                QString label = trk.title.isEmpty()
+                    ? (trk.language.isEmpty() ? QStringLiteral("Track %1").arg(trk.id) : trk.language)
+                    : trk.title;
+                m_osdOverlay->showMessage(QStringLiteral("Subtitle: %1").arg(label), 1500, OsdPosition::TopLeft);
+            }
+        } else {
+            m_engine->setSubtitleTrack(0);
+            if (m_osdOverlay) {
+                m_osdOverlay->showMessage(QStringLiteral("Subtitles: Off"), 1500, OsdPosition::TopLeft);
+            }
+        }
+    };
+
+    registerCommand(core::CommandId::CMD_SUB_TRACK_NEXT, [cycleSubTrack](const QVariantMap&) {
+        cycleSubTrack(true);
+    });
+    registerCommand(core::CommandId::CMD_SUB_TRACK_PREV, [cycleSubTrack](const QVariantMap&) {
+        cycleSubTrack(false);
+    });
+
+    // Subtitle Size Scaling
+    registerCommand(core::CommandId::CMD_SUB_SIZE_UP, [this](const QVariantMap&) {
+        if (m_engine) {
+            m_engine->setSubtitleScale(m_engine->subtitleScale() + 0.1);
+            if (m_osdOverlay) {
+                m_osdOverlay->showMessage(
+                    QStringLiteral("Subtitle Size: %1%").arg(qRound(m_engine->subtitleScale() * 100)),
+                    1500, OsdPosition::TopLeft);
+            }
+        }
+    });
+    registerCommand(core::CommandId::CMD_SUB_SIZE_DOWN, [this](const QVariantMap&) {
+        if (m_engine) {
+            m_engine->setSubtitleScale(m_engine->subtitleScale() - 0.1);
+            if (m_osdOverlay) {
+                m_osdOverlay->showMessage(
+                    QStringLiteral("Subtitle Size: %1%").arg(qRound(m_engine->subtitleScale() * 100)),
+                    1500, OsdPosition::TopLeft);
+            }
+        }
+    });
+    registerCommand(core::CommandId::CMD_SUB_SIZE_RESET, [this](const QVariantMap&) {
+        if (m_engine) {
+            m_engine->setSubtitleScale(1.0);
+            if (m_osdOverlay) {
+                m_osdOverlay->showMessage(
+                    QStringLiteral("Subtitle Size: 100%"),
+                    1500, OsdPosition::TopLeft);
+            }
         }
     });
 

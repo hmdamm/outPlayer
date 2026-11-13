@@ -522,6 +522,26 @@ target_link_libraries(test_main_window_hotkeys
 
 add_test(NAME test_main_window_hotkeys COMMAND test_main_window_hotkeys)
 
+# ==============================================================================
+# Task 2: test_subtitle_pipeline target
+# ==============================================================================
+qt_add_executable(test_subtitle_pipeline
+    test_subtitle_pipeline.cpp
+)
+
+target_link_libraries(test_subtitle_pipeline
+    PRIVATE
+        outplayer_ui
+        outplayer_playlist
+        outplayer_input
+        outplayer_core
+        Qt6::Test
+        Qt6::Widgets
+)
+
+add_test(NAME test_subtitle_pipeline COMMAND test_subtitle_pipeline)
+
+
 
 
 

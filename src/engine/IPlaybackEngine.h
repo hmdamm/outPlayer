@@ -89,6 +89,10 @@ public:
     virtual void setSubtitleDelay(double seconds) = 0;
     [[nodiscard]] virtual double subtitleScale() const = 0;
     virtual void setSubtitleScale(double scale) = 0;
+    [[nodiscard]] virtual bool isSubtitleVisible() const { return true; }
+    virtual void setSubtitleVisible(bool /*visible*/) {}
+    [[nodiscard]] virtual int currentSubtitleTrack() const { return 0; }
+    virtual bool setSubtitleTrack(int /*trackId*/) { return false; }
     virtual bool loadSubtitle(const QString& filePath) = 0;
 
     // Frame Capture
