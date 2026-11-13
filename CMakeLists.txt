@@ -9,6 +9,13 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+option(ENABLE_SANITIZERS "Enable AddressSanitizer (ASan) and UndefinedBehaviorSanitizer (UBSan)" OFF)
+if(ENABLE_SANITIZERS)
+    message(STATUS "Sanitizers enabled: AddressSanitizer, UndefinedBehaviorSanitizer")
+    add_compile_options(-fsanitize=address,undefined -fno-omit-frame-pointer)
+    add_link_options(-fsanitize=address,undefined)
+endif()
+
 find_package(Qt6 6.5 REQUIRED COMPONENTS
     Core
     Widgets
