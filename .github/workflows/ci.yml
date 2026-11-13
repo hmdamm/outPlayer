@@ -29,7 +29,7 @@ jobs:
         run: cmake --build build -j$(nproc)
 
       - name: Run CTest test suite
-        run: QT_QPA_PLATFORM=offscreen xvfb-run -a ctest --test-dir build --output-on-failure
+        run: QT_QPA_PLATFORM=xcb xvfb-run -a ctest --test-dir build --output-on-failure
 
       - name: Run packaging and spec tests
         run: |
