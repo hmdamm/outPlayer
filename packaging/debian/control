@@ -1,0 +1,24 @@
+Source: outplayer
+Section: video
+Priority: optional
+Maintainer: outPlayer Developers <dev@outplayer.org>
+Build-Depends: debhelper-compat (= 13),
+               cmake (>= 3.22),
+               ninja-build,
+               pkg-config,
+               qt6-base-dev,
+               libqt6opengl6-dev,
+               qt6-declarative-dev,
+               libqt6svg6-dev,
+               libmpv-dev (>= 0.35.0)
+Standards-Version: 4.6.2
+Homepage: https://github.com/outplayer/outplayer
+
+Package: outplayer
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Modern, high-performance Linux media player
+ outPlayer is a feature-rich, high-performance Linux media player
+ powered by Qt 6 and libmpv. It provides hardware-accelerated
+ video playback, a responsive frameless interface, customizable hotkeys,
+ advanced playlist management, and deep desktop integration.
