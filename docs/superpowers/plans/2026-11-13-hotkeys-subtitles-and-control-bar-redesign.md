@@ -99,21 +99,21 @@ git commit -m "feat(hotkeys): implement playback speed shortcuts C/X/Z and expan
   6. Command handlers for `CMD_SUB_TOGGLE_VISIBILITY` (`Alt+H`), `CMD_SUB_LOAD` (`Alt+O`), `CMD_SUB_TRACK_NEXT`, `CMD_SUB_TRACK_PREV`, `CMD_SUB_SIZE_UP`, `CMD_SUB_SIZE_DOWN`, `CMD_SUB_SIZE_RESET`.
   7. Automated test in `tests/test_subtitle_pipeline.cpp`.
 
-- [ ] **Step 1: Write failing test in `tests/test_subtitle_pipeline.cpp`**
+- [x] **Step 1: Write failing test in `tests/test_subtitle_pipeline.cpp`**
 Verify subtitle file loading, visibility toggling, track enumeration, and drop event subtitle handling.
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 Run: `wsl bash -c 'cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=Debug && cmake --build build -j$(nproc) && QT_QPA_PLATFORM=xcb xvfb-run -a ctest --test-dir build -R test_subtitle_pipeline --output-on-failure'`
 Expected: FAIL.
 
-- [ ] **Step 3: Implement subtitle engine and UI integration**
+- [x] **Step 3: Implement subtitle engine and UI integration**
 Update `MpvEngine`, `MediaOpenController`, and `MainWindow`.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 Run: `wsl bash -c 'QT_QPA_PLATFORM=xcb xvfb-run -a ctest --test-dir build -R test_subtitle_pipeline --output-on-failure'`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 ```bash
 git add src/engine/IPlaybackEngine.h src/engine/MpvEngine.h src/engine/MpvEngine.cpp src/ui/MediaOpenController.h src/ui/MediaOpenController.cpp src/ui/MainWindow.h src/ui/MainWindow.cpp tests/test_subtitle_pipeline.cpp tests/CMakeLists.txt
 git commit -m "feat(subtitles): enable auto-detection, drag-drop subtitle loading, and visibility toggling"
@@ -143,21 +143,21 @@ git commit -m "feat(subtitles): enable auto-detection, drag-drop subtitle loadin
   4. Automatic persistence in `SettingsManager` under `[Subtitles]`.
   5. Test `tests/test_subtitle_font_customization.cpp` verifying styling application, settings persistence, and dialog sync.
 
-- [ ] **Step 1: Write failing test in `tests/test_subtitle_font_customization.cpp`**
+- [x] **Step 1: Write failing test in `tests/test_subtitle_font_customization.cpp`**
 Verify setting subtitle font family, size, color, bold, border, and shadow updates `MpvEngine`, persists to `SettingsManager`, and syncs with Preferences/ControlPanel.
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 Run: `wsl bash -c 'cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=Debug && cmake --build build -j$(nproc) && QT_QPA_PLATFORM=xcb xvfb-run -a ctest --test-dir build -R test_subtitle_font_customization --output-on-failure'`
 Expected: FAIL.
 
-- [ ] **Step 3: Implement subtitle styling in `MpvEngine`, `PreferencesDialog`, and `ControlPanel`**
+- [x] **Step 3: Implement subtitle styling in `MpvEngine`, `PreferencesDialog`, and `ControlPanel`**
 Implement properties, dialog controls, and settings sync.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 Run: `wsl bash -c 'QT_QPA_PLATFORM=xcb xvfb-run -a ctest --test-dir build -R test_subtitle_font_customization --output-on-failure'`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 ```bash
 git add src/engine/IPlaybackEngine.h src/engine/MpvEngine.h src/engine/MpvEngine.cpp src/ui/PreferencesDialog.h src/ui/PreferencesDialog.cpp src/ui/ControlPanel.h src/ui/ControlPanel.cpp tests/test_subtitle_font_customization.cpp tests/CMakeLists.txt
 git commit -m "feat(subtitles): add custom font selection, size, color, weight, and border customization"
@@ -186,21 +186,21 @@ git commit -m "feat(subtitles): add custom font selection, size, color, weight, 
   4. Video info badges update dynamically based on loaded stream properties (`H/W` decoding, video codec, audio codec, audio channels).
   5. Test `tests/test_control_bar_layout.cpp` verifying 2-tier layout, button placements, badge updates, and signal emissions.
 
-- [ ] **Step 1: Write failing test in `tests/test_control_bar_layout.cpp`**
+- [x] **Step 1: Write failing test in `tests/test_control_bar_layout.cpp`**
 Verify two-tier structure, widget presence, top-row seek/volume, bottom-row controls/badges, and click signals.
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 Run: `wsl bash -c 'cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=Debug && cmake --build build -j$(nproc) && QT_QPA_PLATFORM=xcb xvfb-run -a ctest --test-dir build -R test_control_bar_layout --output-on-failure'`
 Expected: FAIL.
 
-- [ ] **Step 3: Implement 2-tier ControlBar and MainWindow connections**
+- [x] **Step 3: Implement 2-tier ControlBar and MainWindow connections**
 Redesign `ControlBar.h` / `ControlBar.cpp`, wire `openFileClicked` and `preferencesClicked` in `MainWindow`, and connect track change events to update video info badges.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 Run: `wsl bash -c 'QT_QPA_PLATFORM=xcb xvfb-run -a ctest --test-dir build -R test_control_bar_layout --output-on-failure'`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 ```bash
 git add src/ui/ControlBar.h src/ui/ControlBar.cpp src/ui/MainWindow.h src/ui/MainWindow.cpp tests/test_control_bar_layout.cpp tests/CMakeLists.txt
 git commit -m "feat(ui): redesign bottom control bar to 2-tier layout matching PotPlayer"
@@ -223,16 +223,16 @@ git commit -m "feat(ui): redesign bottom control bar to 2-tier layout matching P
   3. Updated `TASKS.md` with verification logs.
   4. 100% test pass rate across all 33 CTest suites and all packaging verification suites.
 
-- [ ] **Step 1: Update `tests/test_ui_layout_validation.cpp`**
+- [x] **Step 1: Update `tests/test_ui_layout_validation.cpp`**
 Update expected control bar height assertions to match new 2-tier layout (~56px).
 
-- [ ] **Step 2: Record ADR 012 in `docs/decisions.md`**
+- [x] **Step 2: Record ADR 012 in `docs/decisions.md`**
 Document architectural context, decisions, and consequences.
 
-- [ ] **Step 3: Update `TASKS.md`**
+- [x] **Step 3: Update `TASKS.md`**
 Record task completion and verification evidence.
 
-- [ ] **Step 4: Run complete verification suite**
+- [x] **Step 4: Run complete verification suite**
 Run:
 - `wsl bash -c 'cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=Debug && cmake --build build -j$(nproc)'`
 - `wsl bash -c 'QT_QPA_PLATFORM=xcb xvfb-run -a ctest --test-dir build --output-on-failure'`
@@ -244,7 +244,7 @@ Run:
 - `wsl python3 tests/test_phase1_specs.py`
 - `wsl python3 tests/test_project_scaffold.py`
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 ```bash
 git add tests/test_ui_layout_validation.cpp docs/decisions.md TASKS.md
 git commit -m "docs: record ADR 012 and certify hotkeys, subtitles, and control bar redesign"
