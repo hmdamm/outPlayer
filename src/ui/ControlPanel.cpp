@@ -10,12 +10,14 @@
 #include <QComboBox>
 #include <QDoubleSpinBox>
 #include <QFileDialog>
+#include <QFontComboBox>
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
 #include <QSlider>
+#include <QSpinBox>
 #include <QTabBar>
 #include <QTabWidget>
 #include <QVBoxLayout>
@@ -379,6 +381,39 @@ void ControlPanel::setupSubtitlesTab() {
     trackLayout->addWidget(m_loadSubtitleBtn);
 
     subLayout->addLayout(trackLayout);
+
+    // Font and Size row
+    auto* fontLayout = new QHBoxLayout();
+    auto* fontLabel = new QLabel(tr("Font Family:"), subWidget);
+    fontLabel->setFixedWidth(90);
+    fontLabel->setStyleSheet(QStringLiteral("color: #cccccc; font-weight: 500;"));
+    fontLayout->addWidget(fontLabel);
+
+    m_subtitleFontCombo = new QFontComboBox(subWidget);
+    m_subtitleFontCombo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    connect(m_subtitleFontCombo, &QFontComboBox::currentFontChanged, this, [this](const QFont& font) {
+        if (!m_updatingFromEngine && m_engine) {
+            m_engine->setSubtitleFont(font.family());
+        }
+    });
+    fontLayout->addWidget(m_subtitleFontCombo);
+
+    auto* sizeLabel = new QLabel(tr("Size:"), subWidget);
+    sizeLabel->setStyleSheet(QStringLiteral("color: #cccccc; font-weight: 500;"));
+    fontLayout->addWidget(sizeLabel);
+
+    m_subtitleFontSizeSpinBox = new QSpinBox(subWidget);
+    m_subtitleFontSizeSpinBox->setRange(10, 96);
+    m_subtitleFontSizeSpinBox->setValue(24);
+    m_subtitleFontSizeSpinBox->setSuffix(QStringLiteral(" pt"));
+    connect(m_subtitleFontSizeSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, [this](int val) {
+        if (!m_updatingFromEngine && m_engine) {
+            m_engine->setSubtitleFontSize(val);
+        }
+    });
+    fontLayout->addWidget(m_subtitleFontSizeSpinBox);
+
+    subLayout->addLayout(fontLayout);
 
     // Sync Offset row
     auto* delayLayout = new QHBoxLayout();
@@ -789,6 +824,13 @@ void ControlPanel::updateSubtitlesFromEngine() {
     const int scalePercent = std::clamp(static_cast<int>(std::round(scale * 100.0)), 50, 200);
     m_subtitleScaleSlider->setValue(scalePercent);
     m_subtitleScaleLabel->setText(QString::number(scalePercent) + QStringLiteral("%"));
+
+    if (m_subtitleFontCombo) {
+        m_subtitleFontCombo->setCurrentFont(QFont(m_engine->subtitleFont()));
+    }
+    if (m_subtitleFontSizeSpinBox) {
+        m_subtitleFontSizeSpinBox->setValue(m_engine->subtitleFontSize());
+    }
 
     m_updatingFromEngine = false;
 }

@@ -25,6 +25,7 @@ target_include_directories(outplayer_core
 target_link_libraries(outplayer_core
     PUBLIC
         Qt6::Core
+        Qt6::Gui
         PkgConfig::MPV
 )
 

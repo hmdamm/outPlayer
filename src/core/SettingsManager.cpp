@@ -35,6 +35,14 @@ void SettingsManager::initDefaults() {
         {QStringLiteral("Video/HardwareDecoder"), QStringLiteral("auto-safe")},
         {QStringLiteral("Audio/Channels"), QStringLiteral("stereo")},
         {QStringLiteral("Subtitles/Font"), QStringLiteral("sans-serif")},
+        {QStringLiteral("Subtitles/FontSize"), 24},
+        {QStringLiteral("Subtitles/Color"), QStringLiteral("#ffffffff")},
+        {QStringLiteral("Subtitles/Bold"), false},
+        {QStringLiteral("Subtitles/Italic"), false},
+        {QStringLiteral("Subtitles/BorderColor"), QStringLiteral("#ff000000")},
+        {QStringLiteral("Subtitles/BorderSize"), 2.0},
+        {QStringLiteral("Subtitles/ShadowColor"), QStringLiteral("#80000000")},
+        {QStringLiteral("Subtitles/ShadowOffset"), 0.0},
         {QStringLiteral("Video/Deinterlace"), QStringLiteral("auto")}
     };
 }

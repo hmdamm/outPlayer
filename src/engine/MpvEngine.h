@@ -81,6 +81,26 @@ public:
     bool setSubtitleTrack(int trackId) override;
     bool loadSubtitle(const QString& filePath) override;
 
+    // Subtitle Appearance & Font Customization
+    [[nodiscard]] QString subtitleFont() const override;
+    void setSubtitleFont(const QString& fontName) override;
+    [[nodiscard]] int subtitleFontSize() const override;
+    void setSubtitleFontSize(int pt) override;
+    [[nodiscard]] QColor subtitleColor() const override;
+    void setSubtitleColor(const QColor& color) override;
+    [[nodiscard]] bool isSubtitleBold() const override;
+    void setSubtitleBold(bool bold) override;
+    [[nodiscard]] bool isSubtitleItalic() const override;
+    void setSubtitleItalic(bool italic) override;
+    [[nodiscard]] QColor subtitleBorderColor() const override;
+    void setSubtitleBorderColor(const QColor& color) override;
+    [[nodiscard]] double subtitleBorderSize() const override;
+    void setSubtitleBorderSize(double size) override;
+    [[nodiscard]] QColor subtitleShadowColor() const override;
+    void setSubtitleShadowColor(const QColor& color) override;
+    [[nodiscard]] double subtitleShadowOffset() const override;
+    void setSubtitleShadowOffset(double offset) override;
+
     // Frame Capture
     bool captureFrame(const QString& destinationPath) override;
 
@@ -123,6 +143,16 @@ private:
     double m_subtitleDelay{0.0};
     double m_subtitleScale{1.0};
     bool m_subtitleVisible{true};
+
+    QString m_subtitleFont{QStringLiteral("sans-serif")};
+    int m_subtitleFontSize{24};
+    QColor m_subtitleColor{255, 255, 255, 255};
+    bool m_subtitleBold{false};
+    bool m_subtitleItalic{false};
+    QColor m_subtitleBorderColor{0, 0, 0, 255};
+    double m_subtitleBorderSize{2.0};
+    QColor m_subtitleShadowColor{0, 0, 0, 128};
+    double m_subtitleShadowOffset{0.0};
 };
 
 } // namespace outplayer::engine

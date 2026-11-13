@@ -12,6 +12,8 @@ class QLabel;
 class QCheckBox;
 class QComboBox;
 class QDoubleSpinBox;
+class QFontComboBox;
+class QSpinBox;
 class QCloseEvent;
 
 namespace outplayer::engine {
@@ -65,6 +67,8 @@ public:
     [[nodiscard]] QPushButton* audioDelayResetButton() const noexcept { return m_audioDelayResetBtn; }
 
     // Tab 3: Subtitles
+    [[nodiscard]] QFontComboBox* subtitleFontComboBox() const noexcept { return m_subtitleFontCombo; }
+    [[nodiscard]] QSpinBox* subtitleFontSizeSpinBox() const noexcept { return m_subtitleFontSizeSpinBox; }
     [[nodiscard]] QDoubleSpinBox* subtitleDelaySpinBox() const noexcept { return m_subtitleDelaySpinBox; }
     [[nodiscard]] QPushButton* subtitleDelayMinusButton() const noexcept { return m_subtitleDelayMinusBtn; }
     [[nodiscard]] QPushButton* subtitleDelayPlusButton() const noexcept { return m_subtitleDelayPlusBtn; }
@@ -141,6 +145,8 @@ private:
     QPushButton* m_audioDelayResetBtn{nullptr};
 
     // Tab 3 Subtitles
+    QFontComboBox* m_subtitleFontCombo{nullptr};
+    QSpinBox* m_subtitleFontSizeSpinBox{nullptr};
     QDoubleSpinBox* m_subtitleDelaySpinBox{nullptr};
     QPushButton* m_subtitleDelayMinusBtn{nullptr};
     QPushButton* m_subtitleDelayPlusBtn{nullptr};

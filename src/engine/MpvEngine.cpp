@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "engine/MpvEngine.h"
+#include "core/SettingsManager.h"
 
 #include <QDir>
 #include <QFileInfo>
@@ -199,6 +200,49 @@ bool MpvEngine::initialize()
     }
 
     mpv_set_property_string(m_mpv, "sub-visibility", "yes");
+
+    // Load and apply persisted subtitle appearance settings
+    auto& settings = core::SettingsManager::instance();
+    m_subtitleFont = settings.get(QStringLiteral("Subtitles/Font"), QStringLiteral("sans-serif")).toString();
+    m_subtitleFontSize = settings.get(QStringLiteral("Subtitles/FontSize"), 24).toInt();
+
+    const QString colorStr = settings.get(QStringLiteral("Subtitles/Color"), QStringLiteral("#ffffffff")).toString();
+    if (QColor::isValidColorName(colorStr)) {
+        m_subtitleColor = QColor(colorStr);
+    } else {
+        m_subtitleColor = QColor(255, 255, 255, 255);
+    }
+
+    m_subtitleBold = settings.get(QStringLiteral("Subtitles/Bold"), false).toBool();
+    m_subtitleItalic = settings.get(QStringLiteral("Subtitles/Italic"), false).toBool();
+
+    const QString borderColStr = settings.get(QStringLiteral("Subtitles/BorderColor"), QStringLiteral("#ff000000")).toString();
+    if (QColor::isValidColorName(borderColStr)) {
+        m_subtitleBorderColor = QColor(borderColStr);
+    } else {
+        m_subtitleBorderColor = QColor(0, 0, 0, 255);
+    }
+
+    m_subtitleBorderSize = settings.get(QStringLiteral("Subtitles/BorderSize"), 2.0).toDouble();
+
+    const QString shadowColStr = settings.get(QStringLiteral("Subtitles/ShadowColor"), QStringLiteral("#80000000")).toString();
+    if (QColor::isValidColorName(shadowColStr)) {
+        m_subtitleShadowColor = QColor(shadowColStr);
+    } else {
+        m_subtitleShadowColor = QColor(0, 0, 0, 128);
+    }
+
+    m_subtitleShadowOffset = settings.get(QStringLiteral("Subtitles/ShadowOffset"), 0.0).toDouble();
+
+    setSubtitleFont(m_subtitleFont);
+    setSubtitleFontSize(m_subtitleFontSize);
+    setSubtitleColor(m_subtitleColor);
+    setSubtitleBold(m_subtitleBold);
+    setSubtitleItalic(m_subtitleItalic);
+    setSubtitleBorderColor(m_subtitleBorderColor);
+    setSubtitleBorderSize(m_subtitleBorderSize);
+    setSubtitleShadowColor(m_subtitleShadowColor);
+    setSubtitleShadowOffset(m_subtitleShadowOffset);
 
     // Observe core playback properties
     mpv_observe_property(m_mpv, 0, "time-pos", MPV_FORMAT_DOUBLE);
@@ -899,6 +943,144 @@ bool MpvEngine::captureFrame(const QString& destinationPath)
     const QByteArray pathUtf8 = destinationPath.toUtf8();
     const char* cmd[] = {"screenshot-to-file", pathUtf8.constData(), "video", nullptr};
     return mpv_command(m_mpv, cmd) >= 0;
+}
+
+QString MpvEngine::subtitleFont() const
+{
+    return m_subtitleFont;
+}
+
+void MpvEngine::setSubtitleFont(const QString& fontName)
+{
+    m_subtitleFont = fontName.trimmed().isEmpty() ? QStringLiteral("sans-serif") : fontName.trimmed();
+    if (m_mpv) {
+        mpv_set_property_string(m_mpv, "sub-font", m_subtitleFont.toUtf8().constData());
+    }
+    emit subtitleSettingsChanged();
+}
+
+int MpvEngine::subtitleFontSize() const
+{
+    return m_subtitleFontSize;
+}
+
+void MpvEngine::setSubtitleFontSize(int pt)
+{
+    m_subtitleFontSize = std::clamp(pt, 10, 96);
+    if (m_mpv) {
+        mpv_set_property_string(m_mpv, "sub-font-size", QByteArray::number(m_subtitleFontSize).constData());
+    }
+    emit subtitleSettingsChanged();
+}
+
+QColor MpvEngine::subtitleColor() const
+{
+    return m_subtitleColor;
+}
+
+void MpvEngine::setSubtitleColor(const QColor& color)
+{
+    if (!color.isValid()) {
+        return;
+    }
+    m_subtitleColor = color;
+    if (m_mpv) {
+        const QString hex = color.name(QColor::HexArgb);
+        mpv_set_property_string(m_mpv, "sub-color", hex.toUtf8().constData());
+    }
+    emit subtitleSettingsChanged();
+}
+
+bool MpvEngine::isSubtitleBold() const
+{
+    return m_subtitleBold;
+}
+
+void MpvEngine::setSubtitleBold(bool bold)
+{
+    m_subtitleBold = bold;
+    if (m_mpv) {
+        mpv_set_property_string(m_mpv, "sub-bold", bold ? "yes" : "no");
+    }
+    emit subtitleSettingsChanged();
+}
+
+bool MpvEngine::isSubtitleItalic() const
+{
+    return m_subtitleItalic;
+}
+
+void MpvEngine::setSubtitleItalic(bool italic)
+{
+    m_subtitleItalic = italic;
+    if (m_mpv) {
+        mpv_set_property_string(m_mpv, "sub-italic", italic ? "yes" : "no");
+    }
+    emit subtitleSettingsChanged();
+}
+
+QColor MpvEngine::subtitleBorderColor() const
+{
+    return m_subtitleBorderColor;
+}
+
+void MpvEngine::setSubtitleBorderColor(const QColor& color)
+{
+    if (!color.isValid()) {
+        return;
+    }
+    m_subtitleBorderColor = color;
+    if (m_mpv) {
+        const QString hex = color.name(QColor::HexArgb);
+        mpv_set_property_string(m_mpv, "sub-border-color", hex.toUtf8().constData());
+    }
+    emit subtitleSettingsChanged();
+}
+
+double MpvEngine::subtitleBorderSize() const
+{
+    return m_subtitleBorderSize;
+}
+
+void MpvEngine::setSubtitleBorderSize(double size)
+{
+    m_subtitleBorderSize = std::clamp(size, 0.0, 10.0);
+    if (m_mpv) {
+        mpv_set_property_string(m_mpv, "sub-border-size", QByteArray::number(m_subtitleBorderSize, 'f', 1).constData());
+    }
+    emit subtitleSettingsChanged();
+}
+
+QColor MpvEngine::subtitleShadowColor() const
+{
+    return m_subtitleShadowColor;
+}
+
+void MpvEngine::setSubtitleShadowColor(const QColor& color)
+{
+    if (!color.isValid()) {
+        return;
+    }
+    m_subtitleShadowColor = color;
+    if (m_mpv) {
+        const QString hex = color.name(QColor::HexArgb);
+        mpv_set_property_string(m_mpv, "sub-shadow-color", hex.toUtf8().constData());
+    }
+    emit subtitleSettingsChanged();
+}
+
+double MpvEngine::subtitleShadowOffset() const
+{
+    return m_subtitleShadowOffset;
+}
+
+void MpvEngine::setSubtitleShadowOffset(double offset)
+{
+    m_subtitleShadowOffset = std::clamp(offset, 0.0, 10.0);
+    if (m_mpv) {
+        mpv_set_property_string(m_mpv, "sub-shadow-offset", QByteArray::number(m_subtitleShadowOffset, 'f', 1).constData());
+    }
+    emit subtitleSettingsChanged();
 }
 
 } // namespace outplayer::engine
