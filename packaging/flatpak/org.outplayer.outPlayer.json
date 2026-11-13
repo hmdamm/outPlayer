@@ -1,0 +1,68 @@
+{
+  "app-id": "org.outplayer.outPlayer",
+  "runtime": "org.kde.Platform",
+  "runtime-version": "6.8",
+  "sdk": "org.kde.Sdk",
+  "command": "outplayer",
+  "rename-desktop-file": "org.outplayer.outPlayer.desktop",
+  "rename-appdata-file": "org.outplayer.outPlayer.metainfo.xml",
+  "rename-icon": "org.outplayer.outPlayer",
+  "finish-args": [
+    "--share=ipc",
+    "--socket=fallback-x11",
+    "--socket=wayland",
+    "--socket=pulseaudio",
+    "--filesystem=xdg-run/pipewire-0",
+    "--device=all",
+    "--filesystem=host:ro",
+    "--filesystem=xdg-download:ro",
+    "--filesystem=xdg-videos:ro",
+    "--filesystem=xdg-music:ro",
+    "--filesystem=xdg-pictures:ro",
+    "--talk-name=org.mpris.MediaPlayer2.*",
+    "--talk-name=org.freedesktop.ScreenSaver"
+  ],
+  "cleanup": [
+    "/include",
+    "/lib/pkgconfig",
+    "/share/man",
+    "*.la",
+    "*.a"
+  ],
+  "modules": [
+    {
+      "name": "libmpv",
+      "buildsystem": "meson",
+      "config-opts": [
+        "-Dlibmpv=true",
+        "-Dcplayer=false",
+        "-Dbuild-date=false",
+        "-Dmanpage-build=disabled",
+        "-Dlua=disabled",
+        "-Djavascript=disabled",
+        "-Duchardet=disabled"
+      ],
+      "sources": [
+        {
+          "type": "archive",
+          "url": "https://github.com/mpv-player/mpv/archive/refs/tags/v0.38.0.tar.gz",
+          "sha256": "86d9ef40b60589170a41f94d4dd61eb9aa55d496030b627db59cb6da4b4287db"
+        }
+      ]
+    },
+    {
+      "name": "outplayer",
+      "buildsystem": "cmake-ninja",
+      "builddir": true,
+      "config-opts": [
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "sources": [
+        {
+          "type": "dir",
+          "path": "../.."
+        }
+      ]
+    }
+  ]
+}
