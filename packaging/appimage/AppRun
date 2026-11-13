@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# AppRun entrypoint for outPlayer standalone AppImage / AppDir bundle
+set -e
+
+HERE="$(dirname "$(readlink -f "${0}")")"
+
+export APPDIR="${HERE}"
+export PATH="${HERE}/usr/bin:${PATH}"
+
+if [ -n "${LD_LIBRARY_PATH:-}" ]; then
+    export LD_LIBRARY_PATH="${HERE}/usr/lib:${HERE}/usr/lib64:${LD_LIBRARY_PATH}"
+else
+    export LD_LIBRARY_PATH="${HERE}/usr/lib:${HERE}/usr/lib64"
+fi
+
+if [ -n "${QT_PLUGIN_PATH:-}" ]; then
+    export QT_PLUGIN_PATH="${HERE}/usr/plugins:${QT_PLUGIN_PATH}"
+else
+    export QT_PLUGIN_PATH="${HERE}/usr/plugins"
+fi
+
+if [ -n "${XDG_DATA_DIRS:-}" ]; then
+    export XDG_DATA_DIRS="${HERE}/usr/share:${XDG_DATA_DIRS}"
+else
+    export XDG_DATA_DIRS="${HERE}/usr/share:/usr/local/share:/usr/share"
+fi
+
+exec "${HERE}/usr/bin/outplayer" "$@"
