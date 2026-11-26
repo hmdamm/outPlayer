@@ -124,13 +124,13 @@ To prevent architectural drift and maintain testability, dependencies are strict
 
 | Target Library | Permitted Qt Modules | Permitted External Libraries | Source Directory | Allowed Dependencies | Prohibited Dependencies |
 |---|---|---|---|---|---|
-| **`outplayer_core`** | `Qt6::Core` | `PkgConfig::MPV` | `src/core/`, `src/engine/` | Standard C++20 library, `mpv/client.h` | `QtWidgets`, `QtGui`, `QtOpenGLWidgets`, GUI headers |
+| **`outplayer_core`** | `Qt6::Core`, `Qt6::Gui` (value types only) | `PkgConfig::MPV` | `src/core/`, `src/engine/` | Standard C++20 library, `mpv/client.h` | `QtWidgets`, `QtOpenGLWidgets`, widget/window headers |
 | **`outplayer_input`** | `Qt6::Core`, `Qt6::Widgets` | None | `src/input/` | `outplayer_core` | `QtOpenGLWidgets`, direct `mpv` handles |
 | **`outplayer_ui`** | `Qt6::Core`, `Qt6::Widgets`, `Qt6::OpenGLWidgets` | `PkgConfig::MPV` | `src/ui/` | `outplayer_core`, `outplayer_input`, `mpv/render.h` | Internal implementation leaks |
 | **`outplayer` (exe)** | `Qt6::Widgets`, `Qt6::OpenGLWidgets` | None (via libs) | `src/main.cpp` | `outplayer_ui`, `outplayer_input`, `outplayer_core` | Circular dependencies |
 
 ### Architectural Boundary Invariants
-1. **Zero UI in `src/core`:** `src/core/` and `src/engine/` must compile with only `Qt6::Core`. Inclusion of `<QWidget>`, `<QAction>`, `<QPainter>`, `<QShortcut>`, or any GUI header in these modules is a build violation.
+1. **Zero Widget UI in `src/core`:** `src/core/` and `src/engine/` must compile without `Qt6::Widgets` or `Qt6::OpenGLWidgets` (`Qt6::Gui` is used strictly for `QColor` value types). Inclusion of `<QWidget>`, `<QAction>`, `<QPainter>`, `<QShortcut>`, or any widget/window header in these modules is a build violation.
 2. **Abstract Engine Access:** Higher-level UI components should consume `IPlaybackEngine` rather than coupling directly to `MpvEngine` implementation details where feasible (except for `VideoWidget` which requires the `mpv_handle*` for OpenGL render context creation).
 3. **Decoupled Command Handlers:** Handlers registered in `CommandRegistry` are lightweight lambdas or member functions connected via `std::function<void(const QVariantMap&)>`. Handlers do not block and dispatch asynchronously to the appropriate domain service.
 

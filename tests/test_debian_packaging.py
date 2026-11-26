@@ -100,7 +100,7 @@ def test_control_file():
         assert dep in build_deps, f"Missing Build-Depends '{dep}' in: {build_deps}"
 
     assert source_block.get("Standards-Version") == "4.6.2", f"Unexpected Standards-Version: {source_block.get('Standards-Version')}"
-    assert source_block.get("Homepage") == "https://github.com/outplayer/outplayer", f"Unexpected Homepage: {source_block.get('Homepage')}"
+    assert source_block.get("Homepage") == "https://github.com/hmdamm/outPlayer", f"Unexpected Homepage: {source_block.get('Homepage')}"
 
     pkg_block = paras[1]
     assert pkg_block.get("Package") == "outplayer", f"Unexpected Package: {pkg_block.get('Package')}"
@@ -151,7 +151,7 @@ def test_changelog():
     match = re.match(r"^outplayer\s+\((.+)\)\s+([a-zA-Z0-9_-]+);\s+urgency=([a-zA-Z0-9]+)", header)
     assert match, f"Changelog header does not match Debian standard: {header}"
     version, dist, urgency = match.groups()
-    assert version == "0.1.0-1", f"Expected version 0.1.0-1, got: {version}"
+    assert version == "0.1.1-1", f"Expected version 0.1.1-1, got: {version}"
 
     trailer = lines[-1]
     assert trailer.startswith("-- "), f"Changelog trailer must start with '-- ', got: {trailer}"
@@ -208,7 +208,7 @@ def test_build_deb_script():
     arch = arch_res.stdout.strip() if arch_res.returncode == 0 else "amd64"
 
     dist_dir = os.path.join(REPO_ROOT, "dist")
-    expected_deb = os.path.join(dist_dir, f"outplayer_0.1.0-1_{arch}.deb")
+    expected_deb = os.path.join(dist_dir, f"outplayer_0.1.1-1_{arch}.deb")
 
     # Run build-deb.sh
     res = subprocess.run([BUILD_DEB_SCRIPT, dist_dir], cwd=REPO_ROOT, capture_output=True, text=True)
@@ -224,7 +224,7 @@ def test_build_deb_script():
     control_info = info_res.stdout
 
     assert "Package: outplayer" in control_info, f"dpkg-deb -I missing 'Package: outplayer':\n{control_info}"
-    assert "Version: 0.1.0-1" in control_info, f"dpkg-deb -I missing 'Version: 0.1.0-1':\n{control_info}"
+    assert "Version: 0.1.1-1" in control_info, f"dpkg-deb -I missing 'Version: 0.1.1-1':\n{control_info}"
     assert f"Architecture: {arch}" in control_info, f"dpkg-deb -I missing 'Architecture: {arch}':\n{control_info}"
     assert "Maintainer: outPlayer Developers <dev@outplayer.org>" in control_info, (
         f"dpkg-deb -I missing Maintainer:\n{control_info}"

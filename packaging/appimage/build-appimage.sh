@@ -5,7 +5,7 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 OUTPUT_DIR="${1:-$REPO_ROOT/dist}"
 BUILD_DIR="${REPO_ROOT}/build"
-VERSION="0.1.0"
+VERSION="0.1.1"
 ARCH="$(uname -m)"
 APPDIR_NAME="outPlayer-${VERSION}-${ARCH}.AppDir"
 APPDIR="${OUTPUT_DIR}/${APPDIR_NAME}"

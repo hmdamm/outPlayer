@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
     app.setApplicationDisplayName(QStringLiteral("outPlayer"));
     app.setOrganizationName(QStringLiteral("outPlayer"));
     app.setOrganizationDomain(QStringLiteral("org.outplayer.outPlayer"));
-    app.setApplicationVersion(QStringLiteral("0.1.0"));
+    app.setApplicationVersion(QStringLiteral("0.1.1"));
 
     QCommandLineParser parser;
     parser.setApplicationDescription(QStringLiteral("outPlayer - Modern Linux Media Player"));

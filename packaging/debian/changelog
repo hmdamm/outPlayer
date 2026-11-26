@@ -1,3 +1,11 @@
+outplayer (0.1.1-1) unstable; urgency=medium
+
+  * Fix libmpv EOF/stop track-switch auto-advance, aspect ratio reset, and audio equalizer filter syntax.
+  * Fix DesktopIntegration MPRIS2/tray double-toggle and InputManager duplicate/text-input shortcuts.
+  * Fix PlaylistDock chrome overlap, missing command handlers, and Preferences live engine sync.
+
+ -- outPlayer Developers <dev@outplayer.org>  Thu, 26 Nov 2026 00:00:00 +0000
+
 outplayer (0.1.0-1) unstable; urgency=medium
 
   * Initial release of outPlayer for Debian and Ubuntu.

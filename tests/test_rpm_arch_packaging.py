@@ -56,10 +56,10 @@ def test_rpm_spec_query():
     name, version, release, license_tag, url, summary = fields[0], fields[1], fields[2], fields[3], fields[4], fields[5]
 
     assert name == "outplayer", f"Expected package name 'outplayer', got: '{name}'"
-    assert version == "0.1.0", f"Expected version '0.1.0', got: '{version}'"
+    assert version == "0.1.1", f"Expected version '0.1.1', got: '{version}'"
     assert release.startswith("1"), f"Expected release starting with '1', got: '{release}'"
     assert "GPL-3.0" in license_tag, f"Expected GPL-3.0 license, got: '{license_tag}'"
-    assert url == "https://github.com/outplayer/outplayer", f"Expected URL 'https://github.com/outplayer/outplayer', got: '{url}'"
+    assert url == "https://github.com/hmdamm/outPlayer", f"Expected URL 'https://github.com/hmdamm/outPlayer', got: '{url}'"
     assert "media player" in summary.lower(), f"Expected media player in summary, got: '{summary}'"
 
     print("packaging/rpm/outplayer.spec rpmspec query PASSED.")
@@ -112,7 +112,7 @@ def test_rpm_spec_content():
 
     # Check changelog
     assert "dev@outplayer.org" in spec_text, "Missing maintainer email in %changelog"
-    assert "0.1.0-1" in spec_text, "Missing version 0.1.0-1 in %changelog"
+    assert "0.1.1-1" in spec_text, "Missing version 0.1.1-1 in %changelog"
 
     print("packaging/rpm/outplayer.spec contents PASSED.")
 
@@ -165,7 +165,7 @@ def test_build_rpm_script():
         qpi_out = qpi_res.stdout
 
         assert re.search(r"^Name\s*:\s*outplayer\b", qpi_out, re.MULTILINE), f"Missing Name in rpm -qpi:\n{qpi_out}"
-        assert re.search(r"^Version\s*:\s*0\.1\.0\b", qpi_out, re.MULTILINE), f"Missing Version in rpm -qpi:\n{qpi_out}"
+        assert re.search(r"^Version\s*:\s*0\.1\.1\b", qpi_out, re.MULTILINE), f"Missing Version in rpm -qpi:\n{qpi_out}"
         assert "GPL-3.0" in qpi_out, f"Missing GPL-3.0 in rpm -qpi:\n{qpi_out}"
 
         print(f"RPM package successfully built ({rpm_size} bytes) and validated: {bin_rpm}")
@@ -209,10 +209,10 @@ def test_arch_pkgbuild():
             var_dict[k.strip()] = v.strip()
 
     assert var_dict.get("pkgname") == "outplayer", f"Unexpected pkgname: {var_dict.get('pkgname')}"
-    assert var_dict.get("pkgver") == "0.1.0", f"Unexpected pkgver: {var_dict.get('pkgver')}"
+    assert var_dict.get("pkgver") == "0.1.1", f"Unexpected pkgver: {var_dict.get('pkgver')}"
     assert var_dict.get("pkgrel") == "1", f"Unexpected pkgrel: {var_dict.get('pkgrel')}"
     assert "media player" in var_dict.get("pkgdesc", "").lower(), f"Unexpected pkgdesc: {var_dict.get('pkgdesc')}"
-    assert var_dict.get("url") == "https://github.com/outplayer/outplayer", f"Unexpected url: {var_dict.get('url')}"
+    assert var_dict.get("url") == "https://github.com/hmdamm/outPlayer", f"Unexpected url: {var_dict.get('url')}"
 
     archs = var_dict.get("arch", "").split()
     assert "x86_64" in archs, f"Missing x86_64 in arch: {archs}"

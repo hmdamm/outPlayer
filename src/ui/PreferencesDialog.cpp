@@ -253,6 +253,7 @@ QWidget* PreferencesDialog::createVideoPage()
 
     m_hwdecComboBox = new QComboBox(renderGroup);
     m_hwdecComboBox->addItems({
+        QStringLiteral("auto-safe"),
         QStringLiteral("auto"),
         QStringLiteral("vaapi"),
         QStringLiteral("nvdec"),
@@ -553,9 +554,9 @@ QWidget* PreferencesDialog::createHotkeysPage()
     layout->addLayout(btnRow);
 
     connect(m_resetHotkeysButton, &QPushButton::clicked, this, [this]() {
-        const auto commands = core::CommandRegistry::instance().allCommands();
-        for (int r = 0; r < commands.size() && r < m_hotkeysTable->rowCount(); ++r) {
-            const auto& cmd = commands[r];
+        const auto allCommands = core::CommandRegistry::instance().allCommands();
+        for (int r = 0; r < allCommands.size() && r < m_hotkeysTable->rowCount(); ++r) {
+            const auto& cmd = allCommands[r];
             if (auto* item = m_hotkeysTable->item(r, 2)) {
                 item->setText(cmd.defaultKey);
             }
@@ -678,7 +679,7 @@ void PreferencesDialog::loadSettings()
     m_autoResumeCheckBox->setChecked(autoResume);
 
     // Video
-    const QString hwdec = m_settings->get(QStringLiteral("Video/HardwareDecoder"), QStringLiteral("auto")).toString();
+    const QString hwdec = m_settings->get(QStringLiteral("Video/HardwareDecoder"), QStringLiteral("auto-safe")).toString();
     const int hwdecIndex = m_hwdecComboBox->findText(hwdec, Qt::MatchFixedString);
     if (hwdecIndex >= 0) {
         m_hwdecComboBox->setCurrentIndex(hwdecIndex);
@@ -690,7 +691,11 @@ void PreferencesDialog::loadSettings()
         m_aspectRatioComboBox->setCurrentIndex(aspectIndex);
     }
 
-    const bool deint = m_settings->get(QStringLiteral("Video/Deinterlacing"), false).toBool();
+    const QVariant deintVar = m_settings->contains(QStringLiteral("Video/Deinterlacing"))
+        ? m_settings->get(QStringLiteral("Video/Deinterlacing"))
+        : m_settings->get(QStringLiteral("Video/Deinterlace"), false);
+    const QString deintStr = deintVar.toString().trimmed().toLower();
+    const bool deint = deintVar.toBool() || deintStr == QStringLiteral("yes") || deintStr == QStringLiteral("true");
     m_deinterlaceCheckBox->setChecked(deint);
 
     // Audio
@@ -808,7 +813,9 @@ void PreferencesDialog::saveSettings()
     // Video
     m_settings->set(QStringLiteral("Video/HardwareDecoder"), m_hwdecComboBox->currentText());
     m_settings->set(QStringLiteral("Video/AspectRatio"), m_aspectRatioComboBox->currentText());
-    m_settings->set(QStringLiteral("Video/Deinterlacing"), m_deinterlaceCheckBox->isChecked());
+    const bool deinterlaceEnabled = m_deinterlaceCheckBox->isChecked();
+    m_settings->set(QStringLiteral("Video/Deinterlacing"), deinterlaceEnabled);
+    m_settings->set(QStringLiteral("Video/Deinterlace"), deinterlaceEnabled ? QStringLiteral("yes") : QStringLiteral("auto"));
 
     // Audio
     m_settings->set(QStringLiteral("Audio/OutputDevice"), m_audioDeviceComboBox->currentText());
@@ -829,6 +836,12 @@ void PreferencesDialog::saveSettings()
     m_settings->set(QStringLiteral("Subtitles/ShadowOffset"), m_subtitleShadowOffsetSpinBox ? m_subtitleShadowOffsetSpinBox->value() : 0.0);
 
     if (m_engine) {
+        m_engine->setHardwareDecoder(m_hwdecComboBox->currentText());
+        m_engine->setAspectRatio(m_aspectRatioComboBox->currentText());
+        m_engine->setDeinterlace(deinterlaceEnabled);
+        m_engine->setNormalizerEnabled(m_normalizerCheckBox->isChecked());
+        m_engine->setSpeed(m_speedSpinBox->value());
+        m_engine->setSubtitleLanguage(m_subtitleLanguageEdit->text());
         m_engine->setSubtitleFont(subFont);
         m_engine->setSubtitleFontSize(m_subtitleFontSizeSpinBox->value());
         m_engine->setSubtitleColor(m_subtitleColor);

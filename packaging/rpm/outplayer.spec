@@ -3,12 +3,12 @@
 %global debug_package %{nil}
 
 Name:           outplayer
-Version:        0.1.0
+Version:        0.1.1
 Release:        1%{?dist}
 Summary:        Modern, high-performance Linux media player
 
 License:        GPL-3.0-or-later
-URL:            https://github.com/outplayer/outplayer
+URL:            https://github.com/hmdamm/outPlayer
 Source0:        %{name}-%{version}.tar.gz
 
 BuildRequires:  cmake >= 3.22
@@ -52,5 +52,8 @@ desktop environment integration.
 %{_datadir}/icons/hicolor/*/apps/org.outplayer.outPlayer.*
 
 %changelog
+* Thu Nov 26 2026 outPlayer Developers <dev@outplayer.org> - 0.1.1-1
+- Production stability release fixing libmpv EOF/equalizer/aspect handling, MPRIS2 toggles, shortcuts, and Preferences sync
+
 * Fri Nov 13 2026 outPlayer Developers <dev@outplayer.org> - 0.1.0-1
 - Initial release of outPlayer 0.1.0

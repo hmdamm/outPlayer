@@ -201,8 +201,39 @@ bool MpvEngine::initialize()
 
     mpv_set_property_string(m_mpv, "sub-visibility", "yes");
 
-    // Load and apply persisted subtitle appearance settings
+    // Load and apply persisted preferences and subtitle appearance settings
     auto& settings = core::SettingsManager::instance();
+
+    const QString hwdec = settings.hardwareDecoder();
+    if (!hwdec.isEmpty()) {
+        mpv_set_property_string(m_mpv, "hwdec", hwdec.toUtf8().constData());
+    }
+
+    setVolume(settings.defaultVolume());
+    setSpeed(settings.get(QStringLiteral("Playback/DefaultSpeed"), 1.0).toDouble());
+
+    const QString aspectRatioPref = settings.get(QStringLiteral("Video/AspectRatio"), QStringLiteral("auto")).toString();
+    if (!aspectRatioPref.isEmpty() && aspectRatioPref.compare(QStringLiteral("auto"), Qt::CaseInsensitive) != 0) {
+        setAspectRatio(aspectRatioPref);
+    }
+
+    const QVariant deintVar = settings.contains(QStringLiteral("Video/Deinterlacing"))
+        ? settings.get(QStringLiteral("Video/Deinterlacing"))
+        : settings.get(QStringLiteral("Video/Deinterlace"));
+    const QString deintStr = deintVar.toString().trimmed().toLower();
+    if (deintVar.toBool() || deintStr == QStringLiteral("yes") || deintStr == QStringLiteral("true")) {
+        setDeinterlace(true);
+    }
+
+    if (settings.get(QStringLiteral("Audio/Normalizer"), false).toBool()) {
+        setNormalizerEnabled(true);
+    }
+
+    const QString subLang = settings.get(QStringLiteral("Subtitles/DefaultLanguage"), QString()).toString().trimmed();
+    if (!subLang.isEmpty()) {
+        mpv_set_property_string(m_mpv, "slang", subLang.toUtf8().constData());
+    }
+
     m_subtitleFont = settings.get(QStringLiteral("Subtitles/Font"), QStringLiteral("sans-serif")).toString();
     m_subtitleFontSize = settings.get(QStringLiteral("Subtitles/FontSize"), 24).toInt();
 
@@ -392,9 +423,19 @@ void MpvEngine::processEvent(mpv_event* event)
     case MPV_EVENT_FILE_LOADED:
         emit fileLoaded();
         break;
-    case MPV_EVENT_END_FILE:
-        emit playbackFinished();
+    case MPV_EVENT_END_FILE: {
+        const auto* endFile = static_cast<const mpv_event_end_file*>(event->data);
+        if (!endFile || endFile->reason == MPV_END_FILE_REASON_EOF) {
+            emit playbackFinished();
+        } else if (endFile->reason == MPV_END_FILE_REASON_ERROR) {
+            emit playbackStopped();
+            emit errorOccurred(QString::fromUtf8(mpv_error_string(endFile->error)));
+        } else if (endFile->reason == MPV_END_FILE_REASON_STOP ||
+                   endFile->reason == MPV_END_FILE_REASON_QUIT) {
+            emit playbackStopped();
+        }
         break;
+    }
     default:
         break;
     }
@@ -469,6 +510,10 @@ void MpvEngine::stop()
     m_duration = 0.0;
     m_tracks.clear();
     m_chapters.clear();
+    emit positionChanged(0.0);
+    emit durationChanged(0.0);
+    emit tracksChanged();
+    emit chaptersChanged();
 }
 
 void MpvEngine::seek(double seconds, bool exact)
@@ -609,11 +654,30 @@ QString MpvEngine::aspectRatio() const
     return m_aspectRatio;
 }
 
+void MpvEngine::setHardwareDecoder(const QString& hwdec)
+{
+    if (!hwdec.isEmpty()) {
+        setProperty(QStringLiteral("hwdec"), hwdec);
+    }
+}
+
+void MpvEngine::setSubtitleLanguage(const QString& lang)
+{
+    const QString trimmed = lang.trimmed();
+    if (!trimmed.isEmpty()) {
+        setProperty(QStringLiteral("slang"), trimmed);
+    }
+}
+
 void MpvEngine::setAspectRatio(const QString& ar)
 {
     m_aspectRatio = ar;
     if (m_mpv) {
-        QByteArray val = (ar.isEmpty() || ar == QStringLiteral("-1")) ? QByteArray("-1") : ar.toUtf8();
+        const bool isAuto = ar.isEmpty()
+            || ar == QStringLiteral("-1")
+            || ar.compare(QStringLiteral("auto"), Qt::CaseInsensitive) == 0
+            || ar.compare(QStringLiteral("no"), Qt::CaseInsensitive) == 0;
+        const QByteArray val = isAuto ? QByteArrayLiteral("no") : ar.toUtf8();
         mpv_set_property_string(m_mpv, "video-aspect-override", val.constData());
     }
 }
@@ -826,11 +890,17 @@ void MpvEngine::updateAudioFilters()
     }
 
     if (hasEq) {
-        QStringList bandParams;
+        static constexpr int kBandFrequencies[10] = {
+            31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000
+        };
+        QStringList entries;
+        entries.reserve(10);
         for (int i = 0; i < 10; ++i) {
-            bandParams.append(QStringLiteral("g%1=%2").arg(i + 1).arg(m_eqBands[i], 0, 'f', 1));
+            entries.append(QStringLiteral("entry(%1,%2)")
+                               .arg(kBandFrequencies[i])
+                               .arg(m_eqBands[i], 0, 'f', 1));
         }
-        filters.append(QStringLiteral("equalizer=%1").arg(bandParams.join(u':')));
+        filters.append(QStringLiteral("lavfi=[firequalizer=gain_entry='%1']").arg(entries.join(u';')));
     }
 
     if (m_normalizerEnabled) {

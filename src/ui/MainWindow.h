@@ -130,8 +130,8 @@ private:
     std::unique_ptr<ScreenCaptureController> m_captureController;
     std::unique_ptr<ContextMenuManager> m_contextMenuManager;
     std::unique_ptr<MediaOpenController> m_mediaOpenController;
-    std::unique_ptr<PreferencesDialog> m_preferencesDialog;
     std::unique_ptr<core::DeviceStreamManager> m_deviceStreamManager;
+    std::unique_ptr<PreferencesDialog> m_preferencesDialog;
     std::unique_ptr<DesktopIntegration> m_desktopIntegration;
 
     QString m_currentFile;

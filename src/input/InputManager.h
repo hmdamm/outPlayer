@@ -55,6 +55,8 @@ private:
     void initDefaultShortcuts();
     void initDefaultMouseMappings();
     void rebuildShortcuts();
+    bool isWindowScopedCommand(core::CommandId id) const;
+    void applyWindowShortcut(core::CommandId id, const QKeySequence& seq);
 
     QPointer<QWidget> m_parentWindow;
     QMap<core::CommandId, QKeySequence> m_defaultShortcuts;

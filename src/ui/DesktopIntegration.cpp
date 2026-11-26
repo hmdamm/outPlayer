@@ -237,6 +237,7 @@ DesktopIntegration::DesktopIntegration(engine::IPlaybackEngine* engine,
     if (m_engine) {
         connect(m_engine, &engine::IPlaybackEngine::stateChanged, this, &DesktopIntegration::onEngineStateChanged);
         connect(m_engine, &engine::IPlaybackEngine::playbackFinished, this, &DesktopIntegration::onEnginePlaybackFinished);
+        connect(m_engine, &engine::IPlaybackEngine::playbackStopped, this, &DesktopIntegration::onEnginePlaybackFinished);
         connect(m_engine, &engine::IPlaybackEngine::fileLoaded, this, &DesktopIntegration::onEngineFileLoaded);
         connect(m_engine, &engine::IPlaybackEngine::volumeChanged, this, &DesktopIntegration::onEngineVolumeChanged);
 
@@ -525,16 +526,18 @@ void DesktopIntegration::notifyPropertiesChanged(const QString& interfaceName, c
 
 void DesktopIntegration::play()
 {
-    emit playPauseRequested();
-    if (m_engine) {
+    emit playRequested();
+    const bool delegated = (m_mainWindow && m_mainWindow->inherits("outplayer::ui::MainWindow"));
+    if (!delegated && m_engine) {
         m_engine->play();
     }
 }
 
 void DesktopIntegration::pause()
 {
-    emit playPauseRequested();
-    if (m_engine) {
+    emit pauseRequested();
+    const bool delegated = (m_mainWindow && m_mainWindow->inherits("outplayer::ui::MainWindow"));
+    if (!delegated && m_engine) {
         m_engine->pause();
     }
 }
@@ -542,7 +545,8 @@ void DesktopIntegration::pause()
 void DesktopIntegration::playPause()
 {
     emit playPauseRequested();
-    if (m_engine) {
+    const bool delegated = (m_mainWindow && m_mainWindow->inherits("outplayer::ui::MainWindow"));
+    if (!delegated && m_engine) {
         m_engine->togglePause();
     }
 }
@@ -550,7 +554,8 @@ void DesktopIntegration::playPause()
 void DesktopIntegration::stop()
 {
     emit stopRequested();
-    if (m_engine) {
+    const bool delegated = (m_mainWindow && m_mainWindow->inherits("outplayer::ui::MainWindow"));
+    if (!delegated && m_engine) {
         m_engine->stop();
     }
 }

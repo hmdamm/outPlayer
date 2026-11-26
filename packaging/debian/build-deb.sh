@@ -5,7 +5,7 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 OUTPUT_DIR="${1:-$REPO_ROOT/dist}"
 BUILD_DIR="${REPO_ROOT}/build"
-VERSION="0.1.0-1"
+VERSION="0.1.1-1"
 
 # Determine host architecture
 ARCH="$(dpkg --print-architecture 2>/dev/null || uname -m)"

@@ -4,7 +4,7 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 OUTPUT_DIR="${1:-$REPO_ROOT/dist}"
-VERSION="0.1.0"
+VERSION="0.1.1"
 RELEASE="1"
 
 echo "==> Building RPM packages for outPlayer (${VERSION}-${RELEASE})..."

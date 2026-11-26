@@ -33,7 +33,7 @@ outPlayer provides native packaging manifests and automated build recipes for al
 
 Reverse-DNS identifier: **`org.outplayer.outPlayer`**  
 Canonical binary executable: **`outplayer`**  
-Current Release: **`v0.1.0`**
+Current Release: **`v0.1.1`**
 
 ---
 
@@ -142,7 +142,7 @@ The Debian packaging hierarchy supports Debian 12 (Bookworm), Ubuntu 22.04 LTS (
 
 ```bash
 # Install binary deb package
-sudo dpkg -i outplayer_0.1.0-1_amd64.deb
+sudo dpkg -i outplayer_0.1.1-1_amd64.deb
 
 # If dependencies are missing, automatically fetch and install them:
 sudo apt-get install -f -y
@@ -164,7 +164,7 @@ The repository includes a standalone automated packaging script:
 bash packaging/debian/build-deb.sh dist/
 
 # Output package:
-# dist/outplayer_0.1.0-1_amd64.deb
+# dist/outplayer_0.1.1-1_amd64.deb
 ```
 
 ### 4. Native Debian Source Packaging (`debian/rules`)
@@ -178,7 +178,7 @@ sudo apt-get install -y debhelper-compat cmake ninja-build pkg-config \
     qt6-base-dev libqt6opengl6-dev qt6-declarative-dev libqt6svg6-dev libmpv-dev
 
 # Prepare upstream source tarball
-tar --exclude-vcs -czf ../outplayer_0.1.0.orig.tar.gz .
+tar --exclude-vcs -czf ../outplayer_0.1.1.orig.tar.gz .
 
 # Copy debian control files to project root if building natively
 cp -r packaging/debian .
@@ -187,8 +187,8 @@ cp -r packaging/debian .
 dpkg-buildpackage -us -uc -b
 
 # Verify package structure
-dpkg-deb --contents ../outplayer_0.1.0-1_*.deb
-dpkg-deb --info ../outplayer_0.1.0-1_*.deb
+dpkg-deb --contents ../outplayer_0.1.1-1_*.deb
+dpkg-deb --info ../outplayer_0.1.1-1_*.deb
 ```
 
 ---
@@ -201,7 +201,7 @@ Fedora 39+, Red Hat Enterprise Linux 9+, and CentOS Stream packages are built us
 
 ```bash
 # Install using dnf (resolves dependencies automatically)
-sudo dnf install ./outplayer-0.1.0-1.x86_64.rpm
+sudo dnf install ./outplayer-0.1.1-1.x86_64.rpm
 ```
 
 ### 2. Runtime Dependencies
@@ -218,7 +218,7 @@ sudo dnf install ./outplayer-0.1.0-1.x86_64.rpm
 bash packaging/rpm/build-rpm.sh dist/
 
 # Output package:
-# dist/outplayer-0.1.0-1.x86_64.rpm
+# dist/outplayer-0.1.1-1.x86_64.rpm
 ```
 
 ### 4. Building with `rpmbuild`
@@ -232,13 +232,13 @@ sudo dnf install -y rpm-build rpmdevtools cmake ninja-build gcc-c++ \
 rpmdev-setuptree
 
 # Archive source into rpmbuild SOURCES
-tar --exclude-vcs -czf ~/rpmbuild/SOURCES/outplayer-0.1.0.tar.gz .
+tar --exclude-vcs -czf ~/rpmbuild/SOURCES/outplayer-0.1.1.tar.gz .
 
 # Execute rpmbuild
 rpmbuild -ba packaging/rpm/outplayer.spec
 
 # Generated RPM will be in:
-# ~/rpmbuild/RPMS/x86_64/outplayer-0.1.0-1.*.x86_64.rpm
+# ~/rpmbuild/RPMS/x86_64/outplayer-0.1.1-1.*.x86_64.rpm
 ```
 
 ---
@@ -271,7 +271,7 @@ makepkg -si
 
 The `PKGBUILD` adheres to Arch Packaging Standards:
 - `pkgname`: `outplayer`
-- `pkgver`: `0.1.0`
+- `pkgver`: `0.1.1`
 - `pkgrel`: `1`
 - `arch`: `('x86_64' 'aarch64')`
 - `depends`: `('qt6-base' 'qt6-svg' 'mpv' 'hicolor-icon-theme')`
@@ -288,13 +288,13 @@ AppImage bundles all necessary runtime components, Qt plugins, and libraries int
 
 ```bash
 # Make executable
-chmod +x outPlayer-0.1.0-x86_64.AppImage
+chmod +x outPlayer-0.1.1-x86_64.AppImage
 
 # Run directly
-./outPlayer-0.1.0-x86_64.AppImage
+./outPlayer-0.1.1-x86_64.AppImage
 
 # Play file directly
-./outPlayer-0.1.0-x86_64.AppImage ~/Videos/sample.mkv
+./outPlayer-0.1.1-x86_64.AppImage ~/Videos/sample.mkv
 ```
 
 ### 2. Portable AppDir Directory Archive
@@ -303,10 +303,10 @@ If you prefer extracting or running from an extracted folder without FUSE:
 
 ```bash
 # Extract portable tarball
-tar -xzf outPlayer-0.1.0-x86_64.AppDir.tar.gz
+tar -xzf outPlayer-0.1.1-x86_64.AppDir.tar.gz
 
 # Execute via AppRun
-./outPlayer-0.1.0-x86_64.AppDir/AppRun ~/Videos/sample.mkv
+./outPlayer-0.1.1-x86_64.AppDir/AppRun ~/Videos/sample.mkv
 ```
 
 ### 3. Automated AppImage & AppDir Build (`build-appimage.sh`)
@@ -315,9 +315,9 @@ tar -xzf outPlayer-0.1.0-x86_64.AppDir.tar.gz
 # Run automated AppDir/AppImage builder
 bash packaging/appimage/build-appimage.sh dist/
 
-# Staged directory: dist/outPlayer-0.1.0-x86_64.AppDir
-# Portable tarball: dist/outPlayer-0.1.0-x86_64.AppDir.tar.gz
-# Standalone AppImage: dist/outPlayer-0.1.0-x86_64.AppImage (when appimagetool is present)
+# Staged directory: dist/outPlayer-0.1.1-x86_64.AppDir
+# Portable tarball: dist/outPlayer-0.1.1-x86_64.AppDir.tar.gz
+# Standalone AppImage: dist/outPlayer-0.1.1-x86_64.AppImage (when appimagetool is present)
 ```
 
 ### 4. Custom AppRun Launcher Architecture

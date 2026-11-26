@@ -17,7 +17,7 @@ BUILD_APPIMAGE_SCRIPT = os.path.join(APPIMAGE_DIR, "build-appimage.sh")
 DIST_DIR = os.path.join(REPO_ROOT, "dist")
 
 ARCH = platform.machine()
-VERSION = "0.1.0"
+VERSION = "0.1.1"
 APPDIR_NAME = f"outPlayer-{VERSION}-{ARCH}.AppDir"
 APPDIR_PATH = os.path.join(DIST_DIR, APPDIR_NAME)
 TARBALL_PATH = os.path.join(DIST_DIR, f"{APPDIR_NAME}.tar.gz")

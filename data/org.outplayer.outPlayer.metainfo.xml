@@ -28,8 +28,8 @@
 
   <launchable type="desktop-id">org.outplayer.outPlayer.desktop</launchable>
 
-  <url type="homepage">https://github.com/outplayer/outplayer</url>
-  <url type="bugtracker">https://github.com/outplayer/outplayer/issues</url>
+  <url type="homepage">https://github.com/hmdamm/outPlayer</url>
+  <url type="bugtracker">https://github.com/hmdamm/outPlayer/issues</url>
 
   <provides>
     <binary>outplayer</binary>
@@ -56,6 +56,21 @@
   </developer>
 
   <releases>
+    <release version="0.1.1" date="2026-11-26">
+      <description>
+        <p>
+          Production reliability, stability, and bug-fix release:
+        </p>
+        <ul>
+          <li>Fixed libmpv end-of-file handling so manual track switching and stop commands do not skip tracks or emit false playback completion events.</li>
+          <li>Fixed libmpv aspect ratio reset (mapping auto/empty to "no") and 10-band audio equalizer filter graph (firequalizer via lavfi).</li>
+          <li>Fixed MPRIS2/system tray Play/Pause double-toggle and Play/Pause signal dispatch.</li>
+          <li>Fixed QShortcut duplicate collisions with Playlist-scoped commands and prevented single-key hotkeys from intercepting text input fields.</li>
+          <li>Fixed PlaylistDock chrome margin alignment under frameless TitleBar/ControlBar overlays and wired missing command handlers cleanly.</li>
+          <li>Synchronized Preferences settings keys (hwdec, deinterlace, aspect ratio, normalizer, speed, subtitle language) live with MpvEngine and hardened INI import validation.</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.1.0" date="2026-11-13">
       <description>
         <p>

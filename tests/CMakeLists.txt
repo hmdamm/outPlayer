@@ -579,5 +579,25 @@ target_link_libraries(test_control_bar_layout
 
 add_test(NAME test_control_bar_layout COMMAND test_control_bar_layout)
 
+# ==============================================================================
+# Audit Regression Test Suite
+# ==============================================================================
+qt_add_executable(test_audit_regressions
+    test_audit_regressions.cpp
+)
+
+target_link_libraries(test_audit_regressions
+    PRIVATE
+        outplayer_ui
+        outplayer_playlist
+        outplayer_input
+        outplayer_core
+        Qt6::Test
+        Qt6::Widgets
+)
+
+add_test(NAME test_audit_regressions COMMAND test_audit_regressions)
+
+
 
 

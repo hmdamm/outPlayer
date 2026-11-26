@@ -12,7 +12,7 @@ Build-Depends: debhelper-compat (= 13),
                libqt6svg6-dev,
                libmpv-dev (>= 0.35.0)
 Standards-Version: 4.6.2
-Homepage: https://github.com/outplayer/outplayer
+Homepage: https://github.com/hmdamm/outPlayer
 
 Package: outplayer
 Architecture: any

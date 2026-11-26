@@ -1,8 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "input/InputManager.h"
 
+#include <QAbstractSpinBox>
+#include <QApplication>
+#include <QComboBox>
+#include <QEvent>
+#include <QLineEdit>
 #include <QMouseEvent>
+#include <QPlainTextEdit>
+#include <QSet>
 #include <QShortcut>
+#include <QTextEdit>
 #include <QWheelEvent>
 #include <QWidget>
 #include <optional>
@@ -43,6 +51,10 @@ InputManager::InputManager(QWidget* parentWindow)
 }
 
 InputManager::~InputManager() {
+    if (qApp) {
+        qApp->removeEventFilter(this);
+    }
+
     for (QWidget* surface : m_watchedSurfaces) {
         if (surface) {
             surface->removeEventFilter(this);
@@ -140,6 +152,12 @@ void InputManager::attachToWindow(QWidget* window) {
     m_windowShortcuts.clear();
 
     m_parentWindow = window;
+    if (qApp) {
+        qApp->removeEventFilter(this);
+        if (m_parentWindow) {
+            qApp->installEventFilter(this);
+        }
+    }
     if (!m_parentWindow) {
         return;
     }
@@ -158,6 +176,38 @@ void InputManager::attachMouseFilter(QWidget* surface) {
     });
 }
 
+bool InputManager::isWindowScopedCommand(core::CommandId id) const {
+    const auto* info = core::CommandRegistry::instance().getInfo(id);
+    if (!info) {
+        return false;
+    }
+    return info->scope != QStringLiteral("Playlist");
+}
+
+void InputManager::applyWindowShortcut(core::CommandId id, const QKeySequence& seq) {
+    if (!m_parentWindow) {
+        return;
+    }
+
+    if (seq.isEmpty() || !isWindowScopedCommand(id)) {
+        if (m_windowShortcuts.contains(id) && m_windowShortcuts[id]) {
+            delete m_windowShortcuts[id];
+        }
+        m_windowShortcuts.remove(id);
+        return;
+    }
+
+    if (m_windowShortcuts.contains(id) && m_windowShortcuts[id]) {
+        m_windowShortcuts[id]->setKey(seq);
+    } else {
+        auto* shortcut = new QShortcut(seq, m_parentWindow.data(), nullptr, nullptr, Qt::WindowShortcut);
+        connect(shortcut, &QShortcut::activated, this, [id]() {
+            core::CommandRegistry::instance().execute(id);
+        });
+        m_windowShortcuts[id] = shortcut;
+    }
+}
+
 void InputManager::rebuildShortcuts() {
     if (!m_parentWindow) {
         return;
@@ -170,18 +220,21 @@ void InputManager::rebuildShortcuts() {
     }
     m_windowShortcuts.clear();
 
+    QSet<QString> boundKeys;
     for (auto it = m_shortcuts.constBegin(); it != m_shortcuts.constEnd(); ++it) {
-        core::CommandId id = it.key();
+        const core::CommandId id = it.key();
         const QKeySequence& seq = it.value();
-        if (seq.isEmpty()) {
+        if (seq.isEmpty() || !isWindowScopedCommand(id)) {
             continue;
         }
 
-        auto* shortcut = new QShortcut(seq, m_parentWindow.data(), nullptr, nullptr, Qt::WindowShortcut);
-        connect(shortcut, &QShortcut::activated, this, [id]() {
-            core::CommandRegistry::instance().execute(id);
-        });
-        m_windowShortcuts[id] = shortcut;
+        const QString keyStr = seq.toString(QKeySequence::PortableText);
+        if (boundKeys.contains(keyStr)) {
+            continue;
+        }
+        boundKeys.insert(keyStr);
+
+        applyWindowShortcut(id, seq);
     }
 }
 
@@ -195,25 +248,7 @@ bool InputManager::setCustomShortcut(core::CommandId id, const QKeySequence& sho
     QString settingKey = QStringLiteral("shortcuts/") + core::commandIdToString(id);
     core::SettingsManager::instance().set(settingKey, shortcut.toString(QKeySequence::PortableText));
 
-    if (m_parentWindow) {
-        if (shortcut.isEmpty()) {
-            if (m_windowShortcuts.contains(id) && m_windowShortcuts[id]) {
-                delete m_windowShortcuts[id];
-                m_windowShortcuts.remove(id);
-            }
-        } else {
-            if (m_windowShortcuts.contains(id) && m_windowShortcuts[id]) {
-                m_windowShortcuts[id]->setKey(shortcut);
-            } else {
-                auto* sc = new QShortcut(shortcut, m_parentWindow.data(), nullptr, nullptr, Qt::WindowShortcut);
-                connect(sc, &QShortcut::activated, this, [id]() {
-                    core::CommandRegistry::instance().execute(id);
-                });
-                m_windowShortcuts[id] = sc;
-            }
-        }
-    }
-
+    applyWindowShortcut(id, shortcut);
     return true;
 }
 
@@ -236,25 +271,7 @@ void InputManager::resetShortcut(core::CommandId id) {
         m_shortcuts.remove(id);
     }
 
-    if (m_parentWindow) {
-        QKeySequence seq = getShortcut(id);
-        if (seq.isEmpty()) {
-            if (m_windowShortcuts.contains(id) && m_windowShortcuts[id]) {
-                delete m_windowShortcuts[id];
-                m_windowShortcuts.remove(id);
-            }
-        } else {
-            if (m_windowShortcuts.contains(id) && m_windowShortcuts[id]) {
-                m_windowShortcuts[id]->setKey(seq);
-            } else {
-                auto* sc = new QShortcut(seq, m_parentWindow.data(), nullptr, nullptr, Qt::WindowShortcut);
-                connect(sc, &QShortcut::activated, this, [id]() {
-                    core::CommandRegistry::instance().execute(id);
-                });
-                m_windowShortcuts[id] = sc;
-            }
-        }
-    }
+    applyWindowShortcut(id, getShortcut(id));
 }
 
 void InputManager::setMouseMapping(MouseAction action, core::CommandId commandId) {
@@ -282,6 +299,31 @@ core::CommandId InputManager::getMouseMapping(MouseAction action) const {
 
 bool InputManager::eventFilter(QObject* watched, QEvent* event) {
     if (!event) {
+        return false;
+    }
+
+    if (event->type() == QEvent::ShortcutOverride) {
+        auto* widget = qobject_cast<QWidget*>(watched);
+        if (widget && m_parentWindow && (widget == m_parentWindow || m_parentWindow->isAncestorOf(widget))) {
+            const bool isTextInput = qobject_cast<QLineEdit*>(widget) != nullptr
+                || qobject_cast<QTextEdit*>(widget) != nullptr
+                || qobject_cast<QPlainTextEdit*>(widget) != nullptr
+                || qobject_cast<QAbstractSpinBox*>(widget) != nullptr
+                || (qobject_cast<QComboBox*>(widget) != nullptr && static_cast<QComboBox*>(widget)->isEditable());
+            if (isTextInput) {
+                auto* keyEvent = static_cast<QKeyEvent*>(event);
+                const auto mods = keyEvent->modifiers();
+                const bool plainOrShift = (mods == Qt::NoModifier || mods == Qt::ShiftModifier);
+                if (plainOrShift || (mods == Qt::ControlModifier && (keyEvent->key() == Qt::Key_A || keyEvent->key() == Qt::Key_C || keyEvent->key() == Qt::Key_V || keyEvent->key() == Qt::Key_X || keyEvent->key() == Qt::Key_Z))) {
+                    event->accept();
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    if (watched != nullptr && !m_watchedSurfaces.contains(qobject_cast<QWidget*>(watched))) {
         return false;
     }
 

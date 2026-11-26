@@ -5,7 +5,7 @@
 [![libmpv](https://img.shields.io/badge/engine-libmpv-orange.svg)](https://mpv.io/)
 [![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue.svg)](LICENSE)
 [![CI](https://github.com/hmdamm/outPlayer/actions/workflows/ci.yml/badge.svg)](https://github.com/hmdamm/outPlayer/actions)
-[![CTest](https://img.shields.io/badge/tests-29%2F29%20passed%20(100%25)-brightgreen.svg)](tests/)
+[![CTest](https://img.shields.io/badge/tests-34%2F34%20passed%20(100%25)-brightgreen.svg)](tests/)
 [![Packaging](https://img.shields.io/badge/packages-Flatpak%20%7C%20DEB%20%7C%20RPM%20%7C%20AUR%20%7C%20AppImage-success.svg)](docs/distribution.md)
 
 A modern, high-performance native Linux media player offering complete functional, layout, and hotkey parity with classic desktop media players through a strictly audited clean-room methodology, powered by modern C++20, Qt 6 Widgets, and `libmpv`.
@@ -44,7 +44,7 @@ flatpak run org.outplayer.outPlayer
 
 ```bash
 # Download and install binary .deb package
-sudo dpkg -i outplayer_0.1.0-1_amd64.deb
+sudo dpkg -i outplayer_0.1.1-1_amd64.deb
 sudo apt-get install -f -y # resolve any missing dependencies
 
 # Or build locally using the included script:
@@ -55,7 +55,7 @@ bash packaging/debian/build-deb.sh dist/
 
 ```bash
 # Install using dnf
-sudo dnf install ./outplayer-0.1.0-1.x86_64.rpm
+sudo dnf install ./outplayer-0.1.1-1.x86_64.rpm
 
 # Or build locally using the included script:
 bash packaging/rpm/build-rpm.sh dist/
@@ -76,12 +76,12 @@ cd packaging/arch && makepkg -si
 
 ```bash
 # Make executable and run immediately
-chmod +x outPlayer-0.1.0-x86_64.AppImage
-./outPlayer-0.1.0-x86_64.AppImage /path/to/media.mkv
+chmod +x outPlayer-0.1.1-x86_64.AppImage
+./outPlayer-0.1.1-x86_64.AppImage /path/to/media.mkv
 
 # Or extract portable AppDir:
-tar -xzf outPlayer-0.1.0-x86_64.AppDir.tar.gz
-./outPlayer-0.1.0-x86_64.AppDir/AppRun
+tar -xzf outPlayer-0.1.1-x86_64.AppDir.tar.gz
+./outPlayer-0.1.1-x86_64.AppDir/AppRun
 ```
 
 ---
@@ -94,7 +94,7 @@ tar -xzf outPlayer-0.1.0-x86_64.AppDir.tar.gz
 | **Video Rendering** | Hardware decoding (VA-API/NVDEC), aspect ratio toggle, rotation (90°/180°/270°), flip/mirror, real-time color adjustments (brightness, contrast, saturation, hue -100..100) | Certified 100% |
 | **Audio Subsystem** | 10-band equalizer (31Hz to 16kHz), volume scaling (0–200% with boost), audio delay sync (-10s to +10s), audio stream/channel switching | Certified 100% |
 | **Subtitle Engine** | Subtitle track selection, subtitle delay sync (-10s to +10s), font size scaling (0.2x to 5.0x), external file loading (`.srt`, `.ass`, `.vtt`) | Certified 100% |
-| **User Interface** | Custom frameless dark theme (`#1b1b1b`), 30px titlebar, 40px controlbar, 2.5s chrome autohide, high-contrast OSD overlay, SVG vector icons | Certified 100% |
+| **User Interface** | Custom frameless dark theme (`#1b1b1b`), 30px titlebar, 56px 2-tier controlbar, 2.5s chrome autohide, high-contrast OSD overlay, SVG vector icons | Certified 100% |
 | **Timeline Slider** | 10,000-point resolution, chapter tick markers, hover time preview popup, smooth dragging | Certified 100% |
 | **Playlist Dock (F6)** | Model/View virtualized table, 10,000+ items with <1ms insertion, live search filtering, drag-and-drop ingestion, repeat/shuffle modes | Certified 100% |
 | **Control Panel (F7)** | Multi-tab quick adjustment panel: Audio equalizer, Video color sliders, Playback speeds, Subtitle sync offsets | Certified 100% |
@@ -117,15 +117,15 @@ outPlayer provides 253 keyboard shortcuts and mouse gestures matching desktop me
 | | `Alt+Left` / `Alt+Right` | `CMD_SEEK_BACK_1M` / `FORWARD_1M` | Long Seek (1 minute) |
 | | `Ctrl+Alt+Left` / `Right` | `CMD_SEEK_BACK_5M` / `FORWARD_5M` | Extra Long Seek (5 minutes) |
 | | `D` / `F` | `CMD_FRAME_PREV` / `FRAME_NEXT` | Step One Frame Backward / Forward |
-| | `[` / `]` | `CMD_SPEED_DOWN` / `SPEED_UP` | Decrease / Increase Playback Speed |
-| | `Backspace` | `CMD_SPEED_NORMAL` | Reset Playback Speed to 1.0x |
+| | `X` / `C` | `CMD_SPEED_DOWN` / `SPEED_UP` | Decrease / Increase Playback Speed |
+| | `Z` | `CMD_SPEED_NORMAL` | Reset Playback Speed to 1.0x |
 | | `Enter` or `F` | `CMD_TOGGLE_FULLSCREEN` | Toggle Fullscreen |
 | **Audio** | `Up` / `Down` | `CMD_VOLUME_UP` / `VOLUME_DOWN` | Volume Up / Down (5%) |
 | | `M` | `CMD_MUTE_TOGGLE` | Toggle Mute |
 | | `Shift+Up` / `Shift+Down` | `CMD_AUDIO_SYNC_ADVANCE` / `DELAY` | Adjust Audio Sync Delay (±0.1s) |
 | | `A` | `CMD_AUDIO_CYCLE_TRACK` | Cycle Audio Track |
-| **Subtitles** | `C` / `V` | `CMD_SUB_SYNC_ADVANCE` / `DELAY` | Adjust Subtitle Delay (±0.1s) |
-| | `Alt+[` / `Alt+]` | `CMD_SUB_FONT_DOWN` / `UP` | Decrease / Increase Subtitle Size |
+| **Subtitles** | `,` / `.` | `CMD_SUB_SYNC_FASTER` / `SLOWER` | Adjust Subtitle Delay (±0.5s) |
+| | `Alt+PgUp` / `Alt+PgDn` | `CMD_SUB_SIZE_UP` / `DOWN` | Increase / Decrease Subtitle Size |
 | | `L` | `CMD_SUB_CYCLE_TRACK` | Cycle Subtitle Track |
 | | `Alt+H` | `CMD_SUB_TOGGLE_VISIBILITY` | Toggle Subtitle Visibility |
 | **Video** | `1`..`5` | `CMD_ASPECT_RATIO_*` | Cycle / Set Aspect Ratio Preset |
@@ -136,7 +136,7 @@ outPlayer provides 253 keyboard shortcuts and mouse gestures matching desktop me
 | | `F6` | `CMD_PLAYLIST_TOGGLE` | Toggle Playlist Dock Window |
 | | `F7` | `CMD_CONTROL_PANEL_TOGGLE` | Toggle Control Panel Window |
 | | `Tab` | `CMD_OSD_PLAYBACK_INFO` | Toggle On-Screen Playback Information |
-| | `P` | `CMD_BOOKMARK_ADD` | Add Bookmark at Current Position |
+| | `Ctrl+P` | `CMD_BOOKMARK_ADD` | Add Bookmark at Current Position |
 | | `Ctrl+E` | `CMD_CAPTURE_FRAME` | Save Current Video Frame Snapshot |
 | | `Ctrl+C` | `CMD_CAPTURE_CLIPBOARD` | Copy Video Frame to Clipboard |
 | | `Ctrl+O` | `CMD_FILE_OPEN` | Open File Dialog |
@@ -150,7 +150,9 @@ outPlayer provides 253 keyboard shortcuts and mouse gestures matching desktop me
 outplayer/
 ├── src/
 │   ├── engine/       # Headless IPlaybackEngine & MpvEngine (libmpv C++20 wrapper)
-│   ├── core/         # CommandRegistry, InputManager, SettingsManager, BookmarkManager
+│   ├── core/         # CommandRegistry, SettingsManager, BookmarkManager, DeviceStreamManager
+│   ├── input/        # InputManager (Qt shortcut routing and mouse gesture mapping)
+│   ├── playlist/     # PlaylistModel & PlaylistItem (QAbstractListModel)
 │   ├── ui/           # MainWindow, VideoWidget (OpenGL / mpv_render_context), ControlBar,
 │   │                 # TimelineSlider, OsdOverlay, PlaylistDock, ControlPanel, PreferencesDialog
 │   └── main.cpp      # Application entrypoint & CLI argument router
@@ -164,10 +166,10 @@ outplayer/
 ├── docs/             # Architecture, design decisions, specifications, distribution guide
 │   ├── distribution.md    # Multi-distribution installation & maintainer guide
 │   ├── architecture.md    # System architecture, threading, and data flow
-│   ├── decisions.md       # Architectural Decision Records (ADR 001 - ADR 011)
+│   ├── decisions.md       # Architectural Decision Records (ADR 001 - ADR 012)
 │   ├── clean-room-log.md  # Clean-room audit trail and observer logs
 │   └── spec/              # Specifications (hotkeys, features, formats, CLI, UI metrics)
-├── tests/            # Automated test suite (29 CTest targets + 7 verification suites)
+├── tests/            # Automated test suite (34 CTest targets + 7 verification suites)
 ├── TASKS.md          # Multi-phase roadmap and 100% completion certification ledger
 └── THIRD_PARTY_NOTICES.md # Licensing details & third-party attributions
 ```
@@ -222,7 +224,7 @@ cmake --build build -j$(nproc)
 outPlayer maintains a comprehensive automated testing suite:
 
 ```bash
-# 1. Run all 29 unit and integration tests under headless X11 server
+# 1. Run all 34 unit and integration tests under headless X11 server
 QT_QPA_PLATFORM=xcb xvfb-run -a ctest --test-dir build --output-on-failure
 
 # 2. Run packaging and asset validation test suites

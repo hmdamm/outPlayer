@@ -33,6 +33,7 @@
 #include "ui/CustomTitleBar.h"
 #include "ui/DesktopIntegration.h"
 #include "ui/MediaOpenController.h"
+#include "ui/OpenUrlDialog.h"
 #include "ui/OsdOverlay.h"
 #include "ui/PlaylistDock.h"
 #include "ui/PreferencesDialog.h"
@@ -88,6 +89,16 @@ MainWindow::MainWindow(QWidget* parent)
 
     // Desktop integration (MPRIS2, system tray, screensaver inhibition)
     m_desktopIntegration = std::make_unique<DesktopIntegration>(m_engine.get(), m_playlistModel, this, this);
+    connect(m_desktopIntegration.get(), &DesktopIntegration::playRequested, this, [this]() {
+        if (m_engine) {
+            m_engine->play();
+        }
+    });
+    connect(m_desktopIntegration.get(), &DesktopIntegration::pauseRequested, this, [this]() {
+        if (m_engine) {
+            m_engine->pause();
+        }
+    });
     connect(m_desktopIntegration.get(), &DesktopIntegration::playPauseRequested, this, [this]() {
         if (m_engine) {
             m_engine->togglePause();
@@ -359,6 +370,13 @@ void MainWindow::setChromeVisible(bool visible)
             m_videoWidget->setCursor(Qt::BlankCursor);
         }
     }
+
+    if (m_playlistDock && m_playlistDock->isVisible()) {
+        const bool titleVisible = m_titleBar && m_titleBar->isVisible();
+        const bool ctrlVisible = m_controlBar && m_controlBar->isVisible();
+        m_playlistDock->setContentsMargins(0, titleVisible ? m_titleBar->height() : 0,
+                                           0, ctrlVisible ? m_controlBar->height() : 0);
+    }
 }
 
 void MainWindow::setPlaylistVisible(bool visible)
@@ -551,6 +569,11 @@ void MainWindow::playPrevious()
 void MainWindow::stopPlayback()
 {
     m_userStopped = true;
+    m_currentFile.clear();
+    if (m_autohideTimer) {
+        m_autohideTimer->stop();
+    }
+    setChromeVisible(true);
     if (m_engine) {
         m_engine->pause();
         m_engine->stop();
@@ -558,6 +581,7 @@ void MainWindow::stopPlayback()
     if (m_controlBar) {
         m_controlBar->setVideoInfo(false, QString(), QString(), QString());
     }
+    setWindowTitle(QStringLiteral("outPlayer"));
 }
 
 void MainWindow::dragEnterEvent(QDragEnterEvent* event)
@@ -692,6 +716,14 @@ void MainWindow::updateChromeLayout()
             m_controlBar->hide();
         }
     }
+
+    if (m_playlistDock) {
+        const bool titleVisible = m_titleBar && m_titleBar->isVisible();
+        const bool ctrlVisible = m_controlBar && m_controlBar->isVisible();
+        const int topInset = (m_playlistDock->isVisible() && titleVisible) ? m_titleBar->height() : 0;
+        const int bottomInset = (m_playlistDock->isVisible() && ctrlVisible) ? m_controlBar->height() : 0;
+        m_playlistDock->setContentsMargins(0, topInset, 0, bottomInset);
+    }
 }
 
 void MainWindow::setupEngineConnections()
@@ -721,6 +753,16 @@ void MainWindow::setupEngineConnections()
             return;
         }
         playNext();
+    });
+
+    connect(m_engine.get(), &engine::IPlaybackEngine::playbackStopped, this, [this]() {
+        if (m_userStopped) {
+            m_autohideTimer->stop();
+            setChromeVisible(true);
+            if (m_controlBar) {
+                m_controlBar->setVideoInfo(false, QString(), QString(), QString());
+            }
+        }
     });
 
     connect(m_engine.get(), &engine::IPlaybackEngine::fileLoaded, this, [this]() {
@@ -1509,6 +1551,176 @@ void MainWindow::setupCommandHandlers()
         if (m_osdOverlay) {
             m_osdOverlay->showMessage(QStringLiteral("Window Size: 2.0x"), 1500, OsdPosition::TopLeft);
         }
+    });
+    registerCommand(core::CommandId::CMD_WINDOW_MAXIMUM, [this](const QVariantMap&) {
+        if (isMaximized()) {
+            showNormal();
+        } else {
+            showMaximized();
+        }
+        updateChromeLayout();
+    });
+
+    // Open file / folder / URL / Blu-ray handlers (modeless so automation never blocks)
+    auto openFilesHandler = [this](const QVariantMap& args) {
+        if (args.contains(QStringLiteral("path"))) {
+            const QString path = args.value(QStringLiteral("path")).toString();
+            if (!path.isEmpty()) {
+                openMedia(path);
+            }
+            return;
+        }
+        auto* dialog = new QFileDialog(this, tr("Open Media Files"), QString(), MediaOpenController::supportedMediaFilterString());
+        dialog->setAttribute(Qt::WA_DeleteOnClose);
+        dialog->setFileMode(QFileDialog::ExistingFiles);
+        connect(dialog, &QFileDialog::filesSelected, this, [this](const QStringList& files) {
+            if (!files.isEmpty()) {
+                openFiles(files, true);
+            }
+        });
+        dialog->show();
+        dialog->raise();
+        dialog->activateWindow();
+    };
+    registerCommand(core::CommandId::CMD_OPEN_FILE, openFilesHandler);
+    registerCommand(core::CommandId::CMD_OPEN_FILE_STD, openFilesHandler);
+
+    registerCommand(core::CommandId::CMD_OPEN_FOLDER, [this](const QVariantMap& args) {
+        if (args.contains(QStringLiteral("path"))) {
+            const QString dir = args.value(QStringLiteral("path")).toString();
+            if (!dir.isEmpty()) {
+                openFolder(dir, true);
+            }
+            return;
+        }
+        auto* dialog = new QFileDialog(this, tr("Open Folder"));
+        dialog->setAttribute(Qt::WA_DeleteOnClose);
+        dialog->setFileMode(QFileDialog::Directory);
+        dialog->setOption(QFileDialog::ShowDirsOnly, true);
+        connect(dialog, &QFileDialog::fileSelected, this, [this](const QString& dir) {
+            if (!dir.isEmpty()) {
+                openFolder(dir, true);
+            }
+        });
+        dialog->show();
+        dialog->raise();
+        dialog->activateWindow();
+    });
+
+    registerCommand(core::CommandId::CMD_OPEN_URL, [this](const QVariantMap& args) {
+        if (args.contains(QStringLiteral("url"))) {
+            const QString url = args.value(QStringLiteral("url")).toString();
+            if (!url.isEmpty()) {
+                openMedia(url);
+            }
+            return;
+        }
+        auto* dlg = new OpenUrlDialog(this);
+        dlg->setAttribute(Qt::WA_DeleteOnClose);
+        connect(dlg, &QDialog::accepted, this, [this, dlg]() {
+            const QString url = dlg->url();
+            if (!url.isEmpty()) {
+                openMedia(url);
+            }
+        });
+        dlg->show();
+        dlg->raise();
+        dlg->activateWindow();
+    });
+
+    registerCommand(core::CommandId::CMD_OPEN_BLURAY, [this](const QVariantMap&) {
+        QString devPath;
+        if (m_deviceStreamManager) {
+            const auto drives = m_deviceStreamManager->availableOpticalDrives();
+            if (!drives.isEmpty()) {
+                devPath = drives.first().path;
+            }
+        }
+        openMedia(core::DeviceStreamManager::formatBlurayUrl(devPath));
+    });
+
+    // Additional playback, rotation, aspect, and audio commands
+    registerCommand(core::CommandId::CMD_PLAY_PAUSE_EXPLICIT, [this](const QVariantMap&) {
+        if (m_engine) {
+            m_engine->togglePause();
+            if (m_osdOverlay) {
+                m_osdOverlay->showMessage(
+                    m_engine->isPaused() ? QStringLiteral("Pause") : QStringLiteral("Play"),
+                    1500, OsdPosition::Center);
+            }
+        }
+    });
+
+    registerCommand(core::CommandId::CMD_SEEK_START, [this](const QVariantMap&) {
+        if (m_engine) {
+            m_engine->seek(0.0);
+            if (m_osdOverlay) {
+                m_osdOverlay->showMessage(QStringLiteral("Seek: Start (00:00)"), 1500, OsdPosition::Center);
+            }
+        }
+    });
+
+    registerCommand(core::CommandId::CMD_SEEK_END, [this](const QVariantMap&) {
+        if (m_engine) {
+            const double dur = std::max(0.0, m_engine->duration());
+            const double target = std::max(0.0, dur - 1.0);
+            m_engine->seek(target);
+            if (m_osdOverlay) {
+                m_osdOverlay->showMessage(
+                    QStringLiteral("Seek: End (%1)").arg(TimeFormatter::formatTime(target)),
+                    1500, OsdPosition::Center);
+            }
+        }
+    });
+
+    registerCommand(core::CommandId::CMD_VIDEO_ROTATE_90, [this](const QVariantMap&) {
+        if (m_engine) {
+            const int nextRot = (m_engine->rotation() + 90) % 360;
+            m_engine->setRotation(nextRot);
+            if (m_osdOverlay) {
+                m_osdOverlay->showMessage(QStringLiteral("Rotation: %1°").arg(nextRot), 1500, OsdPosition::TopLeft);
+            }
+        }
+    });
+
+    registerCommand(core::CommandId::CMD_AUDIO_NORMALIZE, [this](const QVariantMap&) {
+        if (m_engine) {
+            const bool nextNorm = !m_engine->isNormalizerEnabled();
+            m_engine->setNormalizerEnabled(nextNorm);
+            if (m_osdOverlay) {
+                m_osdOverlay->showMessage(
+                    nextNorm ? QStringLiteral("Normalizer: On") : QStringLiteral("Normalizer: Off"),
+                    1500, OsdPosition::TopLeft);
+            }
+        }
+    });
+
+    auto setAspectPreset = [this](const QString& ratio, const QString& label) {
+        if (m_engine) {
+            m_engine->setAspectRatio(ratio);
+            if (m_osdOverlay) {
+                m_osdOverlay->showMessage(QStringLiteral("Aspect Ratio: %1").arg(label), 1500, OsdPosition::TopLeft);
+            }
+        }
+    };
+    registerCommand(core::CommandId::CMD_ASPECT_RATIO_1, [setAspectPreset](const QVariantMap&) {
+        setAspectPreset(QStringLiteral("auto"), QStringLiteral("Auto (Default)"));
+    });
+    registerCommand(core::CommandId::CMD_ASPECT_RATIO_2, [setAspectPreset](const QVariantMap&) {
+        setAspectPreset(QStringLiteral("4:3"), QStringLiteral("4:3"));
+    });
+    registerCommand(core::CommandId::CMD_ASPECT_RATIO_3, [setAspectPreset](const QVariantMap&) {
+        setAspectPreset(QStringLiteral("16:9"), QStringLiteral("16:9"));
+    });
+    registerCommand(core::CommandId::CMD_ASPECT_RATIO_4, [setAspectPreset](const QVariantMap&) {
+        setAspectPreset(QStringLiteral("1.85:1"), QStringLiteral("1.85:1"));
+    });
+    registerCommand(core::CommandId::CMD_ASPECT_RATIO_5, [setAspectPreset](const QVariantMap&) {
+        setAspectPreset(QStringLiteral("2.35:1"), QStringLiteral("2.35:1"));
+    });
+
+    registerCommand(core::CommandId::CMD_EXIT, [this](const QVariantMap&) {
+        close();
     });
 
     // Wire general fallback dispatch for all commands in CommandRegistry to avoid unhandled shortcuts

@@ -144,7 +144,7 @@ def test_appstream_metainfo():
     assert elem_releases is not None
     release_elems = elem_releases.findall("release")
     assert len(release_elems) > 0
-    assert release_elems[0].attrib.get("version") == "0.1.0"
+    assert release_elems[0].attrib.get("version") == "0.1.1"
 
     print("AppStream metainfo tests PASSED.")
 

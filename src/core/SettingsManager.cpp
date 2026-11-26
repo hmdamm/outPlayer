@@ -151,12 +151,25 @@ bool SettingsManager::importFromFile(const QString& filePath) {
         return false;
     }
 
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly)) {
+        return false;
+    }
+    const QByteArray raw = file.read(1024 * 1024);
+    file.close();
+    if (raw.isEmpty() || raw.contains('\0')) {
+        return false;
+    }
+
     QSettings importSettings(filePath, QSettings::IniFormat);
     if (importSettings.status() != QSettings::NoError) {
         return false;
     }
 
     const auto keys = importSettings.allKeys();
+    if (keys.isEmpty()) {
+        return false;
+    }
     for (const QString& key : keys) {
         set(key, importSettings.value(key));
     }

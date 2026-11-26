@@ -95,6 +95,8 @@ public:
     [[nodiscard]] virtual int currentSubtitleTrack() const { return 0; }
     virtual bool setSubtitleTrack(int /*trackId*/) { return false; }
     virtual bool loadSubtitle(const QString& filePath) = 0;
+    virtual void setHardwareDecoder(const QString& /*hwdec*/) {}
+    virtual void setSubtitleLanguage(const QString& /*lang*/) {}
 
     // Subtitle Appearance & Font Customization
     [[nodiscard]] virtual QString subtitleFont() const { return QStringLiteral("sans-serif"); }
@@ -125,6 +127,8 @@ signals:
     void stateChanged(bool paused);
     void fileLoaded();
     void playbackFinished();
+    void playbackStopped();
+    void errorOccurred(const QString& message);
     void tracksChanged();
     void volumeChanged(double vol);
     void muteChanged(bool muted);

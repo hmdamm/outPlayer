@@ -151,6 +151,8 @@ public:
     [[nodiscard]] QMenu* trayMenu() const;
 
 signals:
+    void playRequested();
+    void pauseRequested();
     void playPauseRequested();
     void stopRequested();
     void nextRequested();
