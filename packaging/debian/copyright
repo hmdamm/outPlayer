@@ -1,7 +1,7 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: outplayer
 Upstream-Contact: outPlayer Developers <dev@outplayer.org>
-Source: https://github.com/outplayer/outplayer
+Source: https://github.com/hmdamm/outPlayer
 
 Files: *
 Copyright: 2026 outPlayer Developers <dev@outplayer.org>

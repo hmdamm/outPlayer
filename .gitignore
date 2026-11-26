@@ -31,6 +31,8 @@ compile_commands.json
 .superpowers
 .agents/
 skills-lock.json
+AGENTS.md
+GEMINI.md
 
 # External Reference Checkouts
 mpv/

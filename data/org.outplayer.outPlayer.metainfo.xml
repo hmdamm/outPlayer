@@ -35,13 +35,6 @@
     <binary>outplayer</binary>
   </provides>
 
-  <screenshots>
-    <screenshot type="default">
-      <caption>outPlayer media playback and playlist dock</caption>
-      <image>https://raw.githubusercontent.com/outplayer/outplayer/main/docs/screenshots/main_window.png</image>
-    </screenshot>
-  </screenshots>
-
   <categories>
     <category>AudioVideo</category>
     <category>Player</category>

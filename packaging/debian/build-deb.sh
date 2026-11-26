@@ -49,7 +49,7 @@ Architecture: ${ARCH}
 Maintainer: outPlayer Developers <dev@outplayer.org>
 Installed-Size: ${INSTALLED_SIZE}
 Depends: libc6 (>= 2.34), libqt6core6 | libqt6core6t64, libqt6gui6 | libqt6gui6t64, libqt6widgets6 | libqt6widgets6t64, libqt6opengl6 | libqt6opengl6t64, libqt6openglwidgets6 | libqt6openglwidgets6t64, libqt6qml6 | libqt6qml6t64, libqt6quick6 | libqt6quick6t64, libqt6svg6 | libqt6svg6t64, libmpv2 (>= 0.35.0)
-Homepage: https://github.com/outplayer/outplayer
+Homepage: https://github.com/hmdamm/outPlayer
 Description: Modern, high-performance Linux media player
  outPlayer is a feature-rich, high-performance Linux media player
  powered by Qt 6 and libmpv. It provides hardware-accelerated

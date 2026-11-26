@@ -15,7 +15,7 @@ To ensure that **outPlayer** is an entirely original, legally independent work, 
      - Documents visible user interfaces, keybindings, menu layouts, command naming, and behavioral responses into public technical specifications in `docs/spec/`.
      - Logs all observation sessions in this file.
    - **Implementer Role (Software Engineer)**:
-     - Works solely within the Linux/WSL2 development workspace.
+     - Works solely within the Linux development workspace.
      - Authors original source code based exclusively on specifications in `docs/spec/`, public Qt 6 documentation, and open-source `libmpv`/FFmpeg APIs.
      - Never views or requests disassembly or decompilation of the reference software.
 

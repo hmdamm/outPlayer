@@ -130,9 +130,7 @@ def test_appdir_runtime_execution():
     root_apprun = os.path.join(APPDIR_PATH, "AppRun")
     assert os.path.isfile(root_apprun), f"AppRun not found: {root_apprun}"
 
-    # In WSL2 environments where the repository resides on Windows drvfs (/mnt/c/...),
-    # executing mmap'd shared libraries from drvfs can trigger Windows 9P lock contention.
-    # We verify standalone execution by running AppRun in an isolated staging root in /tmp.
+    # Verify standalone execution by running AppRun in an isolated staging root in /tmp.
     staging_appdir = os.path.join("/tmp", APPDIR_NAME)
     shutil.rmtree(staging_appdir, ignore_errors=True)
     subprocess.run(["tar", "-xzf", TARBALL_PATH, "-C", "/tmp"], check=True)

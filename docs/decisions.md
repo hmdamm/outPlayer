@@ -86,7 +86,7 @@ Key components:
 Phase 0 establishes the baseline development environment, modern C++20 build pipeline, decoupled playback engine (`IPlaybackEngine` / `MpvEngine`), and a working video presentation surface (`VideoWidget`) integrated with `mpv_render_context` inside `MainWindow`.
 
 Before transitioning into Phase 1 (Black-Box Feature Inventory) and Phase 2 (Core Architecture & Command Engine), formal clearance of the Phase 0 Gate requires empirical verification that:
-1. The project builds cleanly with zero compiler warnings or errors on Linux/WSL2.
+1. The project builds cleanly with zero compiler warnings or errors on Linux.
 2. The entire unit and integration test suite executes cleanly under an automated headless display server (`xvfb`).
 3. The standalone `outplayer` binary successfully initializes `mpv_render_context`, renders video frames to an OpenGL surface, and handles media lifecycle to completion.
 4. Clean-room protocol and licensing constraints are strictly upheld.
@@ -172,7 +172,7 @@ We formally accept the Phase 1 Specification Baseline and declare the Phase 1 Ga
 2. **Automated Verification Suite:**
    - `python tests/test_phase1_specs.py`: 100% of test assertions pass across Tasks 1 through 6.
    - Clean-Room Guard (`test_clean_room_guard`): Zero violations detected in `src/` or `docs/spec/`.
-   - Linux C++ Test Suite (`wsl xvfb-run -a ctest --test-dir build --output-on-failure`): 3/3 tests pass cleanly (`test_dummy`, `test_mpv_engine`, `test_video_widget`).
+   - Linux C++ Test Suite (`xvfb-run -a ctest --test-dir build --output-on-failure`): 3/3 tests pass cleanly (`test_dummy`, `test_mpv_engine`, `test_video_widget`).
 
 3. **Clean-Room Protocol & Legal Compliance:**
    - All observation sessions documented under audit log entries `CR-001` through `CR-008` in `docs/clean-room-log.md`.

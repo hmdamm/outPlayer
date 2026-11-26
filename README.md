@@ -21,67 +21,73 @@ A modern, high-performance native Linux media player offering complete functiona
 - **Sleek Minimalist Interface**: Custom frameless window with Wayland/X11 system move/resize, 2.5s autohiding control bar with blank cursor suppression, timeline slider with chapter ticks and hover time preview, and crisp OSD overlay.
 - **Detachable Auxiliary Docks**: High-capacity playlist dock (F6) managing 10,000+ items with <1ms insertion and 1.58MB memory footprint, and compact audio/video/subtitle control panel (F7).
 - **Linux Desktop Integration**: Native MPRIS2 D-Bus interface (`org.mpris.MediaPlayer2.outplayer`), dynamic XDG screensaver inhibition during playback, and system tray integration.
-- **Multi-Distribution Releases**: Ready-to-use packages for Flatpak/Flathub, Debian/Ubuntu (`.deb`), Fedora/RHEL (`.rpm`), Arch Linux (`PKGBUILD` / AUR), and standalone zero-install AppImage.
+- **Multi-Distribution Packaging**: Packaging manifests and build recipes for Flatpak, Debian/Ubuntu (`.deb`), Fedora/RHEL (`.rpm`), Arch Linux (`PKGBUILD`), and standalone AppImage.
 - **100% Clean-Room Separation**: Zero proprietary assets, zero reverse compilation, and strictly verified clean-room audit logs.
 
 ---
 
 ## Installation & Distribution Channels
 
-Detailed installation, sandbox configuration, and maintenance instructions are available in [`docs/distribution.md`](docs/distribution.md).
+Detailed packaging, sandbox configuration, and build instructions are available in [`docs/distribution.md`](docs/distribution.md).
 
-### 1. Flatpak / Flathub (Recommended for Universal Linux)
+### 1. Flatpak (Local Build from Manifest — Flathub Pending)
+
+outPlayer is not yet published on Flathub. You can build and install it locally using the included Flatpak manifest:
 
 ```bash
-# Install from Flathub
-flatpak install flathub org.outplayer.outPlayer
+# Install KDE 6.8 Platform and SDK runtimes
+flatpak install -y flathub org.kde.Platform//6.8 org.kde.Sdk//6.8
+
+# Build and install locally from the Flatpak manifest
+flatpak-builder --user --install --force-clean build-flatpak packaging/flatpak/org.outplayer.outPlayer.json
 
 # Run outPlayer
 flatpak run org.outplayer.outPlayer
 ```
 
-### 2. Debian / Ubuntu / Linux Mint / Pop!_OS (.deb)
+### 2. Debian / Ubuntu / Linux Mint / Pop!_OS (`.deb` Packaging Script)
 
 ```bash
-# Download and install binary .deb package
-sudo dpkg -i outplayer_0.1.1-1_amd64.deb
-sudo apt-get install -f -y # resolve any missing dependencies
-
-# Or build locally using the included script:
+# Build the .deb package locally from source using the included script
 bash packaging/debian/build-deb.sh dist/
+
+# Install the generated .deb package
+sudo dpkg -i dist/outplayer_0.1.1-1_amd64.deb
+sudo apt-get install -f -y # resolve any missing dependencies
 ```
 
-### 3. Fedora / RHEL / CentOS Stream (.rpm)
+### 3. Fedora / RHEL / CentOS Stream (`.rpm` Packaging Script)
 
 ```bash
-# Install using dnf
-sudo dnf install ./outplayer-0.1.1-1.x86_64.rpm
-
-# Or build locally using the included script:
+# Build the .rpm package locally from source using the included script
 bash packaging/rpm/build-rpm.sh dist/
+
+# Install the generated .rpm package using dnf
+sudo dnf install ./dist/outplayer-0.1.1-1.*.x86_64.rpm
 ```
 
-### 4. Arch Linux & AUR (PKGBUILD)
+### 4. Arch Linux (`PKGBUILD` — AUR Pending)
+
+outPlayer is not yet published in the AUR. Build and install locally using the included `PKGBUILD`:
 
 ```bash
-# Install via AUR helper
-yay -S outplayer
-# or: paru -S outplayer
-
-# Or build manually using makepkg:
+# Build and install locally using makepkg
 cd packaging/arch && makepkg -si
 ```
 
-### 5. Standalone AppImage (Portable, Zero-Install)
+### 5. Standalone AppImage / Portable AppDir (Build Script)
 
 ```bash
-# Make executable and run immediately
-chmod +x outPlayer-0.1.1-x86_64.AppImage
-./outPlayer-0.1.1-x86_64.AppImage /path/to/media.mkv
+# Build portable AppDir (and AppImage when appimagetool is available)
+bash packaging/appimage/build-appimage.sh dist/
 
-# Or extract portable AppDir:
-tar -xzf outPlayer-0.1.1-x86_64.AppDir.tar.gz
-./outPlayer-0.1.1-x86_64.AppDir/AppRun
+# If AppImage was built:
+chmod +x dist/outPlayer-0.1.1-x86_64.AppImage
+./dist/outPlayer-0.1.1-x86_64.AppImage /path/to/media.mkv
+
+# Or extract and run the portable AppDir:
+tar -xzf dist/outPlayer-0.1.1-x86_64.AppDir.tar.gz
+./outPlayer-0.1.1-x86_64.AppDir/AppRun /path/to/media.mkv
 ```
 
 ---
@@ -180,7 +186,7 @@ outplayer/
 
 ### Build Prerequisites
 
-Ensure your Linux distribution or WSL2 environment has the required dependencies installed:
+Ensure your Linux distribution has the required dependencies installed:
 
 #### Ubuntu / Debian
 ```bash

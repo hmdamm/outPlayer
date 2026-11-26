@@ -21,26 +21,26 @@ This document tracks the roadmap, phase progression, and verification evidence f
 
 ## Phase 0: Development Environment & "Hello Player"
 
-**Gate Requirement:** Working `outplayer` binary playing video on Linux/WSL and unit test suite passing cleanly under `ctest` / `xvfb-run`.  
+**Gate Requirement:** Working `outplayer` binary playing video on Linux and unit test suite passing cleanly under `ctest` / `xvfb-run`.  
 **Phase Gate Status:** **CLEARED / COMPLETE** (ADR 003)
 
 | Task ID | Description | Status | Assignee / Role | Target Deliverables | Verification Evidence |
 |---|---|---|---|---|---|
 | **P0-T1** | Scaffolding, Governance Documents & Clean-Room Log | Done | Implementer | `TASKS.md`, `docs/decisions.md`, `docs/clean-room-log.md`, `THIRD_PARTY_NOTICES.md`, `.gitignore`, `README.md`, `tests/test_project_scaffold.py` | `python tests/test_project_scaffold.py` PASS, commit `772c1e2` |
-| **P0-T2** | CMake Build System with Qt 6 & libmpv | Done | Implementer | `CMakeLists.txt`, `src/CMakeLists.txt`, `tests/CMakeLists.txt` | `wsl cmake -B build -S . -G Ninja` succeeds, commit `8617263` |
-| **P0-T3** | Core Playback Engine Interface & libmpv Wrapper | Done | Implementer | `src/engine/IPlaybackEngine.h`, `src/engine/MpvEngine.h`, `src/engine/MpvEngine.cpp`, `tests/test_mpv_engine.cpp` | `wsl ctest -R test_mpv_engine` PASS, commit `73a084e` |
-| **P0-T4** | VideoWidget (mpv_render_context) & MainWindow Shell | Done | Implementer | `src/ui/VideoWidget.h`, `src/ui/VideoWidget.cpp`, `src/ui/MainWindow.h`, `src/ui/MainWindow.cpp`, `src/main.cpp`, `tests/test_video_widget.cpp` | `wsl xvfb-run -a ctest -R test_video_widget` PASS, commits `2e9a280`..`9470275` |
-| **P0-T5** | Phase 0 Verification & Gate Clearance | Done | Implementer | Verification runs, synthetic media playback test, status documentation updates | `wsl xvfb-run -a ./build/src/outplayer --test-run lavfi://nullsrc=s=640x360:d=1` exit code 0; 3/3 tests pass (100%) |
+| **P0-T2** | CMake Build System with Qt 6 & libmpv | Done | Implementer | `CMakeLists.txt`, `src/CMakeLists.txt`, `tests/CMakeLists.txt` | `cmake -B build -S . -G Ninja` succeeds, commit `8617263` |
+| **P0-T3** | Core Playback Engine Interface & libmpv Wrapper | Done | Implementer | `src/engine/IPlaybackEngine.h`, `src/engine/MpvEngine.h`, `src/engine/MpvEngine.cpp`, `tests/test_mpv_engine.cpp` | `ctest -R test_mpv_engine` PASS, commit `73a084e` |
+| **P0-T4** | VideoWidget (mpv_render_context) & MainWindow Shell | Done | Implementer | `src/ui/VideoWidget.h`, `src/ui/VideoWidget.cpp`, `src/ui/MainWindow.h`, `src/ui/MainWindow.cpp`, `src/main.cpp`, `tests/test_video_widget.cpp` | `xvfb-run -a ctest -R test_video_widget` PASS, commits `2e9a280`..`9470275` |
+| **P0-T5** | Phase 0 Verification & Gate Clearance | Done | Implementer | Verification runs, synthetic media playback test, status documentation updates | `xvfb-run -a ./build/src/outplayer --test-run lavfi://nullsrc=s=640x360:d=1` exit code 0; 3/3 tests pass (100%) |
 
 ### Phase 0 Gate Clearance Evidence
 - **Build Cleanliness:**
-  - `wsl cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=Debug` & `wsl cmake --build build`: 0 errors, 0 warnings.
-- **Unit & Integration Test Suite (`wsl xvfb-run -a ctest --test-dir build --output-on-failure`):**
+  - `cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=Debug` & `cmake --build build`: 0 errors, 0 warnings.
+- **Unit & Integration Test Suite (`xvfb-run -a ctest --test-dir build --output-on-failure`):**
   - `test_dummy`: PASSED (0.03s)
   - `test_mpv_engine`: PASSED (0.90s)
   - `test_video_widget`: PASSED (1.36s)
   - Result: 100% tests passed, 0 tests failed out of 3 (Total Test time = 2.43s).
-- **End-to-End Synthetic Media Playback (`wsl xvfb-run -a ./build/src/outplayer --test-run lavfi://nullsrc=s=640x360:d=1`):**
+- **End-to-End Synthetic Media Playback (`xvfb-run -a ./build/src/outplayer --test-run lavfi://nullsrc=s=640x360:d=1`):**
   - Exit code: `0`
   - Render Surface: `QOpenGLWidget` + `mpv_render_context` using OpenGL FBO (`rgba16f`, Mesa llvmpipe desktop OpenGL 4.6).
   - Stream lifecycle: Demuxed `lavfi` source (640x360 @ 25fps), initialized `libmpv` video output, painted video frames to widget surface, received EOF, exited cleanly.
@@ -75,7 +75,7 @@ This document tracks the roadmap, phase progression, and verification evidence f
 - **Automated Specification & Clean-Room Verification Suite (`python tests/test_phase1_specs.py`):**
   - All Phase 1 spec test suites pass (100% assertions satisfied).
   - Clean-room branding guard (`test_clean_room_guard`): zero forbidden proprietary branding ("PotPlayer", "Daum", "Kakao") in `src/`, code symbols, binary paths, or package IDs.
-- **Linux/WSL Test Suite (`wsl xvfb-run -a ctest --test-dir build --output-on-failure`):**
+- **Linux Test Suite (`xvfb-run -a ctest --test-dir build --output-on-failure`):**
   - 3/3 tests pass (100%), 0 failures.
 - **Clean-Room Audit Compliance:**
   - Complete observation entries CR-001 through CR-008 logged in `docs/clean-room-log.md`.
@@ -97,8 +97,8 @@ This document tracks the roadmap, phase progression, and verification evidence f
 
 ### Phase 2 Gate Clearance Evidence
 - **Build Cleanliness:**
-  - `wsl bash -c 'cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=Debug && cmake --build build -j$(nproc)'`: 0 errors, 0 warnings.
-- **Unit & Integration Test Suite (`wsl xvfb-run -a ctest --test-dir build --output-on-failure`):**
+  - `cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=Debug && cmake --build build -j$(nproc)`: 0 errors, 0 warnings.
+- **Unit & Integration Test Suite (`xvfb-run -a ctest --test-dir build --output-on-failure`):**
   - `test_dummy`: PASSED (0.01s)
   - `test_command_registry`: PASSED (0.49s) — verifies 253 canonical command registrations, string-to-enum resolution, info lookups, and callback dispatch.
   - `test_settings_manager`: PASSED (0.29s) — verifies INI persistence, XDG directory resolution, typed accessors, reactive `settingChanged` signals, and file export/import.
@@ -137,8 +137,8 @@ This document tracks the roadmap, phase progression, and verification evidence f
 
 ### Phase 3A Gate Clearance Evidence
 - **Build Cleanliness:**
-  - `wsl bash -c 'cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=Debug && cmake --build build -j$(nproc)'`: 0 errors, 0 warnings.
-- **Unit & Integration Test Suite (`wsl xvfb-run -a ctest --test-dir build --output-on-failure`):**
+  - `cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=Debug && cmake --build build -j$(nproc)`: 0 errors, 0 warnings.
+- **Unit & Integration Test Suite (`xvfb-run -a ctest --test-dir build --output-on-failure`):**
   - `test_dummy`: PASSED (0.01s)
   - `test_command_registry`: PASSED (0.21s)
   - `test_settings_manager`: PASSED (0.25s)
@@ -150,7 +150,7 @@ This document tracks the roadmap, phase progression, and verification evidence f
   - `test_osd_overlay`: PASSED (0.48s)
   - `test_main_window_ui`: PASSED (13.86s) — verifies composite layout, play/pause synchronization, volume slider/mute sync, timeline seeking, 2.5s chrome autohide, blank cursor suppression, and mouse motion chrome restoration.
   - Result: 10/10 passed (100%), 0 failures (Total Test time = 17.27s).
-- **End-to-End Synthetic Media Playback (`wsl xvfb-run -a ./build/src/outplayer --test-run lavfi://nullsrc=s=640x360:d=1`):**
+- **End-to-End Synthetic Media Playback (`xvfb-run -a ./build/src/outplayer --test-run lavfi://nullsrc=s=640x360:d=1`):**
   - Exit code: `0`
   - Render Surface: `QOpenGLWidget` + `mpv_render_context` using OpenGL FBO (`rgba16f`, Mesa llvmpipe desktop OpenGL 4.6).
   - Stream lifecycle: Demuxed `lavfi` source (640x360 @ 25fps), presented frames through `mpv_render_context_render()`, reached container EOF, and exited cleanly.
@@ -174,8 +174,8 @@ This document tracks the roadmap, phase progression, and verification evidence f
 
 ### Phase 3B Gate Clearance Evidence
 - **Build Cleanliness:**
-  - `wsl bash -c 'cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=Debug && cmake --build build -j$(nproc)'`: 0 errors, 0 warnings.
-- **Unit & Integration Test Suite (`wsl xvfb-run -a ctest --test-dir build --output-on-failure`):**
+  - `cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=Debug && cmake --build build -j$(nproc)`: 0 errors, 0 warnings.
+- **Unit & Integration Test Suite (`xvfb-run -a ctest --test-dir build --output-on-failure`):**
   - `test_dummy`: PASSED (0.01s)
   - `test_command_registry`: PASSED (0.20s)
   - `test_settings_manager`: PASSED (0.23s)
@@ -192,7 +192,7 @@ This document tracks the roadmap, phase progression, and verification evidence f
   - `test_playlist_dock`: PASSED (0.23s) — verifies dark dock view, proxy search filter, delegate rendering, and toolbar actions.
   - `test_main_window_navigation`: PASSED (0.96s) — verifies F6 dock toggle, right-click menu, drag & drop ingestion, and EOF auto-advance.
   - Result: 15/15 passed (100%), 0 failures (Total Test time = 11.88s).
-- **End-to-End Synthetic Media Playback (`wsl xvfb-run -a ./build/src/outplayer --test-run lavfi://nullsrc=s=640x360:d=1`):**
+- **End-to-End Synthetic Media Playback (`xvfb-run -a ./build/src/outplayer --test-run lavfi://nullsrc=s=640x360:d=1`):**
   - Exit code: `0`
   - Render Surface: `QOpenGLWidget` + `mpv_render_context` using OpenGL FBO (`rgba16f`, Mesa llvmpipe desktop OpenGL 4.6).
   - Stream lifecycle: Demuxed `lavfi` source (640x360 @ 25fps), presented frames through `mpv_render_context_render()`, reached container EOF, and exited cleanly.
@@ -216,8 +216,8 @@ This document tracks the roadmap, phase progression, and verification evidence f
 
 ### Phase 3C Gate Clearance Evidence
 - **Build Cleanliness:**
-  - `wsl bash -c 'cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=Debug && cmake --build build -j$(nproc)'`: 0 errors, 0 warnings.
-- **Unit & Integration Test Suite (`wsl xvfb-run -a ctest --test-dir build --output-on-failure`):**
+  - `cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=Debug && cmake --build build -j$(nproc)`: 0 errors, 0 warnings.
+- **Unit & Integration Test Suite (`xvfb-run -a ctest --test-dir build --output-on-failure`):**
   - `test_dummy`: PASSED (0.01s)
   - `test_command_registry`: PASSED (0.19s)
   - `test_settings_manager`: PASSED (0.25s)
@@ -239,7 +239,7 @@ This document tracks the roadmap, phase progression, and verification evidence f
   - `test_control_panel`: PASSED (0.34s) — verifies 4 tabs, slider ranges, resets, and engine bi-directional sync.
   - `test_main_window_av`: PASSED (4.28s) — verifies F7 toggle, CP button, bookmark hotkeys, capture hotkeys, and OSD display.
   - Result: 20/20 passed (100%), 0 failures (Total Test time = 18.53s).
-- **End-to-End Synthetic Media Playback (`wsl xvfb-run -a ./build/src/outplayer --test-run lavfi://nullsrc=s=640x360:d=1`):**
+- **End-to-End Synthetic Media Playback (`xvfb-run -a ./build/src/outplayer --test-run lavfi://nullsrc=s=640x360:d=1`):**
   - Exit code: `0`
   - Render Surface: `QOpenGLWidget` + `mpv_render_context` using OpenGL FBO (`rgba16f`, Mesa llvmpipe desktop OpenGL 4.6).
   - Stream lifecycle: Demuxed `lavfi` source (640x360 @ 25fps), presented frames through `mpv_render_context_render()`, reached container EOF, and exited cleanly.
@@ -263,8 +263,8 @@ This document tracks the roadmap, phase progression, and verification evidence f
 
 ### Phase 3D Gate Clearance Evidence
 - **Build Cleanliness:**
-  - `wsl bash -c 'cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=Debug && cmake --build build -j$(nproc)'`: 0 errors, 0 warnings.
-- **Unit & Integration Test Suite (`wsl xvfb-run -a ctest --test-dir build --output-on-failure`):**
+  - `cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=Debug && cmake --build build -j$(nproc)`: 0 errors, 0 warnings.
+- **Unit & Integration Test Suite (`xvfb-run -a ctest --test-dir build --output-on-failure`):**
   - `test_dummy`: PASSED (0.01s)
   - `test_command_registry`: PASSED (0.13s)
   - `test_settings_manager`: PASSED (0.17s)
@@ -291,7 +291,7 @@ This document tracks the roadmap, phase progression, and verification evidence f
   - `test_desktop_integration`: PASSED (0.25s) — verifies D-Bus graceful fallback, screensaver inhibit lifecycle, metadata updates, and tray menu actions.
   - `test_main_window_integration`: PASSED (1.79s) — verifies unified F5 preferences dialog, device/stream triggers, desktop remote signals, screensaver inhibition, and theme updates.
   - Result: 25/25 passed (100%), 0 failures (Total Test time = 21.99s).
-- **End-to-End Synthetic Media Playback (`wsl xvfb-run -a ./build/src/outplayer --test-run lavfi://nullsrc=s=640x360:d=1`):**
+- **End-to-End Synthetic Media Playback (`xvfb-run -a ./build/src/outplayer --test-run lavfi://nullsrc=s=640x360:d=1`):**
   - Exit code: `0`
   - Render Surface: `QOpenGLWidget` + `mpv_render_context` using OpenGL FBO (`rgba16f`, Mesa llvmpipe desktop OpenGL 4.6).
   - Stream lifecycle: Demuxed `lavfi` source (640x360 @ 25fps), presented frames through `mpv_render_context_render()`, reached container EOF, and exited cleanly.
@@ -338,8 +338,8 @@ This document tracks the roadmap, phase progression, and verification evidence f
 
 ### Phase 4 Gate Clearance Evidence
 - **Build Cleanliness:**
-  - `wsl bash -c 'cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=Debug && cmake --build build -j$(nproc)'`: 0 errors, 0 warnings.
-- **Unit & Integration Test Suite (`wsl xvfb-run -a ctest --test-dir build --output-on-failure`):**
+  - `cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=Debug && cmake --build build -j$(nproc)`: 0 errors, 0 warnings.
+- **Unit & Integration Test Suite (`xvfb-run -a ctest --test-dir build --output-on-failure`):**
   - `test_dummy`: PASSED (0.01s)
   - `test_command_registry`: PASSED (0.51s)
   - `test_settings_manager`: PASSED (0.26s)
@@ -373,7 +373,7 @@ This document tracks the roadmap, phase progression, and verification evidence f
 - **Sanitizer & Memory Safety Certification:**
   - Build configured with `-DENABLE_SANITIZERS=ON` incorporating AddressSanitizer and UndefinedBehaviorSanitizer.
   - Complete test suite executed cleanly under ASan/UBSan with 0 memory errors, 0 leaks, 0 buffer overflows, and 0 undefined behavior instances.
-- **End-to-End Synthetic Media Playback (`wsl xvfb-run -a ./build/src/outplayer --test-run lavfi://nullsrc=s=640x360:d=1`):**
+- **End-to-End Synthetic Media Playback (`xvfb-run -a ./build/src/outplayer --test-run lavfi://nullsrc=s=640x360:d=1`):**
   - Exit code: `0`
   - Render Surface: `QOpenGLWidget` + `mpv_render_context` using OpenGL FBO (`rgba16f`, Mesa llvmpipe desktop OpenGL 4.6).
   - Stream lifecycle: Demuxed `lavfi` source (640x360 @ 25fps), presented frames through `mpv_render_context_render()`, reached container EOF, and exited cleanly.

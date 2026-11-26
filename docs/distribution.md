@@ -249,6 +249,8 @@ Arch Linux users can install via AUR helpers or build directly using `makepkg`.
 
 ### 1. Installation via AUR Helper
 
+Once published to the AUR:
+
 ```bash
 # Install using yay
 yay -S outplayer
